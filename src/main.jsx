@@ -1,5 +1,6 @@
 import '@styles/custom.css';
 import '@styles/tailwind.css';
+import '@mantine/core/styles.css';
 
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
