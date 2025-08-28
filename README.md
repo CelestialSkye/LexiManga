@@ -1,39 +1,148 @@
-# 🚀 React and Tailwind Starter Kit
+# VocabularyManga
 
-Quickly set up a new `React.js` project with Tailwind CSS using the [starter kit](https://github.com/labnol/react-tailwind). The project was bootstrapped with Vite (replacing Create React App) and it uses the `singlefile` plugin to inline all the JavaScript and CSS files into a single minified file.
+A comprehensive manga vocabulary learning application built with React, Mantine UI, and Tailwind CSS.
 
-The latest version of the starter kit is built with React 19 and Tailwind CSS 4.
+## 🚀 Features
 
-## Live Demo
+- **Mobile-optimized Spotlight Search** - Fast, responsive search functionality
+- **Reusable Component Library** - Modular components for consistent UI
+- **Beautiful Animations** - Smooth Framer Motion animations
+- **Responsive Design** - Works perfectly on all devices
+- **Manga Integration** - Connect with AniList API
+- **AI-Powered Learning** - Gemini AI integration for vocabulary help
+- **Study Tools** - Comprehensive vocabulary learning features
 
-The [Digital Inspiration](https://digitalinspiration.com/) website is built with the Tailwind CSS, React.js and Vite. You can test the starter kit by opening the project in [StackBlitz](https://stackblitz.com/github/labnol/react-tailwind) or [CodeSandbox](https://codesandbox.io/p/sandbox/github/labnol/react-tailwind).
+## 🧱 Reusable Components
 
-[![Screenshot](screenshot.png)](https://stackblitz.com/github/labnol/react-tailwind)
+### Core Components
+- **SpotlightSearch** - Mobile-optimized search with customizable actions
+- **InfoModal** - Flexible modal for displaying information
+- **FeatureCard** - Animated feature display cards
+- **ActionButton** - Interactive buttons with animations
+- **AnimatedDropdown** - Beautiful dropdown menus with Framer Motion
 
-[![Open in StackBlitz](https://img.shields.io/badge/Open_In_StackBlitz-blue.svg?logo=stackblitz&style=flat-square)](https://stackblitz.com/github/labnol/react-tailwind) [![Open in CodeSandbox](https://img.shields.io/badge/Open_In_CodeSandbox-000000?logo=codesandbox&style=flat-square)](https://codesandbox.io/p/sandbox/github/labnol/react-tailwind)
+### Features
+- **Manga Management** - Overview, vocabulary, staff, study, and read tabs
+- **Profile System** - Activity, scores, vocabulary, study, and profile tabs
+- **Vocabulary Tools** - Word lists, forms, and study utilities
+- **Authentication** - Complete auth system with context and hooks
 
-### Available `npm` commands
+## 🛠️ Tech Stack
 
-In the project directory, you can run:
+- **Frontend**: React 18, Vite
+- **UI Library**: Mantine UI
+- **Styling**: Tailwind CSS
+- **Animations**: Framer Motion
+- **State Management**: Redux Toolkit
+- **API Integration**: AniList API, Gemini AI
+- **Authentication**: Custom auth service
 
-#### `npm run start`
+## 📁 Project Structure
 
-Runs the app in the development mode.
+```
+manga-vocab-app/
+├── public/                 # Static assets
+├── src/
+│   ├── assets/            # Images and media
+│   ├── components/        # Reusable UI components
+│   ├── pages/            # Page components
+│   ├── features/         # Feature-based modules
+│   │   ├── manga/        # Manga-related features
+│   │   ├── profile/      # User profile features
+│   │   └── vocab/        # Vocabulary features
+│   ├── services/         # API and external services
+│   ├── hooks/            # Custom React hooks
+│   ├── context/          # React context providers
+│   ├── utils/            # Utility functions
+│   ├── App.jsx           # Main application
+│   └── main.jsx          # Application entry point
+├── .env                   # Environment variables
+└── package.json          # Dependencies
+```
 
-Open `http://localhost:5173` to view it in the browser. The page will reload if you make edits. You will also see any lint errors in the console.
+## 🚀 Getting Started
 
-#### `npm run build`
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/CelestialSkye/VocabularyManga.git
+   cd VocabularyManga
+   ```
 
-Builds the React app for production to the `build` folder. It correctly bundles React in production mode and optimizes the build for the best performance.
+2. **Install dependencies**
+   ```bash
+   npm install
+   ```
 
-#### `npm run inline`
+3. **Set up environment variables**
+   ```bash
+   cp .env.example .env
+   # Add your API keys and configuration
+   ```
 
-This command will inline all the JavaScript and CSS files from the production build into a single minified file.
+4. **Start development server**
+   ```bash
+   npm run dev
+   ```
 
-## Connect with me
+## 📱 Mobile Optimization
 
-The React and Tailwind CSS starter is written by [Amit Agarwal](https://www.labnol.org/about).
+The application is built with mobile-first design principles:
+- Responsive layouts that adapt to all screen sizes
+- Touch-friendly interactions and gestures
+- Optimized performance for mobile devices
+- Progressive Web App capabilities
 
-[![X](https://img.shields.io/badge/Twitter-black.svg?logo=X&logoColor=white&style=flat)](https://x.com/labnol) [![YouTube](https://img.shields.io/badge/YouTube-%23FF0000.svg?logo=YouTube&logoColor=white&style=flat)](https://www.youtube.com/labnol) [![Google](https://img.shields.io/badge/Google-black.svg?logo=Google&logoColor=white&style=flat)](https://g.dev/amit) [![Instagram](https://img.shields.io/badge/Instagram-%23E4405F.svg?logo=Instagram&logoColor=white&style=flat)](https://instagram.com/labnol) [![LinkedIn](https://img.shields.io/badge/LinkedIn-%230077B5.svg?logo=linkedin&logoColor=white&style=flat)](https://linkedin.com/in/labnol) [![Stack Overflow](https://img.shields.io/badge/-Stackoverflow-FE7A16?logo=stack-overflow&logoColor=white&style=flat)](https://stackoverflow.com/users/512127/amit-agarwal)
+## 🎨 Component Usage
 
-If you have any questions or feedback, send an email at [amit@labnol.org](mailto:amit@labnol.org?subject=Tailwind+React).
+### SpotlightSearch
+```jsx
+import { SpotlightSearch } from './components';
+
+<SpotlightSearch
+  onActionClick={handleResult}
+  placeholder="Search anything..."
+  limit={5}
+/>
+```
+
+### InfoModal
+```jsx
+import { InfoModal } from './components';
+
+<InfoModal
+  opened={isOpen}
+  onClose={closeModal}
+  title="User Details"
+  data={userData}
+/>
+```
+
+### AnimatedDropdown
+```jsx
+import { AnimatedDropdown } from './components';
+
+<AnimatedDropdown
+  buttonText="Select Option"
+  items={options}
+  onItemSelect={handleSelect}
+/>
+```
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Add tests if applicable
+5. Submit a pull request
+
+## 📄 License
+
+This project is licensed under the MIT License.
+
+## 🙏 Acknowledgments
+
+- Mantine UI for the beautiful component library
+- Framer Motion for smooth animations
+- AniList for manga data
+- Google Gemini for AI-powered learning features
