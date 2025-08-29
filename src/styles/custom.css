@@ -1,3 +1,101 @@
+/* body styling */
 body {
-  background-color: #f5f5f5;
+  background-color: #fafdff !important;
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+  width: 100%;
 }
+
+.page-container {
+  width: 65%;
+  margin: 0 auto;
+  max-width: 1200px;
+}
+
+/* topbar styling */
+.topbar-wrapper {
+  width: 65%;
+  margin: 0 auto;
+  max-width: 1200px;
+  margin-top: 0;
+  margin-bottom: 1rem;
+  background-color: transparent !important;
+  background: transparent !important;
+  border-radius: 9999px !important;
+}
+
+.topbar-content {
+  background-color: #FFFFFF;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  border-radius: 9999px;
+  padding: 0.50rem 1rem;
+  margin-top: 1rem;
+}
+
+/* SpotlightSearch styling */
+.spotlight-action-item {
+  display: block !important;
+  width: 100% !important;
+  padding: 12px 16px !important;
+  margin-bottom: 8px !important;
+  border-bottom: 1px solid #f3f4f6 !important;
+  background-color: white !important;
+  border-radius: 12px !important;
+}
+
+.spotlight-action-item:last-child {
+  border-bottom: none !important;
+}
+
+.spotlight-action-label {
+  display: block !important;
+  width: 100% !important;
+  font-size: 14px !important;
+  font-weight: 400 !important;
+  color: #111827 !important;
+  line-height: 1.2 !important;
+}
+
+.spotlight-action-description {
+  display: block !important;
+  width: 100% !important;
+  font-size: 12px !important;
+  color: #6b7280 !important;
+  margin-top: 4px !important;
+}
+
+/* Spotlight search bar styling */
+.spotlight-search {
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+.spotlight-search:focus {
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+/* Target the search input wrapper */
+.spotlight-search-wrapper {
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+/* Target the search input itself */
+.spotlight-search input {
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+.spotlight-search input:focus {
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+
