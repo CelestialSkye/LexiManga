@@ -1,0 +1,33 @@
+{
+  "name": "vocabulary-manga-backend",
+  "version": "1.0.0",
+  "description": "Backend server for Vocabulary Manga app with AniList API integration",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js",
+    "test": "node test-simple.js",
+    "build": "echo 'No build step needed'"
+  },
+  "keywords": [
+    "manga",
+    "vocabulary",
+    "anilist",
+    "api",
+    "caching",
+    "express"
+  ],
+  "author": "AI Assistant + User collaboration",
+  "license": "MIT",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.18.2",
+    "node-cache": "^5.1.2"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

@@ -1,6 +1,6 @@
 /* body styling */
-body {
-  background-color: #fafdff !important;
+html, body {
+  background-color: #E5EBF1 !important;
   margin: 0;
   padding: 0;
   min-height: 100vh;
@@ -8,9 +8,19 @@ body {
 }
 
 .page-container {
-  width: 65%;
-  margin: 0 auto;
+  width: 85% !important;
+  margin: 0 auto !important;
   max-width: 1200px;
+  min-width: 0;
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+  .page-container {
+    width: 95% !important;
+    margin: 0 auto !important;
+    max-width: none;
+  }
 }
 
 /* topbar styling */
@@ -20,9 +30,18 @@ body {
   max-width: 1200px;
   margin-top: 0;
   margin-bottom: 1rem;
-  background-color: transparent !important;
-  background: transparent !important;
+  background-color: rgba(255, 255, 255, 0.95) !important;
+  background: rgba(255, 255, 255, 0.95) !important;
   border-radius: 9999px !important;
+  backdrop-filter: blur(10px);
+}
+
+/* Mobile responsive for topbar */
+@media (max-width: 768px) {
+  .topbar-wrapper {
+    width: 100%;
+    padding: 0;
+  }
 }
 
 .topbar-content {
@@ -35,17 +54,44 @@ body {
 
 /* SpotlightSearch styling */
 .spotlight-action-item {
-  display: block !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 12px !important;
   width: 100% !important;
   padding: 12px 16px !important;
-  margin-bottom: 8px !important;
-  border-bottom: 1px solid #f3f4f6 !important;
   background-color: white !important;
-  border-radius: 12px !important;
 }
+
 
 .spotlight-action-item:last-child {
   border-bottom: none !important;
+}
+
+/* Hover effect for spotlight items */
+.spotlight-action-item:hover {
+  background-color: #aa86ff !important;
+  color: #ffffff !important;
+  transition: all 0.3s ease !important;
+}
+
+.spotlight-action-item:hover .spotlight-action-label {
+  color: #ffffff !important;
+}
+
+.spotlight-action-item:hover .spotlight-action-description {
+  color: #e5e7eb !important;
+}
+
+.spotlight-action-item [data-mantine-spotlight-action-left-section] {
+  flex-shrink: 0 !important;
+  margin-right: 0 !important;
+}
+
+.spotlight-action-item [data-mantine-spotlight-action-content] {
+  flex: 1 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: center !important;
 }
 
 .spotlight-action-label {
@@ -97,5 +143,89 @@ body {
   outline: none !important;
   box-shadow: none !important;
 }
+
+/* Violet highlighting for search results */
+* mark,
+* [data-mantine-spotlight-highlight],
+* .mantine-Spotlight-action mark,
+* [data-mantine-spotlight-action] mark,
+* .spotlight-action-item mark {
+  background-color: #8b5cf6 !important;
+  color: #ffffff !important;
+  background: #8b5cf6 !important;
+  background-image: none !important;
+  padding: 1px 2px !important;
+  border-radius: 3px !important;
+  box-shadow: none !important;
+}
+
+/* Hide scrollbars  */
+* {
+  -ms-overflow-style: none;  
+  scrollbar-width: none;  
+}
+*::-webkit-scrollbar { 
+  display: none;  
+}
+
+.scrollbar-hide {
+  -ms-overflow-style: none;  /* Internet Explorer 10+ */
+  scrollbar-width: none;  /* Firefox */
+}
+.scrollbar-hide::-webkit-scrollbar { 
+  display: none;  
+}
+
+/* Custom tab styling */
+.custom-tab {
+  border-bottom-color: none !important;
+  border-bottom-shadow: none !important;
+}
+
+.custom-tab[data-active] {
+  border-bottom-color: #8b5cf6 !important;
+  border-bottom-width: 2px !important;
+}
+
+.custom-tab:hover {
+  background-color: #f3f4f6 !important;
+}
+
+/* Responsive tabs that stretch based on content */
+.custom-tab {
+  min-width: fit-content !important;
+  flex-shrink: 1 !important;
+  flex-grow: 1 !important;
+  flex-basis: auto !important;
+  overflow: visible !important;
+  text-overflow: unset !important;
+  white-space: nowrap !important;
+  text-align: center !important;
+  margin: 0 2px !important;
+  padding: 12px 6px !important;
+}
+
+
+
+
+/* TopBar animation */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.8s ease-out;
+}
+
+
+
+
 
 

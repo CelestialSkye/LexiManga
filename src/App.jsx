@@ -4,6 +4,7 @@ import { AuthProvider } from './context/AuthContext';
 import LandingPage from './pages/LandingPage';
 import Home from './pages/Home';
 import Dashboard from './pages/Dashboard';
+import MangaPage from './pages/MangaPage';
 
 const App = () => {
   return (
@@ -14,7 +15,7 @@ const App = () => {
             <Route path="/" element={<LandingPage />} />
             <Route path="/home" element={<Home />} />
             <Route path="/dashboard" element={<Dashboard />} />
-            {/* Add more routes here later */}
+            <Route path="/manga/:id" element={<MangaPage />} />
           </Routes>
         </BrowserRouter>
       </AuthProvider>
