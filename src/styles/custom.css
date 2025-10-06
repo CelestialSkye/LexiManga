@@ -1,6 +1,6 @@
 /* body styling */
 html, body {
-  background-color: #E5EBF1 !important;
+  background-color: #F9FAFB !important;
   margin: 0;
   padding: 0;
   min-height: 100vh;
@@ -208,20 +208,20 @@ html, body {
 
 
 
-/* TopBar animation */
-@keyframes fadeIn {
-  from {
+/* Language Select Pop Down Animation */
+@keyframes popDown {
+  0% {
     opacity: 0;
-    transform: translateY(-20px) scale(0.95);
+    transform: translateY(-10px) scale(0.95);
   }
-  to {
+  50% {
+    opacity: 0.9;
+    transform: translateY(2px) scale(1.02);
+  }
+  100% {
     opacity: 1;
     transform: translateY(0) scale(1);
   }
-}
-
-.animate-fade-in {
-  animation: fadeIn 0.8s ease-out;
 }
 
 

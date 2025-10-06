@@ -1,9 +1,12 @@
 import SpotlightSearch from './SpotlightSearch';
 import {useState} from 'react';
+import {useNavigate} from 'react-router-dom';
 import {IconLogout, IconMenu2, IconUser, IconHome, IconSearch} from '@tabler/icons-react';
 import { spotlight } from '@mantine/spotlight';
 const MobileFAB = () => {
     const [isExpanded, setIsExpanded] = useState(false);
+    const navigate = useNavigate();
+    
     const toggleExpanded = () => {
         setIsExpanded(!isExpanded);
     };
@@ -16,7 +19,10 @@ const MobileFAB = () => {
                 <div>
                     <button 
                         className="w-full h-12 bg-white rounded-lg flex flex-col items-center justify-center gap-1 transition-colors duration-200 group"
-                        onClick={() => console.log('Home clicked')}
+                        onClick={() => {
+                            navigate('/home');
+                            setIsExpanded(false);
+                        }}
                     >
                         <IconHome size={20} className="text-gray-600 group-hover:text-violet-600 transition-colors duration-200" />
                         <span className="text-xs text-gray-700 group-hover:text-violet-600 transition-colors duration-200">Home</span>
@@ -42,7 +48,10 @@ const MobileFAB = () => {
                 <div>
                     <button 
                         className="w-full h-12 bg-white rounded-lg flex flex-col items-center justify-center gap-1 transition-colors duration-200 group"
-                        onClick={() => console.log('Profile clicked')}
+                        onClick={() => {
+                            navigate('/profilepage');
+                            setIsExpanded(false);
+                        }}
                     >
                         <IconUser size={20} className="text-gray-600 group-hover:text-violet-600 transition-colors duration-200" />
                         <span className="text-xs text-gray-700 group-hover:text-violet-600 transition-colors duration-200">Profile</span>
@@ -53,7 +62,10 @@ const MobileFAB = () => {
                 <div>
                     <button 
                         className="w-full h-12 bg-white rounded-lg flex flex-col items-center justify-center gap-1 transition-colors duration-200 group"
-                        onClick={() => console.log('Home clicked')}
+                        onClick={() => {
+                            logout();
+                            setIsExpanded(false);
+                        }}
                     >
                         <IconLogout size={20} className="text-gray-600 group-hover:text-violet-600 transition-colors duration-200" />
                         <span className="text-xs text-gray-700 group-hover:text-violet-600 transition-colors duration-200">Home</span>

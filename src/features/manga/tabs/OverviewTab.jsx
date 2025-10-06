@@ -1,7 +1,7 @@
 const OverviewTab = ({ manga }) => {
   return (
-    <div className="bg-[#FBFBFB] p-4 rounded-[16px]">
-      <h2 className="text-xl font-bold mb-4">Overview</h2>
+    <div className="p-2 pb-4 rounded-[16px]">
+      <h2 className="text-xl font-bold mb-6">Overview</h2>
       
       {/* description */}
       {manga.description && (
@@ -78,13 +78,14 @@ const OverviewTab = ({ manga }) => {
       
       {/* score */}
       {manga.averageScore && (
-        <div className="mb-4">
+        <div className="mb-6">
           <strong>Average Score:</strong> 
           <span className="ml-2 px-2 py-1 bg-blue-100 text-blue-800 rounded text-sm">
             {manga.averageScore}/100
           </span>
         </div>
       )}
+      
     </div>
   );
 };

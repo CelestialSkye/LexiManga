@@ -18,13 +18,11 @@ const Home = () => {
           <TopBar />
         </div>
         
-        {/* Hero Banner Section */}
-        <section className="relative">
-          <HeroBanner />
-        </section>
+        {/* Hero Banner */}
+        <HeroBanner />
         
-        {/* Content Section - Separate from hero banner */}
-        <section className="relative z-20 bg-[#FBFBFB]">
+        {/* Content Section - Flows naturally after hero banner */}
+        <div className="relative z-20 bg-[#FBFBFB]">
           <div className="page-container py-8">
             <div className="bg-white rounded-2xl shadow-sm p-8">
               {/* Header */}
@@ -53,7 +51,7 @@ const Home = () => {
               </div>
             </div>
           </div>
-        </section>
+        </div>
       </div>
     </>
   );

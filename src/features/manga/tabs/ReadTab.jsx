@@ -3,8 +3,8 @@ const ReadTab = ({ manga }) => {
     <div>
       
       {/* Reading options */}
-      <div className="space-y-4">
-        <div className="bg-[#FBFBFB] p-4 rounded-[16px]">
+      <div>
+        <div className="p-2 rounded-[16px] mb-4">
           <h3 className="font-semibold mb-2">Reading Options</h3>
           <p className="text-gray-600 text-sm mb-3">
             Choose how you'd like to read this manga
@@ -24,7 +24,7 @@ const ReadTab = ({ manga }) => {
         </div>
         
         {/* Chapter list placeholder */}
-        <div className="bg-[#FBFBFB] p-4 rounded-lg">
+        <div className="p-2 rounded-lg mb-4">
           <h3 className="font-semibold mb-2">Chapters</h3>
           <p className="text-gray-600 text-sm">
             {manga.chapters ? `${manga.chapters} chapters available` : 'Chapter information not available'}
@@ -32,15 +32,15 @@ const ReadTab = ({ manga }) => {
         </div>
         
         {/* Reading progress */}
-        <div className="bg-[#FBFBFB] p-4 rounded-lg">
+        <div className="p-2 rounded-lg">
           <h3 className="font-semibold mb-2">Reading Progress</h3>
           <div className="space-y-2">
             <div className="flex justify-between text-sm">
               <span>Progress</span>
               <span>0%</span>
             </div>
-            <div className="w-full bg-[#FBFBFB] rounded-full h-2">
-              <div className="bg-[#FBFBFB] h-2 rounded-full" style={{ width: '0%' }}></div>
+            <div className="w-full  rounded-full h-2">
+              <div className=" h-2 rounded-full" style={{ width: '0%' }}></div>
             </div>
             <p className="text-xs text-gray-500">Start reading to track your progress</p>
           </div>
