@@ -44,16 +44,16 @@ const MangaPage = () => {
   const manga = data.data.Media; 
 
   return (
-    <>
-      {/* testing white bg  */}
-      <div className='bg-[#FBFBFB] '> 
-      {/*  banner section */}
-      <div className={`relative w-full  ${isMobile ? 'h-52' : 'h-96'}`}>
+      <>
+        {/* page background */}
+        <div className='bg-white rounded-t-lg'> 
+        {/*  banner section */}
+        <div className={`relative w-full bg-white ${isMobile ? 'h-52' : 'h-96'}`}>
         {/* TopBar overlap with the banner */}
         <div className={`${isDesktop ? 'absolute top-0 left-0 right-0 z-10' : ''}`}>
           <TopBar />
         </div>
-        {/* debug info
+        {/* debug
         <div className="text-white bg-black p-2 text-xs">
           isMobile: {isMobile ? 'true' : 'false'} | Height: {isMobile ? 'h-52' : 'h-96'}
         </div> */}
@@ -72,10 +72,11 @@ const MangaPage = () => {
                 className="w-full h-96 object-cover object-center"
               />
             )}
-
+            
+          
             {manga.coverImage?.large && (
               <div className={`absolute ${isMobile ? '-bottom-14' : '-bottom-18'} flex items-end gap-4`}>
-                <div className={`${isMobile ? 'ml-[calc((100vw-min(95vw,1200px))/2+16px)]' : 'ml-[calc((100vw-min(85vw,1200px))/2)]'}`}>
+                <div className={`${isMobile ? 'ml-[calc((100vw-min(95vw,1200px))/2+2px)]' : 'ml-[calc((100vw-min(85vw,1200px))/2)]'}`}>
                   <img 
                     src={manga.coverImage.large} 
                     alt={manga.title?.english || manga.title?.romaji}
@@ -83,7 +84,7 @@ const MangaPage = () => {
                   />
                 </div>
                 <div className="text-black">
-                  <h1 className={`${isMobile ? 'text-sm' : 'text-1xl'} font-bold mb-4 whitespace-nowrap`}>
+                  <h1 className={`${isMobile ? 'text-base' : 'text-1xl'} font-bold mb-4 whitespace-nowrap`}>
                     {manga.title?.english || manga.title?.romaji}
                   </h1>
                   {manga.title?.english && manga.title.romaji !== manga.title.english && (
@@ -117,20 +118,15 @@ const MangaPage = () => {
                  </div>
                )}
              </div>
-
-
-
-
-        {/* testing white bg  */}
       </div>
 
       
              <div className="page-container">
                <div className="relative mt-6">
                  {/* left section - fixed position on desktop */}
-                 {isDesktop && (
-                   <div className="absolute left-0 w-48">
-                     <div className="p-4 bg-white rounded-[16px] shadow-sm mt-2">
+                  {isDesktop && (
+                    <div className="absolute left-0 w-48">
+                      <div className="p-4 bg-white rounded-[16px] shadow-sm mt-0">
                        <h3 className="text-xs font-bold mb-3">Quick Info</h3>
                        <div className="space-y-2">
                          <div>
@@ -158,9 +154,9 @@ const MangaPage = () => {
                    </div>
                  )}
 
-                 {/* main container - positioned to the right of sidebar */}
-                 <div className={`w-full ${isDesktop ? 'ml-48 max-w-[calc(100%-192px)]' : ''}`}>
-            <div className='pt-2 pb-4 px-4'>
+                {/* main container - positioned to the right of sidebar */}
+                <div className={`w-full ${isDesktop ? 'ml-48 max-w-[calc(100%-192px)] pl-4 pr-4' : ''}`}>
+           <div className='mt-0 pb-4 px-4 bg-white rounded-[16px] shadow-sm'>
   
       {/* scrollbuttons content (for now) */}
       <div className="mb-4">

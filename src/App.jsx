@@ -5,6 +5,8 @@ import LandingPage from './pages/LandingPage';
 import Home from './pages/Home';
 import Dashboard from './pages/Dashboard';
 import MangaPage from './pages/MangaPage';
+import Auth from './pages/Auth';
+import ProfilePage from './pages/ProfilePage';
 
 const App = () => {
   return (
@@ -13,9 +15,11 @@ const App = () => {
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<LandingPage />} />
+            <Route path="/auth" element={<Auth />} />
             <Route path="/home" element={<Home />} />
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/manga/:id" element={<MangaPage />} />
+            <Route path="/profile" element={<ProfilePage />} />
           </Routes>
         </BrowserRouter>
       </AuthProvider>

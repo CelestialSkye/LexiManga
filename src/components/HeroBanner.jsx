@@ -84,7 +84,7 @@ const HeroBanner = () => {
               }}
               transition={{
                 duration: 2,
-                ease: [0.34, 1.35, 0.64, 1], // Bouncy easing effect
+                ease: [0.34, 1.35, 0.64, 1],
                 delay: index * (animationConfig.staggerDelay / 1000)
               }}
             >
@@ -183,11 +183,9 @@ const HeroBanner = () => {
           {paragraph}
         </motion.p>
       </motion.div>
-
-      {/* Spacer for proper spacing */}
-      <div className="hero-banner-spacer h-48 w-full" />
     </div>
   );
 };
+
 
 export default HeroBanner;
