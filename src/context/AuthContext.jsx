@@ -1,4 +1,3 @@
-
 import { createContext, useContext, useEffect, useState } from "react";
 import { auth, db } from "../config/firebase"; 
 import {
@@ -9,6 +8,9 @@ import {
   updateProfile,
 } from "firebase/auth";
 import { doc, setDoc, getDoc } from "firebase/firestore";
+import { avatarService } from "../services/avatarService";
+
+
 
 const AuthContext = createContext();
 
@@ -64,6 +66,43 @@ export const AuthProvider = ({ children }) => {
         setProfile(null);
     };
 
+    //Update Avatar
+    const updateAvatar = async (file) => {
+      try {
+        if (!user) 
+          throw new Error('User not found');
+        
+        const avatarUrl = await avatarService.updateAvatar(user.uid, file);
+        
+        // Update local state
+        setProfile( prev => ({ ...prev, avatarUrl }));
+        return avatarUrl;
+      } catch (error) {
+        console.error('Error updating avatar:', error);
+        throw error;
+      }
+    };
+    
+    //Delete Avatar
+    const deleteAvatar = async () => {
+      try {
+        if (!user) throw new Error('No user logged in');
+        
+        await avatarService.deleteAvatar(user.uid);
+        
+        // Update local profile state
+        setProfile(prev => ({
+          ...prev,
+          avatarUrl: null
+        }));
+        
+        return true;
+      } catch (error) {
+        console.error('Avatar delete error:', error);
+        throw error;
+      }
+    };
+
 
     //Keep track of user state
     useEffect(() => {
@@ -93,6 +132,8 @@ export const AuthProvider = ({ children }) => {
         user,
         profile,
         loading,
+        updateAvatar,
+        deleteAvatar,
     };
 
     return (

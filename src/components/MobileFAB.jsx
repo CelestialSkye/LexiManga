@@ -49,7 +49,7 @@ const MobileFAB = () => {
                     <button 
                         className="w-full h-12 bg-white rounded-lg flex flex-col items-center justify-center gap-1 transition-colors duration-200 group"
                         onClick={() => {
-                            navigate('/profilepage');
+                            navigate('/profile');
                             setIsExpanded(false);
                         }}
                     >

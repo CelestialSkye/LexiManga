@@ -23,34 +23,11 @@ html, body {
   }
 }
 
-/* topbar styling */
-.topbar-wrapper {
-  width: 65%;
-  margin: 0 auto;
-  max-width: 1200px;
-  margin-top: 0;
-  margin-bottom: 1rem;
-  background-color: rgba(255, 255, 255, 0.95) !important;
-  background: rgba(255, 255, 255, 0.95) !important;
-  border-radius: 9999px !important;
-  backdrop-filter: blur(10px);
-}
 
-/* Mobile responsive for topbar */
-@media (max-width: 768px) {
-  .topbar-wrapper {
-    width: 100%;
-    padding: 0;
-  }
-}
 
-.topbar-content {
-  background-color: #FFFFFF;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-  border-radius: 9999px;
-  padding: 0.50rem 1rem;
-  margin-top: 1rem;
-}
+
+
+
 
 /* SpotlightSearch styling */
 .spotlight-action-item {
