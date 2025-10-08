@@ -46,7 +46,7 @@ const MangaPage = () => {
   return (
       <>
         {/* page background */}
-        <div className='bg-white rounded-t-lg'> 
+        <div className='bg-white rounded-b-[16px] shadow-sm'> 
         {/*  banner section */}
         <div className={`relative w-full bg-white ${isMobile ? 'h-52' : 'h-96'}`}>
         {/* TopBar overlap with the banner */}
@@ -58,7 +58,7 @@ const MangaPage = () => {
           isMobile: {isMobile ? 'true' : 'false'} | Height: {isMobile ? 'h-52' : 'h-96'}
         </div> */}
         {manga.bannerImage && (
-          <div className="mb-6">
+          <div className="mb-6 relative">
             {isMobile ? (
               <img 
                 src={manga.bannerImage} 
@@ -71,9 +71,13 @@ const MangaPage = () => {
                 alt={`${manga.title?.english || manga.title?.romaji} banner`}
                 className="w-full h-96 object-cover object-center"
               />
+              
             )}
+            {/* black fading effect for topof the banner */}
+            <div className="absolute top-0 left-0 w-full h-1/3 bg-gradient-to-b from-black/70 to-transparent"></div>
+            {/* bottom */}
+            <div class="absolute bottom-0 left-0 w-full h-1/3 bg-gradient-to-t from-black/70 to-transparent"></div>
             
-          
             {manga.coverImage?.large && (
               <div className={`absolute ${isMobile ? '-bottom-14' : '-bottom-18'} flex items-end gap-4`}>
                 <div className={`${isMobile ? 'ml-[calc((100vw-min(95vw,1200px))/2+2px)]' : 'ml-[calc((100vw-min(85vw,1200px))/2)]'}`}>
@@ -101,7 +105,7 @@ const MangaPage = () => {
              {/* Tab Navigation */}
              <div className="mb-2 mt-18 md:mt-18">
                {isDesktop ? (
-                 <div className="ml-[calc((100vw-min(85vw,1200px))/2+192px)] mr-[calc((100vw-min(85vw,1200px))/2)] px-4">
+                 <div className="ml-[calc((100vw-min(85vw,1200px))/2+192px)] mr-[calc((100vw-min(85vw,1200px))/2)] pl-4 " >
                    <ScrollButtons
                      items={tabs}
                      activeItem={activeTab}
@@ -121,7 +125,7 @@ const MangaPage = () => {
       </div>
 
       
-             <div className="page-container">
+             <div className="page-container pb-6">
                <div className="relative mt-6">
                  {/* left section - fixed position on desktop */}
                   {isDesktop && (
@@ -155,7 +159,7 @@ const MangaPage = () => {
                  )}
 
                 {/* main container - positioned to the right of sidebar */}
-                <div className={`w-full ${isDesktop ? 'ml-48 max-w-[calc(100%-192px)] pl-4 pr-4' : ''}`}>
+                <div className={`w-full ${isDesktop ? 'ml-48 max-w-[calc(100%-192px)] pl-4 ' : ''}`}>
            <div className='mt-0 pb-4 px-4 bg-white rounded-[16px] shadow-sm'>
   
       {/* scrollbuttons content (for now) */}
@@ -164,11 +168,9 @@ const MangaPage = () => {
           <OverviewTab manga={manga} />
         )}
         
-        <div className='mb-4'>
           {activeTab === 'read' && (
             <ReadTab manga={manga} />
           )}
-          </div>
         
                  {activeTab === 'vocabulary' && (
                    <VocabularyTab manga={manga} />

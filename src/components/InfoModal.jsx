@@ -60,9 +60,7 @@ const InfoModal = ({
           <Text size="xl" fw={700} className="text-gray-800 mb-2">
             {title}
           </Text>
-          <Text size="md" c="dimmed" className="text-gray-600">
-            This is a sample modal showing information
-          </Text>
+          
         </div>
         
         {data.length > 0 && (
