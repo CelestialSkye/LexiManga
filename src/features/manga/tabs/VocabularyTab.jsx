@@ -13,13 +13,20 @@ const VocabularyTab = ({ manga }) => {
       >
         Add Word
       </button>
+      
+      <div className="mt-4">
+        test
+      </div>
+      
       <AddWordModal
         manga={manga}
         opened={isAddWordModalOpen}
         closeModal={() => setIsAddWordModalOpen(false)}
       />
     </div>
+    
   );
+
 };
 
 export default VocabularyTab;

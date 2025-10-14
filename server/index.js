@@ -392,6 +392,29 @@ app.get('/api/word-difficulty', async (req, res) => {
   }
 });
 
+// Get user's vocabulary words for a specific manga
+app.get('/api/user-words', async (req, res) => {
+  try {
+    const { userId, mangaId } = req.query;
+    
+    if (!userId || !mangaId) {
+      return res.status(400).json({ error: 'userId and mangaId required' });
+    }
+
+    // This would connect to your Firestore database
+    // For now, return mock data
+    const mockWords = [
+      { word: 'こんにちは', translation: 'Hello', context: 'Greeting', mangaId, userId },
+      { word: 'ありがとう', translation: 'Thank you', context: 'Politeness', mangaId, userId },
+    ];
+
+    res.json(mockWords);
+  } catch (error) {
+    console.error('Error fetching user words:', error);
+    res.status(500).json({ error: 'Failed to fetch user words' });
+  }
+});
+
 app.get('/api/health', (req, res) => {
   res.json({ status: 'OK', port: PORT });
 });

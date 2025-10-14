@@ -4,7 +4,7 @@ const StudyTab = ({ manga }) => {
   return (
     <div className="p-6">
       <h2 className="text-xl font-bold mb-4">Study</h2>
-      <SRSGame />
+      <SRSGame manga={manga} />
     </div>
   );
 };

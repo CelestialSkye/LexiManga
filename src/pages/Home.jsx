@@ -1,6 +1,6 @@
 import { Text } from '@mantine/core';
 import { useNavigate } from 'react-router-dom';
-import { ActionButton} from '../components';
+import { ActionButton } from '../components';
 import TopBar from '../components/TopBar';
 import HeroBanner from '../components/HeroBanner';
 import WordDifficultyTest from '../components/WordDifficultyTest';
@@ -49,10 +49,7 @@ const Home = () => {
                         <WordDifficultyTest />
                       </div>
 
-                      {/* SRS Game */}
-                      <div className="mb-8">
-                        <SRSGame />
-                      </div>
+                      {/* SRS Game - Removed from here, now only in StudyTab */}
 
               {/* Back to Landing */}
               <div className="text-center mt-6">
