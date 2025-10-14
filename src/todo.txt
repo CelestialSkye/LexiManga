@@ -1,0 +1,27 @@
+Make the banner upload for the profile page
+polish some of the info inside the profile page
+
+start with the anime rating, chapter number, status, and favourite button > add the ability to delete the thing
+
+function for adding word and its meaning to the db, also use gemini api to get a translation for the word
+>word
+>translation with the api button
+>context 
+>what chapter is it from
+>what page
+>save
+
+view words inside the manga page
+
+create the word difficulty decider
+
+view all the data inside the profile page
+
+use the react bits library one way or another
+
+use hover effect extensivley    
+
+// Word difficulty system
+
+A system where the word that hte user is trying to translate, whether using the gemini api or manually,
+will display a difficulty rating, whether in numbers or in 3 levels, easy, medium, hard

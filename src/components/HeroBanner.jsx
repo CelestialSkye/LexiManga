@@ -91,7 +91,7 @@ const HeroBanner = () => {
               <img
                 src={heroImages[index]}
                 alt={`Hero Image ${index + 1}`}
-                className="w-full h-full object-cover"
+                className="w-full h-full object-cover rounded-[8px]"
               />
             </motion.div>
           );

@@ -3,12 +3,13 @@ import { useAuth } from '../context/AuthContext';
 import { Alert, Modal } from '@mantine/core';
 import ActionButton from './ActionButton';
 import InfoModal from './InfoModal';
-import defaultAvatar from '../assets/defaultAvatar.jpg';
 import { useMediaQuery } from '@mantine/hooks';
+const defaultBanner = new URL('../assets/defaultBanner.jpg', import.meta.url).href;
 
-const AvatarUpload = ({ size = "sm" }) => {
-    const { profile, updateAvatar } = useAuth();
+const BannerUpload = ({ size = "sm" }) => {
+    const { profile, updateBanner } = useAuth();
     const [isModalOpen, setIsModalOpen] = useState(false);
+    
     const [selectedFile, setSelectedFile] = useState(null);
     const [preview, setPreview] = useState(null);
     const [loading, setLoading] = useState(false);
@@ -17,6 +18,8 @@ const AvatarUpload = ({ size = "sm" }) => {
 
     const isMobile = useMediaQuery('(max-width: 768px)');
     const isDesktop = useMediaQuery('(min-width: 769px)');
+
+    
 
     const handleFileChange = (e) => {
         const file = e.target.files[0];
@@ -30,7 +33,7 @@ const AvatarUpload = ({ size = "sm" }) => {
         setLoading(true);
         setError('');
         try {
-            await updateAvatar(selectedFile);
+            await updateBanner(selectedFile);
             setIsModalOpen(false);
             setSelectedFile(null);
             setPreview(null);
@@ -43,29 +46,41 @@ const AvatarUpload = ({ size = "sm" }) => {
   
     return (
       <>
-        <div onClick={() => setIsModalOpen(true)} className="cursor-pointer">
-            {profile?.avatarUrl ? (
-
-                isMobile ? (
-                    <img src={profile.avatarUrl} className="w-24 h-24 rounded-[16px] object-cover" />
-                ) : (
-                    <img src={profile.avatarUrl} className="w-48 h-48 rounded-[16px] object-cover" />
-                )
-            ) : (
-                isMobile ? (
-                    <img src={defaultAvatar} className="w-24 h-24 rounded-[16px] object-cover" />
-                ) : (
-                    <img src={defaultAvatar} className="w-48 h-48 rounded-[16px] object-cover" />
-                )
-            )}
-               
+        <div className="relative">
+        {profile?.bannerUrl ? (
+    // User's banner - check mobile/desktop
+    isMobile ? (
+        <img src={profile.bannerUrl} className="w-full h-52 rounded-[16px] object-cover" />
+    ) : (
+        <img src={profile.bannerUrl} className="w-full h-96 rounded-[16px] object-cover" />
+    )
+) : (
+    // Default banner - check mobile/desktop  
+    isMobile ? (
+        <img src={defaultBanner} className="w-full h-52 rounded-[16px] object-cover" />
+    ) : (
+        <img src={defaultBanner} className="w-full h-96 rounded-[16px] object-cover" />
+    )
+)}
+            
+            {/* Edit Button */}
+            <button 
+                onClick={() => {
+                    
+                    setIsModalOpen(true);
+                }}
+                className="absolute top-2 right-2 bg-black/50 hover:bg-black/70 text-white px-3 py-1 rounded text-sm transition-colors z-20"
+            >
+                Edit
+            </button>
         </div>
   
         <Modal 
           opened={isModalOpen}
           onClose={() => setIsModalOpen(false)}
-          title="Upload Avatar"
+          title="Upload Banner"
           centered
+          zIndex={1000}
         >
             <div className="p-4">
                 <input 
@@ -86,7 +101,7 @@ const AvatarUpload = ({ size = "sm" }) => {
                 
                 {preview && (
                     <div className="mb-4">
-                        <img src={preview} alt="Preview" className="w-32 h-32 rounded-full object-cover mx-auto" />
+                        <img src={preview} alt="Preview" className="w-full h-24 rounded-lg object-cover mx-auto" />
                     </div>
                 )}
                 
@@ -96,7 +111,7 @@ const AvatarUpload = ({ size = "sm" }) => {
                     disabled={loading || !selectedFile}
                     className="w-full"
                 >
-                    Upload Avatar
+                    Upload Banner
                 </ActionButton>
                 
                 {error && <Alert color="red" className="mt-4">{error}</Alert>}
@@ -106,4 +121,4 @@ const AvatarUpload = ({ size = "sm" }) => {
     );
   };
 
-export default AvatarUpload;
+export default BannerUpload;

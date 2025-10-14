@@ -7,6 +7,7 @@ import StudyTab from '../features/profile/tabs/StudyTab';
 import VocabularyTab from '../features/profile/tabs/VocabularyTab';
 import TopBar from '../components/TopBar';
 import AvatarUpload from '../components/AvatarUpload';
+import BannerUpload from '../components/BannerUpload';
 import { useMediaQuery } from '@mantine/hooks';
 import { useAuth } from '../context/AuthContext';
 
@@ -37,8 +38,7 @@ const ProfilePage = () => {
     streak: '0 days',
     wordsLearned: '0',
     achievements: ['First Steps', 'Week Warrior'],
-    avatar: 'https://via.placeholder.com/200x300/6366f1/ffffff?text=Profile',
-    banner: 'https://via.placeholder.com/1200x400/8b5cf6/ffffff?text=Profile+Banner'
+    avatar: 'https://via.placeholder.com/200x300/6366f1/ffffff?text=Profile'
   };
 
   return (
@@ -52,27 +52,15 @@ const ProfilePage = () => {
             <TopBar />
           </div>
           
-          {/* Profile Banner */}
+          {/* banner */}
           <div className="mb-6 relative">
-            {isMobile ? (
-              <img 
-                src={profileData.banner} 
-                alt="Profile banner"
-                className="w-full h-52 object-cover object-center"
-              />
-            ) : (
-              <img 
-                src={profileData.banner} 
-                alt="Profile banner"
-                className="w-full h-96 object-cover object-center"
-              />
-            )}
+            <BannerUpload size="lg" />
             {/* black fading effect for top of the banner */}
-            <div className="absolute top-0 left-0 w-full h-1/3 bg-gradient-to-b from-black/70 to-transparent"></div>
+            <div className="absolute top-0 left-0 w-full h-1/3 bg-gradient-to-b from-black/70 to-transparent pointer-events-none"></div>
             {/* bottom */}
-            <div className="absolute bottom-0 left-0 w-full h-1/3 bg-gradient-to-t from-black/70 to-transparent"></div>
+            <div className="absolute bottom-0 left-0 w-full h-1/3 bg-gradient-to-t from-black/70 to-transparent pointer-events-none"></div>
             
-            {/* Profile Avatar and Name */}
+            {/* avatar */}
             <div className={`absolute ${isMobile ? '-bottom-14' : '-bottom-18'} flex items-end gap-4`}>
               <div className={`${isMobile ? 'ml-[calc((100vw-min(95vw,1200px))/2+2px)]' : 'ml-[calc((100vw-min(85vw,1200px))/2)]'}`}>
                 <div className={`${isMobile ? 'w-[96px] min-w-[96px] max-w-[96px]' : 'w-48'} h-[auto]`}>
