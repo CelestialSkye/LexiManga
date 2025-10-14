@@ -9,6 +9,7 @@ import {
 } from "firebase/auth";
 import { doc, setDoc, getDoc } from "firebase/firestore";
 import { avatarService } from "../services/avatarService";
+import { bannerService } from "../services/bannerService";
 
 
 
@@ -104,6 +105,44 @@ export const AuthProvider = ({ children }) => {
     };
 
 
+    //Update Banner
+    const updateBanner = async (file) => {
+      try {
+        if (!user) 
+          throw new Error('User not found');
+        
+        const bannerUrl = await bannerService.updateBanner(user.uid, file);
+        
+        // Update local state
+        setProfile( prev => ({ ...prev, bannerUrl }));
+        return bannerUrl;
+      } catch (error) {
+        console.error('Error updating banner:', error);
+        throw error;
+      }
+    };
+    
+    //Delete Banner
+    const deleteBanner = async () => {
+      try {
+        if (!user) throw new Error('No user logged in');
+        
+        await bannerService.deleteBanner(user.uid);
+        
+        // Update local profile state
+        setProfile(prev => ({
+          ...prev,
+          bannerUrl: null
+        }));
+        
+        return true;
+      } catch (error) {
+        console.error('Banner delete error:', error);
+        throw error;
+      }
+    };  
+
+
     //Keep track of user state
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
@@ -134,6 +173,8 @@ export const AuthProvider = ({ children }) => {
         loading,
         updateAvatar,
         deleteAvatar,
+        updateBanner,
+        deleteBanner,
     };
 
     return (

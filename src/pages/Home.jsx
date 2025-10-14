@@ -1,8 +1,9 @@
 import { Text } from '@mantine/core';
 import { useNavigate } from 'react-router-dom';
-import { ActionButton } from '../components';
+import { ActionButton} from '../components';
 import TopBar from '../components/TopBar';
 import HeroBanner from '../components/HeroBanner';
+import WordDifficultyTest from '../components/WordDifficultyTest';
 import { useMediaQuery } from '@mantine/hooks';
 
 const Home = () => {
@@ -42,6 +43,16 @@ const Home = () => {
                   Track your progress, study with spaced repetition, and build your language skills.
                 </Text>
               </div>
+
+                      {/* Word Difficulty Test */}
+                      <div className="mb-8">
+                        <WordDifficultyTest />
+                      </div>
+
+                      {/* SRS Game */}
+                      <div className="mb-8">
+                        <SRSGame />
+                      </div>
 
               {/* Back to Landing */}
               <div className="text-center mt-6">

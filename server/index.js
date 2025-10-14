@@ -13,6 +13,56 @@ app.use(express.json());
 // Simple cache - 1 hour TTL
 const cache = new NodeCache({ stdTTL: 3600 });
 
+// Translation cache - 24 hour TTL
+const translationCache = new NodeCache({ stdTTL: 86400 });
+
+// Rate limiting storage
+const rateLimits = new Map();
+
+// Rate limiting helper function
+const checkRateLimit = (userId, limit = 20) => {
+  const now = Date.now();
+  const hourAgo = now - (60 * 60 * 1000); // 1 hour ago
+  
+  // Clean old entries
+  for (const [key, data] of rateLimits.entries()) {
+    if (data.resetTime < now) {
+      rateLimits.delete(key);
+    }
+  }
+  
+  // Get or create user data
+  const userKey = `user:${userId}`;
+  let userData = rateLimits.get(userKey);
+  
+  if (!userData || userData.resetTime < now) {
+    // Reset or create new hour window
+    userData = {
+      count: 0,
+      resetTime: now + (60 * 60 * 1000) // Reset in 1 hour
+    };
+    rateLimits.set(userKey, userData);
+  }
+  
+  // Check if limit exceeded
+  if (userData.count >= limit) {
+    return {
+      allowed: false,
+      remaining: 0,
+      resetTime: userData.resetTime
+    };
+  }
+  
+  // Increment count
+  userData.count++;
+  
+  return {
+    allowed: true,
+    remaining: limit - userData.count,
+    resetTime: userData.resetTime
+  };
+};
+
 // AniList GraphQL endpoint
 const ANILIST_API = 'https://graphql.anilist.co';
 
@@ -213,14 +263,139 @@ app.get('/api/manga/:id', async (req, res) => {
   }
 });
 
-// Health check
+// Translation endpoint with rate limiting and caching
+app.post('/api/translate', async (req, res) => {
+  try {
+    const { text, sourceLang, targetLang, userId } = req.body;
+    
+    if (!text || !sourceLang || !targetLang || !userId) {
+      return res.status(400).json({ error: 'Text, sourceLang, targetLang, and userId required' });
+    }
+
+    // Input validation
+    if (text.length > 50) {
+      return res.status(400).json({ error: 'Text too long (max 50 characters)' });
+    }
+
+    // Check rate limit
+    const rateLimit = checkRateLimit(userId, 20);
+    if (!rateLimit.allowed) {
+      return res.status(429).json({ 
+        error: 'Rate limit exceeded', 
+        remaining: rateLimit.remaining,
+        resetTime: rateLimit.resetTime
+      });
+    }
+
+    // Check translation cache
+    const cacheKey = `translate:${text}:${sourceLang}:${targetLang}`;
+    const cached = translationCache.get(cacheKey);
+    
+    if (cached) {
+      return res.json({ 
+        translation: cached, 
+        cached: true,
+        remaining: rateLimit.remaining,
+        resetTime: rateLimit.resetTime
+      });
+    }
+
+    // Call Gemini API
+    const { GoogleGenerativeAI } = require('@google/generative-ai');
+    const genAI = new GoogleGenerativeAI('AIzaSyBpYJMy-wV0FP5pO_ndrVApITWIqTAZ9yc');
+    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash-exp" });
+    
+    const prompt = `Translate the following ${sourceLang} text to ${targetLang}. Only return the translation, nothing else: "${text}"`;
+    
+    const result = await model.generateContent(prompt);
+    const response = await result.response;
+    const translation = response.text().trim();
+    
+    if (!translation) {
+      throw new Error('No translation received from Gemini');
+    }
+
+    // Cache the translation
+    translationCache.set(cacheKey, translation, 86400); // 24 hours
+
+    res.json({ 
+      translation, 
+      cached: false,
+      remaining: rateLimit.remaining,
+      resetTime: rateLimit.resetTime
+    });
+
+  } catch (error) {
+    console.error('Translation error:', error);
+    res.status(500).json({ error: 'Translation failed' });
+  }
+});
+
+// Google Books Ngram API endpoint
+app.get('/api/word-difficulty', async (req, res) => {
+  try {
+    const { word, language } = req.query;
+    
+    if (!word || !language) {
+      return res.status(400).json({ error: 'Word and language required' });
+    }
+
+    const cacheKey = `difficulty:${word}:${language}`;
+    const cached = cache.get(cacheKey);
+    
+    if (cached) {
+      return res.json({ data: cached, cached: true });
+    }
+
+  
+    const corpusMap = {
+      'mandarin': 25,  
+      'spanish': 27,
+      'english': 26,
+      'hindi': 38,
+      'arabic': 36,
+      'portuguese': 33,
+      'bengali': 26,  
+      'russian': 32,
+      'japanese': 28,
+      'hebrew': 37,
+      'korean': 35,
+      'german': 30,
+      'french': 29,
+      'turkish': 39,
+      'italian': 31,
+    };
+    
+    const corpusCode = corpusMap[language] || 26;
+    const url = `https://books.google.com/ngrams/json?content=${encodeURIComponent(word)}&year_start=2000&year_end=2019&corpus=${corpusCode}&smoothing=3`;
+    
+    const response = await fetch(url);
+    const ngramData = await response.json();
+    
+    const frequency = ngramData[0]?.timeseries?.[0] || 0;
+    
+    let difficulty;
+    if (frequency > 1e-10) {
+      difficulty = { level: 'Easy', score: 1, source: 'google_books' };
+    } else if (frequency > 1e-12) {
+      difficulty = { level: 'Medium', score: 2, source: 'google_books' };
+    } else {
+      difficulty = { level: 'Hard', score: 3, source: 'google_books' };
+    }
+
+    cache.set(cacheKey, difficulty, 1800); // 30 min cache
+    res.json({ data: difficulty, cached: false });
+
+  } catch (error) {
+    console.error('Word difficulty error:', error);
+    res.status(500).json({ error: 'Failed to get word difficulty' });
+  }
+});
+
 app.get('/api/health', (req, res) => {
   res.json({ status: 'OK', port: PORT });
 });
 
-// Start server
 app.listen(PORT, () => {
-  console.log(`🚀 Backend running on port ${PORT}`);
-  console.log(`📚 AniList API ready`);
-  console.log(`💾 Caching active`);
+  console.log(` Backend running on port ${PORT}`);
 });
