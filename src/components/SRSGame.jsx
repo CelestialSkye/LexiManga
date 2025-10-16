@@ -9,6 +9,7 @@ const SRSGame = ({ manga }) => {
   const [cards, setCards] = useState([]);
   const [currentCardIndex, setCurrentCardIndex] = useState(0);
   const [showAnswer, setShowAnswer] = useState(false);
+  const [sessionStarted, setSessionStarted] = useState(false);
 
   const fsrs = new FSRS();
   const updateWordMutation = useUpdateVocabWord();
@@ -17,7 +18,7 @@ const SRSGame = ({ manga }) => {
   const { data: userWords, isLoading, error } = useVocabWordsByManga(user?.uid, manga?.id?.toString());
 
   useEffect(() => {
-    if (userWords && userWords.length > 0) {
+    if (userWords && userWords.length > 0 && !sessionStarted) {
       //load cards or create new ones
       const cardsWithSRS = userWords.map(word => {
         // if a card has srs data use it otherwise create a new card
@@ -55,11 +56,11 @@ const SRSGame = ({ manga }) => {
         return dueDate <= now;
       });
       
-      
       setCards(dueCards);
       setCurrentCardIndex(0);
+      setSessionStarted(true);
     }
-  }, [userWords]);
+  }, [userWords, sessionStarted]);
 
   const handleAnswer = async (rating) => {
     if (currentCardIndex >= cards.length) return;
@@ -76,14 +77,17 @@ const SRSGame = ({ manga }) => {
     const newCard = result[rating.toString()].card;
     
     const now = new Date();
-    const actualDueDate = new Date(now.getTime() + (newCard.scheduled_days * 24 * 60 * 60 * 1000));
-    newCard.due = actualDueDate;
-    newCard.last_review = now; // Set last_review to current time
+    const scheduledDays = newCard.scheduled_days || 0;
+    const actualDueDate = new Date(now.getTime() + (scheduledDays * 24 * 60 * 60 * 1000));
     
-      // Update the card in the local array
-    setCards(prev => prev.map((card, index) => 
-      index === currentCardIndex ? newCard : card
-    ));
+    // Ensure the date is valid
+    if (isNaN(actualDueDate.getTime())) {
+      console.error('Invalid due date calculated:', { scheduledDays, now, actualDueDate });
+      return; // Exit early if date is invalid
+    }
+    
+    newCard.due = actualDueDate;
+    newCard.last_review = now;
     
     setShowAnswer(false); 
     
@@ -94,7 +98,7 @@ const SRSGame = ({ manga }) => {
       wordId: currentCard.wordData.id,
       wordData: {
         ...currentCard.wordData,
-        due: newCard.due.toISOString(),
+        due: newCard.due && !isNaN(newCard.due.getTime()) ? newCard.due.toISOString() : new Date().toISOString(),
         stability: newCard.stability,
         difficulty: newCard.difficulty,
         elapsed_days: newCard.elapsed_days,
@@ -103,16 +107,19 @@ const SRSGame = ({ manga }) => {
         lapses: newCard.lapses,
         learning_steps: newCard.learning_steps,
         state: newCard.state,
-        last_review: newCard.last_review ? newCard.last_review.toISOString() : undefined,
+        last_review: newCard.last_review && !isNaN(newCard.last_review.getTime()) ? newCard.last_review.toISOString() : undefined,
       }
     });
     
-    // move to next card
-    if (currentCardIndex + 1 < cards.length) {
-      setCurrentCardIndex(prev => prev + 1);
-    } else {
-      // session is complete
-      setCurrentCardIndex(cards.length);
+    // Remove the current card from the session
+    const newCards = cards.filter((_, index) => index !== currentCardIndex);
+    setCards(newCards);
+    
+    // Update the current card index based on new array length
+    if (newCards.length === 0) {
+      setCurrentCardIndex(0);
+    } else if (currentCardIndex >= newCards.length) {
+      setCurrentCardIndex(newCards.length - 1);
     }
   };
 
@@ -181,6 +188,7 @@ const SRSGame = ({ manga }) => {
           onClick={() => {
             setCurrentCardIndex(0);
             setShowAnswer(false);
+            setSessionStarted(false);
           }}
         >
           Start New Session

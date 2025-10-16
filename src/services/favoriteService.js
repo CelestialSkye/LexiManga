@@ -23,17 +23,18 @@ export const useToggleFavorite = () => {
 };
 
 const checkIfFavorited = async (uid, mangaId) => {
-    const favoriteRef = doc(db, 'users', uid,  'favorites', mangaId);
-    const favoriteDoc = await getDoc(favoriteRef);
-    if (favoriteDoc.exists()) {
-        return true;
-    } else {
+    try {
+        const favoriteRef = doc(db, 'users', uid, 'favorites', String(mangaId));
+        const favoriteDoc = await getDoc(favoriteRef);
+        return favoriteDoc.exists();
+    } catch (error) {
+        console.error('Error in checkIfFavorited:', error);
         return false;
     }
 };
 
 const toggleFavorite = async (uid, mangaId, mangaData) => {
-    const favoriteRef = doc(db, 'users', uid, 'favorites', mangaId);
+    const favoriteRef = doc(db, 'users', uid, 'favorites', String(mangaId));
     const existingDoc = await getDoc(favoriteRef);
     
     if (existingDoc.exists()) {

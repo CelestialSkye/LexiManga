@@ -1,6 +1,6 @@
 const CharactersTab = ({ manga }) => {
   return (
-    <div>
+    <div className="rounded-[16px] bg-white p-2 pb-4">
       <h2 className="text-xl font-bold mb-4">Characters</h2>
       {manga.characters?.edges && manga.characters.edges.length > 0 ? (
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -10,7 +10,7 @@ const CharactersTab = ({ manga }) => {
                 <img 
                   src={edge.node.image.large} 
                   alt={edge.node.name.full}
-                  className="w-16 h-16 rounded-full mx-auto mb-2 object-cover"
+                  className="w-16 h-16 rounded-[8px] mx-auto mb-2 object-cover"
                 />
               )}
               <div className="text-sm font-medium">{edge.node.name.full}</div>

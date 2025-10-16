@@ -101,6 +101,20 @@ html, body {
   box-shadow: none !important;
 }
 
+/* Heart button smooth transitions */
+.heart-icon {
+  transition: opacity 0.3s ease-in-out;
+  opacity: 0.3;
+}
+
+[data-favorited="true"] .heart-icon {
+  opacity: 1;
+}
+
+[data-favorited="false"] .heart-icon {
+  opacity: 0.3;
+}
+
 /* Target the search input wrapper */
 .spotlight-search-wrapper {
   border: none !important;
@@ -184,6 +198,48 @@ html, body {
 
 
 
+
+/* Violet focus for inputs */
+.violet-focus input:focus {
+  border-color: #8B5CF6 !important;
+  box-shadow: 0 0 0 1px #8B5CF6 !important;
+  outline: none !important;
+}
+
+.violet-focus input:focus-visible {
+  border-color: #8B5CF6 !important;
+  box-shadow: 0 0 0 1px #8B5CF6 !important;
+  outline: none !important;
+}
+
+/* Violet focus for radio buttons */
+.violet-focus input[type="radio"]:focus {
+  border-color: #8B5CF6 !important;
+  box-shadow: 0 0 0 1px #8B5CF6 !important;
+  outline: none !important;
+}
+
+.violet-focus input[type="radio"]:checked {
+  background-color: #8B5CF6 !important;
+  border-color: #8B5CF6 !important;
+}
+
+.violet-focus input[type="radio"]:checked::before {
+  background-color: white !important;
+}
+
+/* Global Modal Styling */
+.mantine-Modal-content {
+  border-radius: 24px !important;
+}
+
+.mantine-Modal-header {
+  border-radius: 24px 24px 0 0 !important;
+}
+
+.mantine-Modal-body {
+  border-radius: 0 0 24px 24px !important;
+}
 
 /* Language Select Pop Down Animation */
 @keyframes popDown {

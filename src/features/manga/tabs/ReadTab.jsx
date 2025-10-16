@@ -1,52 +1,138 @@
+import { Button } from '@mantine/core';
+
 const ReadTab = ({ manga }) => {
+
+
+const searchMangaDex = () => {
+  const title = manga?.title?.english || manga?.title?.romaji || manga?.title?.native;
+  if (!title) {
+    return;
+  }
+  const encodedTitle = encodeURIComponent(title);
+  const url = `https://mangadex.org/Search?q=${encodedTitle}`;
+  window.open(url, '_blank');
+};
+
+const searchShonenJump = () => {
+  const title = manga?.title?.english;
+  if(!title) {
+    return;
+  }
+  const encodedTitle = encodeURIComponent(title);
+  const url = `https://viz.com/search?search=${encodedTitle}`;
+  window.open(url, '_blank');
+};
+
+// const searchMangaPlus = () => {
+//   const title = manga?.title?.english || manga?.title?.romaji || manga?.title?.native;
+//   if(!title) {
+//     console.log('No title found for manga:', manga);
+//     return;
+//   }
+//   const encodedTitle = encodeURIComponent(`${title} manga plus shueisha`);
+  
+//   const url = `https://www.google.com/search?q=${encodedTitle}`; 
+//   window.open(url, '_blank');
+// };
+
+const searchMangaPlus = () => {
+  const title = manga?.title?.english || manga?.title?.romaji || manga?.title?.native;
+  if(!title) {
+    console.log('No title found for manga:', manga);
+    return;
+  }
+  const encodedTitle = encodeURIComponent(title);
+  const url = `https://mangaplus.shueisha.co.jp/search_result?keyword=${encodedTitle}`; 
+  window.open(url, '_blank');
+};
+
+const searchAzuki = ( ) => {
+  const title = manga?.title?.english || manga?.title?.romaji || manga?.title?.native;
+  if (!title){
+    console.log('No title found for manga:', manga);
+    return;
+  }
+
+  const encodedTitle = encodeURIComponent(title);
+  const url = `https://www.azuki.co/discover?q=${encodedTitle}`;
+  
+  window.open(url, '_blank');
+}
+
+const searchYenPress = () => {
+  const title = manga?.title?.english || manga?.title?.romaji || manga?.title?.native;
+  if (!title){
+    return;
+  }
+  const encodedTitle = encodeURIComponent(title);
+  const url = `https://www.yenpress.com/search?q=${encodedTitle}`;
+  window.open(url, '_blank');
+}
+
+const searchMangaKatana = () => {
+  const title = manga?.title?.english || manga?.title?.romaji || manga?.title?.native;
+  if (!title){
+    return;
+  }
+  const encodedTitle = encodeURIComponent(title);
+  const url = `https://mangakatana.com/?search=${encodedTitle}`;
+  window.open(url, '_blank');
+};
+
+const searchMangaFire = () => {
+  const title = manga?.title?.english || manga?.title?.romaji || manga?.title?.native;
+  if (!title) return;
+  
+  const encodedTitle = encodeURIComponent(title);
+  
+  const url = `https://www.google.com/search?q=${encodedTitle}+site:mangafire.to`;
+  window.open(url, '_blank');
+};
+
+const searchMangaReader = () => {
+  const title = manga?.title?.english || manga?.title?.romaji || manga?.title?.native;
+  if (!title) return;
+  const encodedTitle = encodeURIComponent(title);
+  const url = `https://www.mangareader.to/search?keyword=${encodedTitle}`;
+  window.open(url, '_blank');
+};
+
+
   return (
-    <div>
-      
-      {/* Reading options */}
-      <div>
-        <div className="p-2 rounded-[16px] mb-4">
-          <h3 className="font-semibold mb-2">Reading Options</h3>
-          <p className="text-gray-600 text-sm mb-3">
-            Choose how you'd like to read this manga
-          </p>
-          
-          <div className="space-y-2">
-            <button className="w-full text-left p-3 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
-              <div className="font-medium">Read Online</div>
-              <div className="text-sm text-gray-500">Read chapters directly in the browser</div>
-            </button>
-            
-            <button className="w-full text-left p-3 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
-              <div className="font-medium">Download Chapters</div>
-              <div className="text-sm text-gray-500">Download for offline reading</div>
-            </button>
-          </div>
+    <div className='rounded-[16px] bg-white p-2 pb-4 '>
+      <div className='mb-4 text-xl font-bold'>Read Online</div>
+      <div className="space-y-2">
+        <div className="text-sm text-gray-600 mb-3">
+         Ways to read online:
         </div>
-        
-        {/* Chapter list placeholder */}
-        <div className="p-2 rounded-lg mb-4">
-          <h3 className="font-semibold mb-2">Chapters</h3>
-          <p className="text-gray-600 text-sm">
-            {manga.chapters ? `${manga.chapters} chapters available` : 'Chapter information not available'}
-          </p>
-        </div>
-        
-        {/* Reading progress */}
-        <div className="p-2 rounded-lg">
-          <h3 className="font-semibold mb-2">Reading Progress</h3>
-          <div className="space-y-2">
-            <div className="flex justify-between text-sm">
-              <span>Progress</span>
-              <span>0%</span>
-            </div>
-            <div className="w-full  rounded-full h-2">
-              <div className=" h-2 rounded-full" style={{ width: '0%' }}></div>
-            </div>
-            <p className="text-xs text-gray-500">Start reading to track your progress</p>
-          </div>
+        <div className="flex gap-2 flex-wrap">
+          <Button onClick={searchMangaDex} variant="outline" size="sm" color="violet">
+            MangaDex (Search)
+          </Button>
+          <Button onClick={searchShonenJump} variant="outline" size="sm" color="violet">
+            Shonen Jump
+          </Button>
+          <Button onClick={searchMangaPlus} variant="outline" size="sm" color="violet">
+            Manga Plus
+          </Button>
+          <Button onClick={searchAzuki} variant="outline" size="sm" color="violet">
+            Azuki
+          </Button>
+          <Button onClick={searchYenPress} variant="outline" size="sm" color="violet">
+            Yen Press
+          </Button>
+          <Button onClick={searchMangaKatana} variant="outline" size="sm" color="violet">
+            Manga Katana
+          </Button>
+          <Button onClick={searchMangaFire} variant="outline" size="sm" color="violet">
+            Manga Fire
+          </Button>
+          <Button onClick={searchMangaReader} variant="outline" size="sm" color="violet">
+            Manga Reader
+          </Button>
         </div>
       </div>
-    </div>
+    </div>  
   );
 };
 

@@ -1,6 +1,6 @@
 export const translateWithGemini = async (text, sourceLanguage, targetLanguage, userId) => {
   try {
-    const response = await fetch('http://localhost:3002/api/translate', {
+    const response = await fetch('http://localhost:3003/api/translate', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

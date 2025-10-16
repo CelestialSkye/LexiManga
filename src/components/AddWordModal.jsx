@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Modal, Radio, Group, ActionIcon } from '@mantine/core';
+import { Modal, Radio, Group, ActionIcon, Stack } from '@mantine/core';
 import { TextInput, NumberInput, Button, Text } from '@mantine/core';
 import { useAddVocabWord } from '../services/vocabService';
 import { useAuth } from '../context/AuthContext';
@@ -24,7 +24,7 @@ const AddWordModal = ({ manga, opened, closeModal }) => {
     setIsTranslating(true);
     setTranslationError('');
     try {
-      // Translate from target language to native language
+      // translate from target language to native language
       const translatedText = await translateWithGemini(word, profile.targetLang, profile.nativeLang, user?.uid);
       setTranslation(translatedText);
     } catch (error) {
@@ -37,6 +37,14 @@ const AddWordModal = ({ manga, opened, closeModal }) => {
 
   const handleSave = async () => {
     if (!user) return;
+
+    // Validate required fields
+    if (!word.trim()) {
+      return; // Don't save if word is empty
+    }
+    if (!translation.trim()) {
+      return; // Don't save if translation is empty
+    }
 
     try {
       await saveMutation.mutateAsync({
@@ -63,18 +71,33 @@ const AddWordModal = ({ manga, opened, closeModal }) => {
 
 
   return (
-    <Modal opened={opened} onClose={closeModal} title='Add Word'>
-      <div className='p-4'>
-        <Text>Word</Text>
-        <TextInput value={word} onChange={(e) => setWord(e.target.value)} required />
+    <Modal opened={opened} onClose={closeModal} centered={true} withCloseButton={false} size='sm' radius='24px'>
+      {/* Custom header with p-2 padding */}
+      <div className="p-2">
+        <h2 className="text-2xl font-bold text-gray-800">Add Word</h2>
+      </div>
+      
+      <div className='p-2 '>
+        <div className='pb-3'>
+          <Text>Word <Text span c="red">*</Text></Text>
+          <TextInput 
+            value={word} 
+            onChange={(e) => setWord(e.target.value)} 
+            required 
+            className="violet-focus"
+            error={!word.trim() ? 'Word is required' : ''}
+          />
+        </div>
         
-                <Text>Translation</Text>
+        <div className='pb-3'>
+          <Text>Translation <Text span c="red">*</Text></Text>
                 <Group>
                   <TextInput 
                     value={translation} 
                     onChange={(e) => setTranslation(e.target.value)} 
                     style={{ flex: 1 }}
-                    error={translationError}
+                    error={translationError || (!translation.trim() ? 'Translation is required' : '')}
+                    className="violet-focus"
                   />
                   <ActionIcon 
                     onClick={handleTranslate}
@@ -97,25 +120,58 @@ const AddWordModal = ({ manga, opened, closeModal }) => {
                     💡 You can translate up to 20 words per hour. Enter translations manually if you need to.
                   </Text>
                 )}
-        <Text>Context</Text>
-        <TextInput value={context} onChange={(e) => setContext(e.target.value)} />
-        <Text>Chapter</Text>
-        <NumberInput value={chapter} onChange={setChapter} />
-        <Text>Page</Text>
-        <NumberInput value={page} onChange={setPage} />
-        <Text>Status</Text>
-        <Radio.Group value={status} onChange={setStatus}>
-          <Radio value="learning" label="Learning" />
-          <Radio value="known" label="Known" />
-          <Radio value="unknown" label="Unknown" />
+        </div>
+
+        <div className='pb-2'>
+          <Text>Context</Text>
+          <TextInput 
+            value={context} 
+            onChange={(e) => setContext(e.target.value)} 
+            className="violet-focus"
+          />
+        </div>
+
+        <div className='pb-2'>
+          <Text>Chapter</Text>
+          <NumberInput 
+            value={chapter} 
+            onChange={setChapter} 
+            className="violet-focus"
+          />
+        </div>
+
+        <div className='pb-2'>
+          <Text>Page</Text>
+          <NumberInput 
+            value={page} 
+            onChange={setPage} 
+            className="violet-focus"
+          />
+        </div>
+
+        <div className='pb-2'>
+          <Text>Status</Text>
+        <Radio.Group value={status} onChange={setStatus} className="violet-focus">
+          <Stack gap="sm">
+            <Radio value="learning" label="Learning" />
+            <Radio value="known" label="Known" />
+            <Radio value="unknown" label="Unknown" />
+          </Stack>
         </Radio.Group>
+        </div>
+
+<div className=' pt-2'>
         <Button
           onClick={handleSave}
           loading={saveMutation.isPending}
-          disabled={saveMutation.isPending}
+          disabled={saveMutation.isPending || !word.trim() || !translation.trim()}
+          color="violet"
+          variant="filled"
+          radius="12px"
         >
           Save
         </Button>
+        </div>
       </div>
     </Modal>
   );
