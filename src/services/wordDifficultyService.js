@@ -43,7 +43,7 @@ export const getLengthBasedDifficulty = (word) => {
 export const getWordDifficulty = async (word, language) => {
     try {
         // First try to get difficulty for the word as entered
-        let response = await fetch(`http://localhost:3002/api/word-difficulty?word=${encodeURIComponent(word)}&language=${encodeURIComponent(language)}`);
+        let response = await fetch(`http://localhost:3003/api/word-difficulty?word=${encodeURIComponent(word)}&language=${encodeURIComponent(language)}`);
         let result = await response.json();
         
         // If no data found, try with spelling correction
@@ -55,7 +55,7 @@ export const getWordDifficulty = async (word, language) => {
             
             for (const variation of variations) {
                 try {
-                    response = await fetch(`http://localhost:3002/api/word-difficulty?word=${encodeURIComponent(variation)}&language=${encodeURIComponent(language)}`);
+                    response = await fetch(`http://localhost:3003/api/word-difficulty?word=${encodeURIComponent(variation)}&language=${encodeURIComponent(language)}`);
                     result = await response.json();
                     
                     if (result.data && result.data.source === 'google_books') {

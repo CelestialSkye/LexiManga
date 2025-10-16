@@ -25,3 +25,24 @@ use hover effect extensivley
 
 A system where the word that hte user is trying to translate, whether using the gemini api or manually,
 will display a difficulty rating, whether in numbers or in 3 levels, easy, medium, hard
+
+
+// new 14 oct
+
+srs game
+
+edit/delete buttons for words
+component identity for the modal
+data css display
+figure out the tech for the website (nice hover effect for lots of stuff etc..)
+
+// oct 15
+
+for the love of god finish the main features for vocab tab 
+
+make universal modals and buttons for them
+
+fix css for add manga and favourite manga
+
+fix the fields they have to be a requirment
+

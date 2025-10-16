@@ -1,4 +1,5 @@
 import { MantineProvider } from '@mantine/core';
+import { ModalsProvider } from '@mantine/modals';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import LandingPage from './pages/LandingPage';
@@ -11,8 +12,9 @@ import ProfilePage from './pages/ProfilePage';
 const App = () => {
   return (
     <MantineProvider defaultColorScheme="light" primaryColor="violet">
-      <AuthProvider>
-        <BrowserRouter>
+      <ModalsProvider>
+        <AuthProvider>
+          <BrowserRouter>
           <Routes>
             <Route path="/" element={<LandingPage />} />
             <Route path="/auth" element={<Auth />} />
@@ -22,7 +24,8 @@ const App = () => {
             <Route path="/profile" element={<ProfilePage />} />
           </Routes>
         </BrowserRouter>
-      </AuthProvider>
+        </AuthProvider>
+      </ModalsProvider>
     </MantineProvider>
   );
 };

@@ -1,7 +1,8 @@
-import { useState } from 'react';
+import { useState, useEffect, useCallback, memo, useRef } from 'react';
 import { useParams } from 'react-router-dom';
 import { useMangaDetails } from '../services/anilistApi';
 import ScrollButtons from '../components/ScrollButtons';
+import SideScrollinfo from '../components/SideScrollinfo';
 import OverviewTab from '../features/manga/tabs/OverviewTab';
 import ReadTab from '../features/manga/tabs/ReadTab';
 import VocabularyTab from '../features/manga/tabs/VocabularyTab';
@@ -13,20 +14,49 @@ import { useMediaQuery } from '@mantine/hooks';
 import MangaStatusModal from '../components/MangaStatusModal';
 import { useIsFavorited, useToggleFavorite } from '../services/favoriteService';
 import { useAuth } from '../context/AuthContext';
+import { IconHeart, IconHeartFilled } from '@tabler/icons-react';
+import { ActionIcon } from '@mantine/core';
+
+const HeartButton = memo(({ isFavorited, isLoading, onClick }) => (
+  <div
+    onClick={isLoading ? undefined : onClick}
+    role="button"
+    aria-pressed={isFavorited}
+    style={{ WebkitTapHighlightColor: 'transparent' }}
+    className="relative inline-flex h-9 w-9 items-center justify-center
+               rounded-[8px] bg-violet-500 text-white select-none touch-manipulation
+               outline-none transition-none hover:bg-violet-500 active:bg-violet-500 focus:outline-none"
+  >
+    <IconHeartFilled
+      size={20}
+      className={`transition-colors duration-300 ease-in-out ${
+        isFavorited ? 'text-white' : 'text-white/30'
+      }`}
+    />
+  </div>
+));
+
+HeartButton.displayName = 'HeartButton';
 
 const MangaPage = () => {
   const { id } = useParams();
   const { user } = useAuth();
   const { data, isLoading, error } = useMangaDetails(id);
   const [activeTab, setActiveTab] = useState('overview');
+  const [isFavorited, setIsFavorited] = useState(false);
   const [isStatusModalOpen, setIsStatusModalOpen] = useState(false);
  
   const manga = data?.data?.Media;
 
+  const { data: isFavoritedFromAPI, isLoading: isFavoritedLoading } = useIsFavorited(user?.uid, manga?.id);
+  const toggleFavoriteMutation = useToggleFavorite();
 
   //toggle function for favorite
-  const handleToggleFavorite = async () => {
+  const handleToggleFavorite = useCallback(async () => {
     if (!user) return;
+
+    // Optimistic update - update UI immediately
+    setIsFavorited(!isFavorited);
 
     try {
       await toggleFavoriteMutation.mutateAsync({
@@ -36,21 +66,25 @@ const MangaPage = () => {
       });
     } catch (error) {
       console.error('Error toggling favorite:', error);
+      // Revert on error
+      setIsFavorited(isFavorited);
     }
-  };
+  }, [user, isFavorited, manga, toggleFavoriteMutation]);
 
-  const { data: isFavorited, isLoading: isFavoritedLoading } = useIsFavorited(user?.uid, manga?.id);
-  const toggleFavoriteMutation = useToggleFavorite();
+  // Sync local state with API data
+  useEffect(() => {
+    if (isFavoritedFromAPI !== undefined) {
+      setIsFavorited(isFavoritedFromAPI);
+    }
+  }, [isFavoritedFromAPI]);
 
   const isMobile = useMediaQuery('(max-width: 768px)');
   const isDesktop = useMediaQuery('(min-width: 769px)');
 
-  // protection against invalid IDs
   if (!id || isNaN(Number(id))) {
     return <div className='page-container'>Invalid manga ID</div>;
   }
 
-  // Tab configuration
   const tabs = [
     { id: 'overview', label: 'Overview' },
     { id: 'read', label: 'Read' },
@@ -101,7 +135,7 @@ const MangaPage = () => {
 
               {manga.coverImage?.large && (
                 <div
-                  className={`absolute ${isMobile ? '-bottom-22' : '-bottom-18'} flex items-end gap-4`}
+                  className={`absolute ${isMobile ? '-bottom-18' : '-bottom-18'} flex items-end gap-4`}
                 >
                   <div
                     className={`${isMobile ? 'ml-[calc((100vw-min(95vw,1200px))/2+2px)]' : 'ml-[calc((100vw-min(85vw,1200px))/2)]'}`}
@@ -114,25 +148,23 @@ const MangaPage = () => {
                   </div>
                   <div className='text-black'>
                     <h1
-                      className={`${isMobile ? 'text-large mb-1' : 'text-1xl mb-4'} font-bold whitespace-nowrap`}
+                      className={`${isMobile ? 'text-base mb-1' : 'text-1xl mb-4'} font-bold whitespace-nowrap`}
                     >
                       {manga.title?.english || manga.title?.romaji}
                     </h1>
                     {isMobile && (
                       <div className='flex items-center gap-2'>
-                        <button
-                          className='rounded-[8px] bg-violet-500 px-2 py-1 text-sm text-white transition-colors hover:bg-violet-600'
+                        <HeartButton 
+                          isFavorited={isFavorited}
+                          isLoading={toggleFavoriteMutation.isPending}
                           onClick={handleToggleFavorite}
-                          disabled={toggleFavoriteMutation.isPending}
-                        >
-                          {isFavorited ? 'Unfav' : 'Fav'}
-                        </button>
+                        />
 
                         <button
-                          className='rounded-[8px] bg-violet-500 px-2 py-1 text-sm text-white transition-colors hover:bg-violet-600'
+                          className='rounded-[8px] bg-violet-500 px-2 py-1 text-sm text-white focus:outline-none focus:ring-0'
                           onClick={() => setIsStatusModalOpen(true)}
                         >
-                          Status
+                          Add
                         </button>
                       </div>
                     )}
@@ -144,7 +176,7 @@ const MangaPage = () => {
         </div>
 
         {/* Tab Navigation */}
-        <div className='mt-26 mb-2 md:mt-18'>
+        <div className='mt-22 mb-2 md:mt-18'>
           {isDesktop ? (
             <div className='mr-[calc((100vw-min(85vw,1200px))/2)] ml-[calc((100vw-min(85vw,1200px))/2+192px)] pl-4'>
               <ScrollButtons items={tabs} activeItem={activeTab} onItemClick={setActiveTab} />
@@ -157,41 +189,127 @@ const MangaPage = () => {
         </div>
       </div>
 
+      
+
       <div className='page-container pb-6'>
         <div className='relative mt-6'>
           {/* left section - fixed position on desktop */}
           {isDesktop && (
-            <div className='absolute left-0 w-48'>
+            <div className='absolute left-0 w-48 pb-4'>
               <div className='mt-0 rounded-[16px] bg-white p-4 shadow-sm'>
-                <h3 className='mb-3 text-xs font-bold'>Quick Info</h3>
-                <div className='space-y-2'>
+                <h3 className='mb-4 text-sm font-bold text-gray-800'>Quick Info</h3>
+                <div className='space-y-3'>
+                  {/* Release Date */}
                   <div>
-                    <span className='text-xs text-gray-600'>Status:</span>
-                    <span className='ml-2 text-xs'>{manga.status || 'Unknown'}</span>
+                    <span className='text-xs text-gray-600 font-medium'>Released</span>
+                    <div className='text-xs text-gray-800 mt-1'>
+                      {manga.startDate?.year ? 
+                        `${manga.startDate.year}-${manga.startDate.month || '01'}-${manga.startDate.day || '01'}` : 
+                        'Unknown'
+                      }
+                    </div>
                   </div>
+
+                  {/* Type */}
                   <div>
-                    <span className='text-xs text-gray-600'>Chapters:</span>
-                    <span className='ml-2 text-xs'>{manga.chapters || 'Unknown'}</span>
+                    <span className='text-xs text-gray-600 font-medium'>Type</span>
+                    <div className='text-xs text-gray-800 mt-1'>
+                      {manga.format || manga.type || 'Manga'}
+                    </div>
                   </div>
+
+                  {/* Status */}
                   <div>
-                    <span className='text-xs text-gray-600'>Volumes:</span>
-                    <span className='ml-2 text-xs'>{manga.volumes || 'Unknown'}</span>
+                    <span className='text-xs text-gray-600 font-medium'>Status</span>
+                    <div className='text-xs text-gray-800 mt-1'>
+                      {manga.status ? 
+                        manga.status.toLowerCase().replace('_', ' ').charAt(0).toUpperCase() + 
+                        manga.status.toLowerCase().replace('_', ' ').slice(1) : 
+                        'Unknown'
+                      }
+                    </div>
                   </div>
+
+                  {/* Chapters */}
                   <div>
-                    <span className='text-xs text-gray-600'>Score:</span>
-                    <span className='ml-2 text-xs'>{manga.averageScore || 'N/A'}</span>
+                    <span className='text-xs text-gray-600 font-medium'>Chapters</span>
+                    <div className='text-xs text-gray-800 mt-1'>
+                      {manga.chapters || 'Unknown'}
+                    </div>
                   </div>
+
+                  {/* Volumes */}
                   <div>
-                    <span className='text-xs text-gray-600'>Popularity:</span>
-                    <span className='ml-2 text-xs'>{manga.popularity || 'N/A'}</span>
+                    <span className='text-xs text-gray-600 font-medium'>Volumes</span>
+                    <div className='text-xs text-gray-800 mt-1'>
+                      {manga.volumes || 'Unknown'}
+                    </div>
                   </div>
+
+                  {/* Score */}
+                  <div>
+                    <span className='text-xs text-gray-600 font-medium'>Score</span>
+                    <div className='text-sm font-bold text-gray-800 mt-1'>
+                      {manga.averageScore ? `${manga.averageScore}/100` : 'N/A'}
+                    </div>
+                  </div>
+
+                  {/* Popularity */}
+                  <div>
+                    <span className='text-xs text-gray-600 font-medium'>Popularity</span>
+                    <div className='text-sm font-bold text-gray-800 mt-1'>
+                      #{manga.popularity || 'N/A'}
+                    </div>
+                  </div>
+
+                  {/* Favourites */}
+                  <div>
+                    <span className='text-xs text-gray-600 font-medium'>Favourites</span>
+                    <div className='text-sm font-bold text-gray-800 mt-1'>
+                      #{manga.favourites || 'N/A'}
+                    </div>
+                  </div>
+
+                  {/* Genres */}
+                  {manga.genres && manga.genres.length > 0 && (
+                    <div>
+                      <span className='text-xs text-gray-600 font-medium'>Genres</span>
+                      <div className='text-xs text-gray-800 mt-1 leading-relaxed'>
+                        {manga.genres.join(', ')}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Romaji Name */}
+                  {manga.title?.romaji && (
+                    <div>
+                      <span className='text-xs text-gray-600 font-medium'>Romaji Name</span>
+                      <div className='text-xs text-gray-800 mt-1 font-semibold'>
+                        {manga.title.romaji}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Native Name */}
+                  {manga.title?.native && (
+                    <div>
+                      <span className='text-xs text-gray-600 font-medium'>Native Name</span>
+                      <div className='text-xs text-gray-800 mt-1 font-semibold'>
+                        {manga.title.native}
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
           )}
 
+          
+
           {/* main container - positioned to the right of sidebar */}
-          <div className={`w-full ${isDesktop ? 'ml-48 max-w-[calc(100%-192px)] pl-4' : ''}`}>
+          <div className={`w-full ${isDesktop ? 'ml-50 max-w-[calc(100%-200px)] pl-2' : ''}`}>
+            {isMobile && <SideScrollinfo manga={manga} />}
+            
             <div className='mt-0 rounded-[16px] bg-white px-4 pb-4 shadow-sm'>
               {/* scrollbuttons content (for now) */}
               <div className='mb-4'>
@@ -208,16 +326,6 @@ const MangaPage = () => {
                 {activeTab === 'characters' && <CharactersTab manga={manga} />}
               </div>
 
-              {/* Description
-      {manga.description && (
-        <div className="mb-6">
-          <h2 className="text-xl font-bold mb-2">Description</h2>
-          <div 
-            className="text-gray-700 leading-relaxed"
-            dangerouslySetInnerHTML={{ __html: manga.description }}
-          />
-        </div>
-      )} */}
             </div>
           </div>
         </div>

@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 
-const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3002';
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3003';
 
 /**
  * Search for manga
