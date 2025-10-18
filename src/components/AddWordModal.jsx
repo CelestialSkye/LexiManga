@@ -73,11 +73,10 @@ const AddWordModal = ({ manga, opened, closeModal }) => {
   return (
     <Modal opened={opened} onClose={closeModal} centered={true} withCloseButton={false} size='sm' radius='24px'>
       {/* Custom header with p-2 padding */}
-      <div className="p-2">
-        <h2 className="text-2xl font-bold text-gray-800">Add Word</h2>
-      </div>
+     
       
       <div className='p-2 '>
+    
         <div className='pb-3'>
           <Text>Word <Text span c="red">*</Text></Text>
           <TextInput 

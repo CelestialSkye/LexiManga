@@ -1,48 +1,10 @@
-Make the banner upload for the profile page
-polish some of the info inside the profile page
-
-start with the anime rating, chapter number, status, and favourite button > add the ability to delete the thing
-
-function for adding word and its meaning to the db, also use gemini api to get a translation for the word
->word
->translation with the api button
->context 
->what chapter is it from
->what page
->save
-
-view words inside the manga page
-
-create the word difficulty decider
-
-view all the data inside the profile page
-
-use the react bits library one way or another
-
-use hover effect extensivley    
-
-// Word difficulty system
-
-A system where the word that hte user is trying to translate, whether using the gemini api or manually,
-will display a difficulty rating, whether in numbers or in 3 levels, easy, medium, hard
 
 
-// new 14 oct
-
-srs game
-
-edit/delete buttons for words
-component identity for the modal
-data css display
-figure out the tech for the website (nice hover effect for lots of stuff etc..)
-
-// oct 15
-
-for the love of god finish the main features for vocab tab 
-
-make universal modals and buttons for them
-
-fix css for add manga and favourite manga
-
-fix the fields they have to be a requirment
-
+Favourite & Add button for mobile and desktop
+CSS for the text in manga tabs (universal padding)
+check the pointer for the Edit and Delete buttons inside WordCard it's funky (it's actually funky everywhere)
+better css for srs game also srs is still broken (it doesnt update the duo timer for re reviewed words)
+figure out the on hover thing lil bro idk
+topbar profile picture
+fix topbar animation 
+the from insdie add word modal is too long 

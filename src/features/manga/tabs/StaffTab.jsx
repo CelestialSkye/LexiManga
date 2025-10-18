@@ -1,7 +1,7 @@
 const StaffTab = ({ manga }) => {
   return (
-    <div className="rounded-[16px] bg-white p-2 pb-4">
-      <h2 className="text-xl font-bold mb-4">Staff</h2>
+    <div className="p-2 pb-4 rounded-[16px]">
+      <h2 className='mb-4 text-xl font-bold pr-4 pt-4'>Staff</h2>
       {manga.staff?.edges && manga.staff.edges.length > 0 ? (
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {manga.staff.edges.map((edge, index) => (

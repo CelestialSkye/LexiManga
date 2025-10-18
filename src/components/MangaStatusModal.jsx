@@ -50,12 +50,13 @@ const MangaStatusModal = ({ manga, opened, closeModal }) => {
   }, [existingStatus]);
 
   return (
-    <Modal opened={opened} onClose={closeModal} title='Manga Status'>
+    <Modal opened={opened} onClose={closeModal} withCloseButton={false} centered>
       <div className='p-4'>
         <Text>Status</Text>
         <Select
           value={status}
           onChange={setStatus}
+          className="violet-focus"
           data={[
             { value: 'reading', label: 'Reading' },
             { value: 'completed', label: 'Completed' },
@@ -65,15 +66,19 @@ const MangaStatusModal = ({ manga, opened, closeModal }) => {
           ]}
         />
         <Text>Progress</Text>
-        <NumberInput value={progress} onChange={setProgress} />
+        <NumberInput value={progress} onChange={setProgress} className="violet-focus" />
         <Text>Score</Text>
-        <NumberInput value={score} onChange={setScore} />
+        <NumberInput value={score} onChange={setScore} className="violet-focus" />
         <Text>Notes</Text>
-        <TextInput value={notes} onChange={(e) => setNotes(e.target.value)} />
+        <TextInput value={notes} onChange={(e) => setNotes(e.target.value)} className="violet-focus" />
         <Button
           onClick={handleSave}
           loading={saveMutation.isPending}
           disabled={saveMutation.isPending}
+          color="violet"
+          variant="filled"
+          radius="12px"
+          className="mt-4"
         >
           Save
         </Button>
