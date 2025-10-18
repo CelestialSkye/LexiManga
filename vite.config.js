@@ -7,6 +7,9 @@ import viteConfigPaths from 'vite-tsconfig-paths';
 export default defineConfig({
   server: {
     port: 3001,
+    watch: {
+      ignored: ['**/src/todo.txt', '**/node_modules/**']
+    }
   },
   build: {
     reportCompressedSize: false,

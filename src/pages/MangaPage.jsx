@@ -22,10 +22,10 @@ const HeartButton = memo(({ isFavorited, isLoading, onClick }) => (
     onClick={isLoading ? undefined : onClick}
     role="button"
     aria-pressed={isFavorited}
-    style={{ WebkitTapHighlightColor: 'transparent' }}
+    style={{ WebkitTapHighlightColor: 'transparent', cursor: 'pointer' }}
     className="relative inline-flex h-9 w-9 items-center justify-center
                rounded-[8px] bg-violet-500 text-white select-none touch-manipulation
-               outline-none transition-none hover:bg-violet-500 active:bg-violet-500 focus:outline-none"
+               outline-none transition-none hover:bg-violet-500 active:bg-violet-500 focus:outline-none cursor-pointer"
   >
     <IconHeartFilled
       size={20}
@@ -161,10 +161,10 @@ const MangaPage = () => {
                         />
 
                         <button
-                          className='rounded-[8px] bg-violet-500 px-2 py-1 text-sm text-white focus:outline-none focus:ring-0'
+                          className='rounded-[8px] h-9 w-50 bg-violet-500 px-2 py-1 text-sm text-white focus:outline-none focus:ring-0 cursor-pointer'
                           onClick={() => setIsStatusModalOpen(true)}
                         >
-                          Add
+                          Add to List
                         </button>
                       </div>
                     )}
@@ -176,10 +176,29 @@ const MangaPage = () => {
         </div>
 
         {/* Tab Navigation */}
-        <div className='mt-22 mb-2 md:mt-18'>
+        <div className='mt-22 mb-2 md:mt-20'>
           {isDesktop ? (
-            <div className='mr-[calc((100vw-min(85vw,1200px))/2)] ml-[calc((100vw-min(85vw,1200px))/2+192px)] pl-4'>
-              <ScrollButtons items={tabs} activeItem={activeTab} onItemClick={setActiveTab} />
+            <div className='flex items-center'>
+              {/* Buttons directly under cover image */}
+              <div className='flex items-center gap-2 ml-[calc((100vw-min(85vw,1200px))/2)]'>
+                <HeartButton 
+                  isFavorited={isFavorited}
+                  isLoading={toggleFavoriteMutation.isPending}
+                  onClick={handleToggleFavorite}
+                />
+
+                <button
+                  className='rounded-[8px] h-9 w-37 bg-violet-500 px-2 py-1 text-sm text-white focus:outline-none focus:ring-0'
+                  onClick={() => setIsStatusModalOpen(true)}
+                >
+                  Add to List
+                </button> 
+              </div>
+              
+              {/* Navbar with old working calc but adjusted for buttons */}
+              <div className='flex-1 mr-[calc((100vw-min(85vw,1200px))/2)] pl-4'>
+                <ScrollButtons items={tabs} activeItem={activeTab} onItemClick={setActiveTab} />
+              </div>
             </div>
           ) : (
             <div className='w-full px-4'>
@@ -202,7 +221,7 @@ const MangaPage = () => {
                   {/* Release Date */}
                   <div>
                     <span className='text-xs text-gray-600 font-medium'>Released</span>
-                    <div className='text-xs text-gray-800 mt-1'>
+                    <div className='text-xs font-bold mt-1'>
                       {manga.startDate?.year ? 
                         `${manga.startDate.year}-${manga.startDate.month || '01'}-${manga.startDate.day || '01'}` : 
                         'Unknown'
@@ -210,39 +229,16 @@ const MangaPage = () => {
                     </div>
                   </div>
 
-                  {/* Type */}
-                  <div>
-                    <span className='text-xs text-gray-600 font-medium'>Type</span>
-                    <div className='text-xs text-gray-800 mt-1'>
-                      {manga.format || manga.type || 'Manga'}
-                    </div>
-                  </div>
 
                   {/* Status */}
                   <div>
                     <span className='text-xs text-gray-600 font-medium'>Status</span>
-                    <div className='text-xs text-gray-800 mt-1'>
+                    <div className='text-xs font-bold mt-1'>
                       {manga.status ? 
                         manga.status.toLowerCase().replace('_', ' ').charAt(0).toUpperCase() + 
                         manga.status.toLowerCase().replace('_', ' ').slice(1) : 
                         'Unknown'
                       }
-                    </div>
-                  </div>
-
-                  {/* Chapters */}
-                  <div>
-                    <span className='text-xs text-gray-600 font-medium'>Chapters</span>
-                    <div className='text-xs text-gray-800 mt-1'>
-                      {manga.chapters || 'Unknown'}
-                    </div>
-                  </div>
-
-                  {/* Volumes */}
-                  <div>
-                    <span className='text-xs text-gray-600 font-medium'>Volumes</span>
-                    <div className='text-xs text-gray-800 mt-1'>
-                      {manga.volumes || 'Unknown'}
                     </div>
                   </div>
 
@@ -257,7 +253,7 @@ const MangaPage = () => {
                   {/* Popularity */}
                   <div>
                     <span className='text-xs text-gray-600 font-medium'>Popularity</span>
-                    <div className='text-sm font-bold text-gray-800 mt-1'>
+                    <div className='text-xs font-bold mt-1'>
                       #{manga.popularity || 'N/A'}
                     </div>
                   </div>
@@ -265,7 +261,7 @@ const MangaPage = () => {
                   {/* Favourites */}
                   <div>
                     <span className='text-xs text-gray-600 font-medium'>Favourites</span>
-                    <div className='text-sm font-bold text-gray-800 mt-1'>
+                    <div className='text-xs font-bold mt-1'>
                       #{manga.favourites || 'N/A'}
                     </div>
                   </div>
@@ -274,7 +270,7 @@ const MangaPage = () => {
                   {manga.genres && manga.genres.length > 0 && (
                     <div>
                       <span className='text-xs text-gray-600 font-medium'>Genres</span>
-                      <div className='text-xs text-gray-800 mt-1 leading-relaxed'>
+                      <div className='text-xs font-bold mt-1 leading-relaxed'>
                         {manga.genres.join(', ')}
                       </div>
                     </div>
@@ -284,7 +280,7 @@ const MangaPage = () => {
                   {manga.title?.romaji && (
                     <div>
                       <span className='text-xs text-gray-600 font-medium'>Romaji Name</span>
-                      <div className='text-xs text-gray-800 mt-1 font-semibold'>
+                      <div className='text-xs font-bold mt-1 font-semibold'>
                         {manga.title.romaji}
                       </div>
                     </div>
@@ -294,7 +290,7 @@ const MangaPage = () => {
                   {manga.title?.native && (
                     <div>
                       <span className='text-xs text-gray-600 font-medium'>Native Name</span>
-                      <div className='text-xs text-gray-800 mt-1 font-semibold'>
+                      <div className='text-xs font-bold mt-1 font-semibold'>
                         {manga.title.native}
                       </div>
                     </div>

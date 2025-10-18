@@ -99,12 +99,10 @@ const searchMangaReader = () => {
 
 
   return (
-    <div className='rounded-[16px] bg-white p-2 pb-4 '>
-      <div className='mb-4 text-xl font-bold'>Read Online</div>
+    <div className="p-2 pb-4 rounded-[16px]">
+      <h2 className='mb-4 text-xl font-bold pr-4 pt-4'>Read Online</h2>
       <div className="space-y-2">
-        <div className="text-sm text-gray-600 mb-3">
-         Ways to read online:
-        </div>
+        
         <div className="flex gap-2 flex-wrap">
           <Button onClick={searchMangaDex} variant="outline" size="sm" color="violet">
             MangaDex (Search)

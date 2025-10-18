@@ -22,3 +22,9 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Cursor AI settings
+.cursorrules
+
+# Personal notes and todo files
+src/todo.txt

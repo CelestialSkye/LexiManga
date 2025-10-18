@@ -16,6 +16,11 @@ const queryClient = new QueryClient({
     queries: {
       staleTime: 1000 * 60 * 5, // 5 minutes
       retry: 1,
+      refetchOnWindowFocus: false, // Prevent refetch when window regains focus
+      refetchOnMount: false, // Prevent refetch when component remounts
+      refetchOnReconnect: false, // Prevent refetch when network reconnects
+      refetchInterval: false, // Disable any automatic polling
+      refetchIntervalInBackground: false, // Disable background polling
     },
   },
 });

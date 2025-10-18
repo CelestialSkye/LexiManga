@@ -1,7 +1,7 @@
 const OverviewTab = ({ manga }) => {
   return (
     <div className="p-2 pb-4 rounded-[16px] bg-white">
-      <h2 className="text-xl font-bold mb-6">Overview</h2>
+      <h2 className='mb-4 text-xl font-bold pr-4 pt-4'>Overview</h2>
       
       {/* description */}
       {manga.description && (

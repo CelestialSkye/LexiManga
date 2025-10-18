@@ -257,6 +257,12 @@ html, body {
   }
 }
 
+/* Cursor pointer */
+button {
+  cursor: pointer;
+}
+
+
 
 
 

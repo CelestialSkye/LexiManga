@@ -47,7 +47,7 @@ const VocabularyTab = ({ manga }) => {
   ];
   
   return (
-    <div className="rounded-[16px] bg-white p-2 pb-4">
+    <div className="p-2 pb-4 rounded-[16px]">
       <h2 className='mb-4 text-xl font-bold pr-4 pt-4'>Vocabulary</h2>
       
       <FilterControls
@@ -59,10 +59,10 @@ const VocabularyTab = ({ manga }) => {
         totalCount={words.length}
         rightAction={
           <button
-            className='rounded-lg bg-violet-500 px-3 py-2 text-white text-sm transition-colors hover:bg-violet-600'
+            className='rounded-lg bg-violet-500 px-3 h-9 text-white text-sm transition-colors hover:bg-violet-600'
             onClick={() => setIsAddWordModalOpen(true)}
           >
-            Add +
+            Add
           </button>
         }
       />
