@@ -50,7 +50,7 @@ export const getWordDifficulty = async (word, language) => {
         if (result.error || !result.data || result.data.source === 'length_fallback') {
             console.log('No Google Books data found, trying spelling correction for', word);
             
-            // Try common spelling variations (for Japanese)
+            // Try common spelling variations mainly for japanese
             const variations = getSpellingVariations(word, language);
             
             for (const variation of variations) {
@@ -114,10 +114,7 @@ const getSpellingVariations = (word, language) => {
             'ö': 'oe', // schön vs schoen
             'ü': 'ue', // über vs ueber
         },
-        chinese: {
-            // For Chinese, we might try simplified vs traditional
-            // This is more complex and would need a proper dictionary
-        }
+      
     };
     
     const rules = spellingRules[language];
