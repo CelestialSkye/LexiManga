@@ -13,7 +13,7 @@ const Home = () => {
 
   return (
     <>
-      <div className="bg-[#FBFBFB] min-h-screen overflow-x-hidden">
+      <div className="min-h-screen overflow-x-hidden">
         {/* TopBar positioned at the top */}
         <div className={`${isDesktop ? 'absolute top-0 left-0 right-0 z-10' : ''}`}>
           <TopBar />
@@ -23,7 +23,7 @@ const Home = () => {
         <HeroBanner />
         
         {/* Content Section - Flows naturally after hero banner */}
-        <div className="relative z-20 bg-[#FBFBFB]">
+        <div className="relative z-20 bg-white">
           <div className="page-container py-8">
             <div className="bg-white rounded-2xl shadow-sm p-8">
               {/* Header */}
