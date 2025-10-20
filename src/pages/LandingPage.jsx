@@ -10,9 +10,8 @@ const LandingPage = () => {
   const handleGoToWebsite = () => {
     // If user is logged in, go to dashboard. Otherwise, go to home
     if (user) {
-      navigate('/dashboard');
-    } else {
       navigate('/home');
+  
     }
   };
 
