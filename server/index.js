@@ -1,49 +1,40 @@
 const express = require('express');
 const cors = require('cors');
 const NodeCache = require('node-cache');
+const fs = require('fs');
+const path = require('path');
 
 const app = express();
 const PORT = process.env.PORT || 3003;
 
-// Middleware
 app.use(cors());
 app.use(express.json());
 
-// Simple cache - 1 hour TTL
 const cache = new NodeCache({ stdTTL: 3600 });
-
-// Translation cache - 24 hour TTL
 const translationCache = new NodeCache({ stdTTL: 86400 });
-
-// Rate limiting storage
 const rateLimits = new Map();
 
-// Rate limiting helper function
 const checkRateLimit = (userId, limit = 20) => {
   const now = Date.now();
-  const hourAgo = now - 60 * 60 * 1000; // 1 hour ago
+  const hourAgo = now - 60 * 60 * 1000;
 
-  // Clean old entries
   for (const [key, data] of rateLimits.entries()) {
     if (data.resetTime < now) {
       rateLimits.delete(key);
     }
   }
 
-  // Get or create user data
   const userKey = `user:${userId}`;
   let userData = rateLimits.get(userKey);
 
   if (!userData || userData.resetTime < now) {
-    // Reset or create new hour window
     userData = {
       count: 0,
-      resetTime: now + 60 * 60 * 1000, // Reset in 1 hour
+      resetTime: now + 60 * 60 * 1000,
     };
     rateLimits.set(userKey, userData);
   }
 
-  // Check if limit exceeded
   if (userData.count >= limit) {
     return {
       allowed: false,
@@ -52,7 +43,6 @@ const checkRateLimit = (userId, limit = 20) => {
     };
   }
 
-  // Increment count
   userData.count++;
 
   return {
@@ -62,10 +52,8 @@ const checkRateLimit = (userId, limit = 20) => {
   };
 };
 
-// AniList GraphQL endpoint
 const ANILIST_API = 'https://graphql.anilist.co';
 
-// Basic search query
 const SEARCH_QUERY = `
   query ($search: String, $perPage: Int) {
     Page(perPage: $perPage) {
@@ -90,7 +78,6 @@ const SEARCH_QUERY = `
   }
 `;
 
-// Manga details query
 const MANGA_QUERY = `
   query ($id: Int) {
     Media(id: $id, type: MANGA) {
@@ -183,7 +170,6 @@ const MANGA_QUERY = `
   }
 `;
 
-// Search manga only
 app.get('/api/search', async (req, res) => {
   try {
     const { q: search, limit = 10 } = req.query;
@@ -214,14 +200,13 @@ app.get('/api/search', async (req, res) => {
       throw new Error('AniList API error');
     }
 
-    cache.set(cacheKey, data.data, 1800); // 30 min cache
+    cache.set(cacheKey, data.data, 1800);
     res.json({ data: data.data, cached: false });
   } catch (error) {
     res.status(500).json({ error: 'Search failed' });
   }
 });
 
-// Get manga by ID
 app.get('/api/manga/:id', async (req, res) => {
   try {
     const { id } = req.params;
@@ -252,14 +237,13 @@ app.get('/api/manga/:id', async (req, res) => {
       throw new Error('AniList API error');
     }
 
-    cache.set(cacheKey, data.data, 7200); // 2 hour cache
+    cache.set(cacheKey, data.data, 7200);
     res.json({ data: data.data, cached: false });
   } catch (error) {
     res.status(500).json({ error: 'Failed to fetch manga' });
   }
 });
 
-// Translation endpoint with rate limiting and caching
 app.post('/api/translate', async (req, res) => {
   try {
     const { text, sourceLang, targetLang, userId } = req.body;
@@ -268,12 +252,10 @@ app.post('/api/translate', async (req, res) => {
       return res.status(400).json({ error: 'Text, sourceLang, targetLang, and userId required' });
     }
 
-    // Input validation
     if (text.length > 50) {
       return res.status(400).json({ error: 'Text too long (max 50 characters)' });
     }
 
-    // Check rate limit
     const rateLimit = checkRateLimit(userId, 20);
     if (!rateLimit.allowed) {
       return res.status(429).json({
@@ -283,7 +265,6 @@ app.post('/api/translate', async (req, res) => {
       });
     }
 
-    // Check translation cache
     const cacheKey = `translate:${text}:${sourceLang}:${targetLang}`;
     const cached = translationCache.get(cacheKey);
 
@@ -296,7 +277,6 @@ app.post('/api/translate', async (req, res) => {
       });
     }
 
-    // Call Gemini API
     const { GoogleGenerativeAI } = require('@google/generative-ai');
     const genAI = new GoogleGenerativeAI('AIzaSyBpYJMy-wV0FP5pO_ndrVApITWIqTAZ9yc');
     const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash-exp' });
@@ -311,8 +291,7 @@ app.post('/api/translate', async (req, res) => {
       throw new Error('No translation received from Gemini');
     }
 
-    // Cache the translation
-    translationCache.set(cacheKey, translation, 86400); // 24 hours
+    translationCache.set(cacheKey, translation, 86400);
 
     res.json({
       translation,
@@ -326,7 +305,64 @@ app.post('/api/translate', async (req, res) => {
   }
 });
 
-// Google Books Ngram API endpoint
+const loadFrequencyLists = () => {
+  const frequencyLists = {
+    english: {},
+    japanese: {},
+    spanish: {},
+    french: {},
+    german: {},
+    hindi: {},
+    arabic: {},
+    portuguese: {},
+    bengali: {},
+    russian: {},
+    hebrew: {},
+    korean: {},
+    turkish: {},
+    italian: {},
+  };
+
+  const languageMap = {
+    english: 'en',
+    japanese: 'ja',
+    spanish: 'es',
+    french: 'fr',
+    german: 'de',
+    hindi: 'hi',
+    arabic: 'ar',
+    portuguese: 'pt',
+    bengali: 'bn',
+    russian: 'ru',
+    hebrew: 'he',
+    korean: 'ko',
+    turkish: 'tr',
+    italian: 'it',
+  };
+
+  Object.entries(languageMap).forEach(([lang, code]) => {
+    const filePath = path.join(__dirname, `frequency-lists/${code}_full.txt`);
+    try {
+      const data = fs.readFileSync(filePath, 'utf8');
+      data.split('\n').forEach((line) => {
+        const parts = line.trim().split(/\s+/);
+        const word = parts[0];
+        const frequency = parseInt(parts[1], 10);
+        if (word && !isNaN(frequency)) {
+          frequencyLists[lang][word.toLowerCase()] = frequency;
+        }
+      });
+      console.log(`Loaded ${Object.keys(frequencyLists[lang]).length} words for ${lang}`);
+    } catch (error) {
+      console.error(`Failed to load frequency list for ${lang}:`, error.message);
+    }
+  });
+
+  return frequencyLists;
+};
+
+const FREQUENCY_LISTS = loadFrequencyLists();
+
 app.get('/api/word-difficulty', async (req, res) => {
   try {
     const { word, language } = req.query;
@@ -342,42 +378,23 @@ app.get('/api/word-difficulty', async (req, res) => {
       return res.json({ data: cached, cached: true });
     }
 
-    const corpusMap = {
-      mandarin: 25,
-      spanish: 27,
-      english: 26,
-      hindi: 38,
-      arabic: 36,
-      portuguese: 33,
-      bengali: 26,
-      russian: 32,
-      japanese: 28,
-      hebrew: 37,
-      korean: 35,
-      german: 30,
-      french: 29,
-      turkish: 39,
-      italian: 31,
-    };
-
-    const corpusCode = corpusMap[language] || 26;
-    const url = `https://books.google.com/ngrams/json?content=${encodeURIComponent(word)}&year_start=2000&year_end=2019&corpus=${corpusCode}&smoothing=3`;
-
-    const response = await fetch(url);
-    const ngramData = await response.json();
-
-    const frequency = ngramData[0]?.timeseries?.[0] || 0;
+    const frequencyLists = FREQUENCY_LISTS[language] || {};
+    const wordLower = word.toLowerCase();
+    const frequency = frequencyLists[wordLower];
 
     let difficulty;
-    if (frequency > 1e-5) {
-      difficulty = { level: 'Easy', score: 1, source: 'google_books' };
-    } else if (frequency > 1.5e-7) {
-      difficulty = { level: 'Medium', score: 2, source: 'google_books' };
+
+    if (frequency === undefined) {
+      difficulty = { level: 'Hard', score: 3, source: 'frequency_list', frequency: 0 };
+    } else if (frequency >= 10000) {
+      difficulty = { level: 'Easy', score: 1, source: 'frequency_list', frequency };
+    } else if (frequency >= 1000) {
+      difficulty = { level: 'Medium', score: 2, source: 'frequency_list', frequency };
     } else {
-      difficulty = { level: 'Hard', score: 3, source: 'google_books' };
+      difficulty = { level: 'Hard', score: 3, source: 'frequency_list', frequency };
     }
 
-    cache.set(cacheKey, difficulty, 1800); // 30 min cache
+    cache.set(cacheKey, difficulty, 1800);
     res.json({ data: difficulty, cached: false });
   } catch (error) {
     console.error('Word difficulty error:', error);
@@ -385,7 +402,6 @@ app.get('/api/word-difficulty', async (req, res) => {
   }
 });
 
-// Get user's vocabulary words for a specific manga
 app.get('/api/user-words', async (req, res) => {
   try {
     const { userId, mangaId } = req.query;
@@ -394,14 +410,7 @@ app.get('/api/user-words', async (req, res) => {
       return res.status(400).json({ error: 'userId and mangaId required' });
     }
 
-    // This would connect to your Firestore database
-    // For now, return mock data
-    const mockWords = [
-      { word: 'こんにちは', translation: 'Hello', context: 'Greeting', mangaId, userId },
-      { word: 'ありがとう', translation: 'Thank you', context: 'Politeness', mangaId, userId },
-    ];
-
-    res.json(mockWords);
+    res.json([]);
   } catch (error) {
     console.error('Error fetching user words:', error);
     res.status(500).json({ error: 'Failed to fetch user words' });

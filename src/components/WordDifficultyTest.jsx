@@ -105,19 +105,7 @@ const WordDifficultyTest = () => {
           </Card>
         )}
 
-        <Card shadow="sm" padding="md" radius="md" withBorder mt="md">
-          <Text size="md" fw={600} mb="sm">Quick Test Words:</Text>
-          <div className="space-y-2">
-            <div>
-              <Text size="sm" fw={500}>English:</Text>
-              <Text size="sm" c="dimmed">hello, algorithm, supercalifragilisticexpialidocious</Text>
-            </div>
-            <div>
-              <Text size="sm" fw={500}>Japanese:</Text>
-              <Text size="sm" c="dimmed">こんにちは, ありがとう, 難しい</Text>
-            </div>
-          </div>
-        </Card>
+        
       </Card>
     </div>
   );
