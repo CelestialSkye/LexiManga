@@ -9,21 +9,27 @@ export const translateWithGemini = async (text, sourceLanguage, targetLanguage, 
         text,
         sourceLang: sourceLanguage,
         targetLang: targetLanguage,
-        userId: userId || 'anonymous'
-      })
+        userId: userId || 'anonymous',
+      }),
     });
 
     if (!response.ok) {
       if (response.status === 429) {
         const errorData = await response.json();
         const minutesLeft = Math.ceil((errorData.resetTime - Date.now()) / 60000);
-        
+
         if (minutesLeft > 60) {
-          throw new Error(`You've reached your translation limit for this hour. Please try again in ${Math.ceil(minutesLeft / 60)} hours.`);
+          throw new Error(
+            `You've reached your translation limit for this hour. Please try again in ${Math.ceil(minutesLeft / 60)} hours.`
+          );
         } else if (minutesLeft > 1) {
-          throw new Error(`You've reached your translation limit for this hour. Please try again in ${minutesLeft} minutes.`);
+          throw new Error(
+            `You've reached your translation limit for this hour. Please try again in ${minutesLeft} minutes.`
+          );
         } else {
-          throw new Error(`You've reached your translation limit for this hour. Please try again in a few minutes.`);
+          throw new Error(
+            `You've reached your translation limit for this hour. Please try again in a few minutes.`
+          );
         }
       }
       throw new Error(`Translation failed: ${response.status}`);
@@ -36,3 +42,9 @@ export const translateWithGemini = async (text, sourceLanguage, targetLanguage, 
     return `[Translation: ${text} (${sourceLanguage} → ${targetLanguage})]`;
   }
 };
+
+const geminiApi = {
+  translateWithGemini,
+};
+
+export default geminiApi;

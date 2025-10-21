@@ -14,8 +14,7 @@ import { useMediaQuery } from '@mantine/hooks';
 import MangaStatusModal from '../components/MangaStatusModal';
 import { useIsFavorited, useToggleFavorite } from '../services/favoriteService';
 import { useAuth } from '../context/AuthContext';
-import { IconHeart, IconHeartFilled } from '@tabler/icons-react';
-import { ActionIcon } from '@mantine/core';
+import {  IconHeartFilled } from '@tabler/icons-react';
 
 const HeartButton = memo(({ isFavorited, isLoading, onClick }) => (
   <div
@@ -195,7 +194,7 @@ const MangaPage = () => {
                 </button> 
               </div>
               
-              {/* Navbar with old working calc but adjusted for buttons */}
+              {/* Navbar */}
               <div className='flex-1 mr-[calc((100vw-min(85vw,1200px))/2)] pl-4'>
                 <ScrollButtons items={tabs} activeItem={activeTab} onItemClick={setActiveTab} />
               </div>
