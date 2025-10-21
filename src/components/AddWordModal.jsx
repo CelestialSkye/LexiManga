@@ -5,7 +5,9 @@ import { useAddVocabWord } from '../services/vocabService';
 import { useAuth } from '../context/AuthContext';
 import { translateWithGemini } from '../services/geminiApi';
 import { IconLanguage } from '@tabler/icons-react';
-import { getWordDifficulty, useWordDifficulty } from 'src/services/wordDifficultyService';
+import {  useWordDifficulty } from 'src/services/wordDifficultyService';
+
+//testing file saving in lvim
 
 const AddWordModal = ({ manga, opened, closeModal }) => {
   const { user, profile } = useAuth();

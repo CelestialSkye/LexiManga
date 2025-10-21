@@ -23,15 +23,6 @@ export const searchManga = async (query, limit = 10) => {
   }
 };
 
-export const useSearchManga = (query, limit = 10) => {
-  return useQuery({
-    queryKey: ['searchManga', query, limit],
-    queryFn: () => searchManga(query, limit),  
-    enabled: Boolean(query && query.length >= 2),
-    staleTime: 5 * 60 * 1000,
-  });
-};
-
 /**
  * Get manga details by ID
  */
@@ -51,15 +42,6 @@ export const getMangaDetails = async (id) => {
   }
 };
 
-export const useMangaDetails = (id) => {
-  return useQuery({
-    queryKey: ['mangaDetails', id],
-    queryFn: () => getMangaDetails(id),
-    enabled: !!id,
-    staleTime: 10 * 60 * 1000,
-  });
-};
-
 /**
  * Check if backend is healthy
  */
@@ -71,3 +53,31 @@ export const checkHealth = async () => {
     return false;
   }
 };
+
+export const useSearchManga = (query, limit = 10) => {
+  return useQuery({
+    queryKey: ['searchManga', query, limit],
+    queryFn: () => searchManga(query, limit),
+    enabled: Boolean(query && query.length >= 2),
+    staleTime: 5 * 60 * 1000,
+  });
+};
+
+export const useMangaDetails = (id) => {
+  return useQuery({
+    queryKey: ['mangaDetails', id],
+    queryFn: () => getMangaDetails(id),
+    enabled: !!id,
+    staleTime: 10 * 60 * 1000,
+  });
+};
+
+const anilistApi = {
+  searchManga,
+  useSearchManga,
+  getMangaDetails,
+  useMangaDetails,
+  checkHealth,
+};
+
+export default anilistApi;
