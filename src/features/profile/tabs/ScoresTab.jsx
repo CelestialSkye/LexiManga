@@ -2,12 +2,19 @@ import React, { useState } from 'react';
 import { useAuth } from 'src/context/AuthContext';
 import { useMangaStatuses } from 'src/services/useMangaStatuses';
 import MangaStatusModal from '@components/MangaStatusModal';
+import { SearchBar } from '@components/index';
 
 const ScoresTab = () => {
   const { user } = useAuth();
   const { data: mangaStatus = [], isLoading, error } = useMangaStatuses(user?.uid);
   const [selectedManga, setSelectedManga] = useState(null);
   const [isStatusModalOpen, setIsStatusModalOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
+  const filteredManga = mangaStatus.filter(manga => 
+  manga.title.toLowerCase().includes(searchTerm.toLowerCase()));
+
+
+
 
   if (!user) return <div>Please log in to view your manga statuses.</div>;
   if (isLoading) return <div>Loading manga statuses...</div>;
@@ -27,12 +34,12 @@ const ScoresTab = () => {
     <>
       <div className='rounded-[16px] bg-white p-2 pb-4'>
         <h2 className='mb-4 pt-4 pr-4 text-xl font-bold'>Manga Scores</h2>
-
-        {mangaStatus.length === 0 ? (
+        <SearchBar value={searchTerm} onChange={setSearchTerm} placeholder='Search manga..'/>
+        {filteredManga.length === 0 ? (
           <div className='text-gray-500'>No manga statuses found</div>
         ) : (
           <div className='grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4'>
-            {mangaStatus.map((manga) => (
+            {filteredManga.map((manga) => (
               <div key={manga.id} className='flex flex-col items-center'>
                 <div onClick={() => handleEditManga(manga)} className='cursor-pointer'>
                   {manga.coverImage && (

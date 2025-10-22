@@ -10,6 +10,7 @@ import useWordFiltering from '../../../hooks/useWordFiltering';
 const VocabularyTab = ({ manga }) => {
   const { user } = useAuth();
   const [isAddWordModalOpen, setIsAddWordModalOpen] = useState(false);
+  
 
   // fetch vocab words from the manga
   const { data: words = [], isLoading, error } = useVocabWordsByManga(

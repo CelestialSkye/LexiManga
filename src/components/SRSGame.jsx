@@ -1,30 +1,68 @@
 import { useState, useEffect } from 'react';
-import { Card, Text, Button, Group, Badge, Progress, Stack } from '@mantine/core';
+import { Card, Text, Button, Group, Badge, Progress, Stack, Select } from '@mantine/core';
 import { useAuth } from '../context/AuthContext';
 import { createEmptyCard, FSRS, Rating } from 'ts-fsrs';
-import { useVocabWordsByManga, useUpdateVocabWord } from '../services/vocabService';
+import { useVocabWordsByManga, useUpdateVocabWord, useVocabWords } from '../services/vocabService';
 
-const SRSGame = ({ manga }) => {
+const SRSGame = ({ manga, words: initialWords }) => {
   const { user } = useAuth();
   const [cards, setCards] = useState([]);
   const [currentCardIndex, setCurrentCardIndex] = useState(0);
   const [showAnswer, setShowAnswer] = useState(false);
   const [sessionStarted, setSessionStarted] = useState(false);
+  const [selectedMangaFilter, setSelectedMangaFilter] = useState(null);
 
   const fsrs = new FSRS();
   const updateWordMutation = useUpdateVocabWord();
 
-  // use vocabulary service
+  // Determine if we're in profile mode (no manga object) or manga mode
+  const isProfileMode = !manga && initialWords;
+
+  // use vocabulary service based on mode
   const {
     data: userWords,
-    isLoading,
-    error,
-  } = useVocabWordsByManga(user?.uid, manga?.id?.toString());
+    isLoading: loadingByManga,
+    error: errorByManga,
+  } = useVocabWordsByManga(user?.uid, manga?.id?.toString(), isProfileMode);
+
+  const {
+    data: allUserWords,
+    isLoading: loadingAll,
+    error: errorAll,
+  } = useVocabWords(user?.uid, isProfileMode);
+
+  const isLoading = isProfileMode ? loadingAll : loadingByManga;
+  const error = isProfileMode ? errorAll : errorByManga;
+
+  // Get words based on mode
+  const getWords = () => {
+    if (isProfileMode && allUserWords) {
+      if (selectedMangaFilter) {
+        return allUserWords.filter((w) => w.mangaId === selectedMangaFilter);
+      }
+      return allUserWords;
+    }
+    return userWords || [];
+  };
+
+  const words = getWords();
+
+  // Get unique manga for filter dropdown in profile mode
+  const getMangaOptions = () => {
+    if (!allUserWords) return [];
+    const mangaMap = new Map();
+    allUserWords.forEach((word) => {
+      if (word.mangaId && word.mangaTitle) {
+        mangaMap.set(word.mangaId, word.mangaTitle);
+      }
+    });
+    return Array.from(mangaMap, ([id, title]) => ({ value: id, label: title }));
+  };
 
   useEffect(() => {
-    if (userWords && userWords.length > 0 && !sessionStarted) {
+    if (words && words.length > 0 && !sessionStarted) {
       //load cards or create new ones
-      const cardsWithSRS = userWords.map((word) => {
+      const cardsWithSRS = words.map((word) => {
         // Check if card has valid SRS data (not corrupted with NaN or invalid values)
         const hasValidSRS =
           word.due &&
@@ -71,7 +109,7 @@ const SRSGame = ({ manga }) => {
       setCurrentCardIndex(0);
       setSessionStarted(true);
     }
-  }, [userWords, sessionStarted]);
+  }, [words, sessionStarted]);
 
   const handleAnswer = async (rating) => {
     if (currentCardIndex >= cards.length) return;
@@ -117,7 +155,7 @@ const SRSGame = ({ manga }) => {
     // save the updated srs data to firestore
     updateWordMutation.mutate({
       uid: user.uid,
-      mangaId: manga.id.toString(),
+      mangaId: currentCard.wordData.mangaId,
       wordId: currentCard.wordData.id,
       wordData: {
         ...currentCard.wordData,
@@ -139,7 +177,7 @@ const SRSGame = ({ manga }) => {
     const newCards = cards.filter((_, index) => index !== currentCardIndex);
     setCards(newCards);
 
-    // Update the current card index 
+    // Update the current card index
     if (newCards.length === 0) {
       setCurrentCardIndex(0);
     } else if (currentCardIndex >= newCards.length) {
@@ -147,11 +185,11 @@ const SRSGame = ({ manga }) => {
     }
   };
 
-  if (!manga || !user) {
+  if (!user) {
     return (
       <Card shadow='sm' padding='lg' radius='md' withBorder>
         <Text ta='center' c='dimmed'>
-          Please select a manga to study
+          Please log in to study
         </Text>
       </Card>
     );
@@ -177,11 +215,11 @@ const SRSGame = ({ manga }) => {
     );
   }
 
-  if (!userWords || userWords.length === 0) {
+  if (!allUserWords || allUserWords.length === 0) {
     return (
       <Card shadow='sm' padding='lg' radius='md' withBorder>
         <Text ta='center' c='dimmed'>
-          No vocabulary words found for this manga. Add some words first! 📚
+          No vocabulary words found. Add some words first! 📚
         </Text>
       </Card>
     );
@@ -201,32 +239,72 @@ const SRSGame = ({ manga }) => {
   }
 
   if (currentCardIndex >= cards.length) {
+    const mangaOptions = getMangaOptions();
+
     return (
-      <Card shadow='sm' padding='lg' radius='md' withBorder>
-        <Text ta='center' c='green' size='lg' fw={700}>
-          Session Complete! 🎉
-        </Text>
-        <Button
-          fullWidth
-          mt='md'
-          onClick={() => {
-            setCurrentCardIndex(0);
-            setShowAnswer(false);
-            setSessionStarted(false);
-          }}
-        >
-          Start New Session
-        </Button>
-      </Card>
+      <div className='mx-auto max-w-md p-6'>
+        <Card shadow='sm' padding='lg' radius='md' withBorder>
+          <Stack gap='md'>
+            {isProfileMode && mangaOptions.length > 0 && (
+              <Select
+                label='Filter by Manga (optional)'
+                placeholder='Study all words'
+                data={mangaOptions}
+                value={selectedMangaFilter}
+                onChange={(value) => {
+                  setSelectedMangaFilter(value);
+                  setSessionStarted(false);
+                  setCurrentCardIndex(0);
+                  setShowAnswer(false);
+                }}
+                clearable
+                searchable
+              />
+            )}
+
+            <Text ta='center' c='green' size='lg' fw={700}>
+              Session Complete! 🎉
+            </Text>
+            <Button
+              fullWidth
+              onClick={() => {
+                setCurrentCardIndex(0);
+                setShowAnswer(false);
+                setSessionStarted(false);
+              }}
+            >
+              Start New Session
+            </Button>
+          </Stack>
+        </Card>
+      </div>
     );
   }
 
   const currentCard = cards[currentCardIndex];
+  const mangaOptions = getMangaOptions();
 
   return (
     <div className='mx-auto max-w-md p-6'>
       <Card shadow='sm' padding='lg' radius='md' withBorder>
         <Stack gap='md'>
+          {isProfileMode && mangaOptions.length > 0 && (
+            <Select
+              label='Filter by Manga (optional)'
+              placeholder='Study all words'
+              data={mangaOptions}
+              value={selectedMangaFilter}
+              onChange={(value) => {
+                setSelectedMangaFilter(value);
+                setSessionStarted(false);
+                setCurrentCardIndex(0);
+                setShowAnswer(false);
+              }}
+              clearable
+              searchable
+            />
+          )}
+
           <div className='text-center'>
             <Text size='lg' fw={700}>
               SRS Review
