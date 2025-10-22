@@ -1,8 +1,16 @@
+import { SRSGame } from '../../../components';
+import { useAuth } from '../../../context/AuthContext';
+import { useVocabWords } from '../../../services/vocabService';
+
 const StudyTab = ({ profile }) => {
+  const { user } = useAuth();
+
+  const { data: words = [], isLoading } = useVocabWords(user?.uid);
+
   return (
-    <div className="p-2 pb-4 rounded-[16px]">
-      <h2 className="text-xl font-bold mb-6">Study Settings</h2>
-      
+    <div className='rounded-[16px] p-2 pb-4'>
+      <h2 className='mb-4 pt-4 pr-4 text-xl font-bold'>Study</h2>
+      <SRSGame words={words} />
     </div>
   );
 };
