@@ -1,5 +1,24 @@
-import { Modal, Stack, Text, Badge, Group, Divider, Button, ActionIcon, TextInput, NumberInput, Radio } from '@mantine/core';
-import { IconEdit, IconTrash, IconSearch, IconLanguage, IconCheck, IconX } from '@tabler/icons-react';
+import {
+  Modal,
+  Stack,
+  Text,
+  Badge,
+  Group,
+  Divider,
+  Button,
+  ActionIcon,
+  TextInput,
+  NumberInput,
+  Radio,
+} from '@mantine/core';
+import {
+  IconEdit,
+  IconTrash,
+  IconSearch,
+  IconLanguage,
+  IconCheck,
+  IconX,
+} from '@tabler/icons-react';
 import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { translateWithGemini } from '../services/geminiApi';
@@ -10,7 +29,7 @@ const WordDetailModal = ({ opened, onClose, word, onEdit, onDelete }) => {
   const { user, profile } = useAuth();
   const updateWordMutation = useUpdateVocabWord();
   const deleteWordMutation = useDeleteVocabWord();
-  
+
   const [isEditing, setIsEditing] = useState(false);
   const [editData, setEditData] = useState({
     word: word?.word || '',
@@ -18,7 +37,7 @@ const WordDetailModal = ({ opened, onClose, word, onEdit, onDelete }) => {
     context: word?.context || '',
     chapter: word?.chapter || '',
     page: word?.page || '',
-    status: word?.status || 'learning'
+    status: word?.status || 'learning',
   });
   const [isTranslating, setIsTranslating] = useState(false);
   const [translationError, setTranslationError] = useState('');
@@ -32,17 +51,21 @@ const WordDetailModal = ({ opened, onClose, word, onEdit, onDelete }) => {
         context: word.context || '',
         chapter: word.chapter || '',
         page: word.page || '',
-        status: word.status || 'learning'
+        status: word.status || 'learning',
       });
     }
   }, [word]);
 
   const getStatusColor = (status) => {
     switch (status) {
-      case 'known': return 'green';
-      case 'learning': return 'blue';
-      case 'unknown': return 'gray';
-      default: return 'gray';
+      case 'known':
+        return 'green';
+      case 'learning':
+        return 'blue';
+      case 'unknown':
+        return 'gray';
+      default:
+        return 'gray';
     }
   };
 
@@ -59,8 +82,7 @@ const WordDetailModal = ({ opened, onClose, word, onEdit, onDelete }) => {
       context: word.context || '',
       chapter: word.chapter || '',
       page: word.page || '',
-      status: word.status || 'learning'
-
+      status: word.status || 'learning',
     });
   };
 
@@ -72,18 +94,23 @@ const WordDetailModal = ({ opened, onClose, word, onEdit, onDelete }) => {
       context: word.context || '',
       chapter: word.chapter || '',
       page: word.page || '',
-      status: word.status || 'learning'
+      status: word.status || 'learning',
     });
   };
 
   const handleTranslate = async () => {
     if (!editData.word.trim() || !profile?.targetLang || !profile?.nativeLang) return;
-    
+
     setIsTranslating(true);
     setTranslationError('');
     try {
-      const translatedText = await translateWithGemini(editData.word, profile.targetLang, profile.nativeLang, user?.uid);
-      setEditData(prev => ({ ...prev, translation: translatedText }));
+      const translatedText = await translateWithGemini(
+        editData.word,
+        profile.targetLang,
+        profile.nativeLang,
+        user?.uid
+      );
+      setEditData((prev) => ({ ...prev, translation: translatedText }));
     } catch (error) {
       setTranslationError(error.message);
     } finally {
@@ -103,19 +130,23 @@ const WordDetailModal = ({ opened, onClose, word, onEdit, onDelete }) => {
     }
 
     try {
+      const updatedWordData = {
+        ...word,
+        ...editData,
+      };
+      console.log('Updating word:', updatedWordData);
       await updateWordMutation.mutateAsync({
         uid: user.uid,
         mangaId: word.mangaId,
         wordId: word.id,
-        wordData: {
-          ...word,
-          ...editData
-        }
+        wordData: updatedWordData,
       });
+      console.log('Word updated successfully');
       setIsEditing(false);
-      onClose(); // close to trigger a refrelsh
-      onEdit?.(word); // notify parent component
+      onClose();
+      onEdit?.(updatedWordData);
     } catch (error) {
+      console.error('Error updating word:', error);
     }
   };
 
@@ -127,10 +158,10 @@ const WordDetailModal = ({ opened, onClose, word, onEdit, onDelete }) => {
         await deleteWordMutation.mutateAsync({
           uid: user.uid,
           mangaId: word.mangaId,
-          wordId: word.id
+          wordId: word.id,
         });
-        onClose(); 
-        onDelete?.(word); 
+        onClose();
+        onDelete?.(word);
       } catch (error) {
         console.error('Error deleting word:', error);
       }
@@ -140,65 +171,70 @@ const WordDetailModal = ({ opened, onClose, word, onEdit, onDelete }) => {
   if (!word) return null;
 
   return (
-    <Modal 
-      opened={opened} 
-      onClose={onClose} 
-      centered={true} 
-      size='sm' 
-      radius="24px"
+    <Modal
+      opened={opened}
+      onClose={onClose}
+      centered={true}
+      size='sm'
+      radius='24px'
       withCloseButton={false}
-      padding="18px"
+      padding='18px'
     >
-      <Stack gap="lg">
+      <Stack gap='lg'>
         <div>
-          <div className="relative p-12 bg-violet-500 rounded-[12px]">
+          <div className='relative rounded-[12px] bg-violet-500 p-12'>
             {isEditing ? (
               <ActionIcon
-                size="lg"
-                variant="filled"
-                color="white"
+                size='lg'
+                variant='filled'
+                color='white'
                 style={{
                   position: 'absolute',
                   bottom: '16px',
                   right: '16px',
                   backgroundColor: 'white !important',
-                  color: 'black !important'
+                  color: 'black !important',
                 }}
-                className="hover:!bg-white hover:!text-black violet-focus"
+                className='violet-focus hover:!bg-white hover:!text-black'
                 onClick={handleTranslate}
                 loading={isTranslating}
-                disabled={!editData.word.trim() || isTranslating || !profile?.targetLang || !profile?.nativeLang}
+                disabled={
+                  !editData.word.trim() ||
+                  isTranslating ||
+                  !profile?.targetLang ||
+                  !profile?.nativeLang
+                }
                 title={`Translate from ${profile?.targetLang || 'target'} to ${profile?.nativeLang || 'native'}`}
               >
-                <IconLanguage size={22} color="black" />
+                <IconLanguage size={22} color='black' />
               </ActionIcon>
             ) : (
               <ActionIcon
-                size="lg"
-                variant="filled"
-                color="white"
+                size='lg'
+                variant='filled'
+                color='white'
                 style={{
                   position: 'absolute',
                   bottom: '16px',
                   right: '16px',
                   backgroundColor: 'white !important',
-                  color: 'black !important'
+                  color: 'black !important',
                 }}
-                className="hover:!bg-white hover:!text-black"
+                className='hover:!bg-white hover:!text-black'
                 onClick={handleGoogleSearch}
                 title={`Search "${word.translation}" meaning on Google`}
               >
-                <IconSearch size={22} color="black" />
+                <IconSearch size={22} color='black' />
               </ActionIcon>
             )}
-            
-            <div className="mb-12 text-center">
+
+            <div className='mb-12 text-center'>
               {isEditing ? (
                 <TextInput
                   value={editData.word}
-                  onChange={(e) => setEditData(prev => ({ ...prev, word: e.target.value }))}
-                  size="lg"
-                  className="violet-focus"
+                  onChange={(e) => setEditData((prev) => ({ ...prev, word: e.target.value }))}
+                  size='lg'
+                  className='violet-focus'
                   error={!editData.word.trim() ? 'Word is required' : ''}
                   styles={{
                     input: {
@@ -210,25 +246,27 @@ const WordDetailModal = ({ opened, onClose, word, onEdit, onDelete }) => {
                       textAlign: 'center',
                       '&:focus': {
                         border: '2px solid white',
-                        backgroundColor: 'rgba(255,255,255,0.1)'
-                      }
-                    }
+                        backgroundColor: 'rgba(255,255,255,0.1)',
+                      },
+                    },
                   }}
                 />
               ) : (
-                <Text size="xl" fw={700} c="white">
+                <Text size='xl' fw={700} c='white'>
                   {word.word}
                 </Text>
               )}
             </div>
-            <div className="text-center">
+            <div className='text-center'>
               {isEditing ? (
                 <TextInput
                   value={editData.translation}
-                  onChange={(e) => setEditData(prev => ({ ...prev, translation: e.target.value }))}
-                  size="md"
+                  onChange={(e) =>
+                    setEditData((prev) => ({ ...prev, translation: e.target.value }))
+                  }
+                  size='md'
                   style={{ maxWidth: '200px', margin: '0 auto' }}
-                  className="violet-focus"
+                  className='violet-focus'
                   error={!editData.translation.trim() ? 'Translation is required' : ''}
                   styles={{
                     input: {
@@ -240,13 +278,13 @@ const WordDetailModal = ({ opened, onClose, word, onEdit, onDelete }) => {
                       textAlign: 'center',
                       '&:focus': {
                         border: '2px solid white',
-                        backgroundColor: 'rgba(255,255,255,0.1)'
-                      }
-                    }
+                        backgroundColor: 'rgba(255,255,255,0.1)',
+                      },
+                    },
                   }}
                 />
               ) : (
-                <Text size="lg" fw={300} c="white">
+                <Text size='lg' fw={300} c='white'>
                   {word.translation}
                 </Text>
               )}
@@ -254,75 +292,74 @@ const WordDetailModal = ({ opened, onClose, word, onEdit, onDelete }) => {
           </div>
         </div>
 
-       
-              {/* more info */}
-        <Stack gap="sm">
+        {/* more info */}
+        <Stack gap='sm'>
           <div>
-            <Text size="sm" fw={500} c="dimmed">Context:</Text>
+            <Text size='sm' fw={500} c='dimmed'>
+              Context:
+            </Text>
             {isEditing ? (
               <TextInput
                 value={editData.context}
-                onChange={(e) => setEditData(prev => ({ ...prev, context: e.target.value }))}
-                placeholder="Add context..."
-                size="sm"
-                className="violet-focus"
+                onChange={(e) => setEditData((prev) => ({ ...prev, context: e.target.value }))}
+                placeholder='Add context...'
+                size='sm'
+                className='violet-focus'
               />
             ) : (
-              <Text size="md">{word.context || 'No context added'}</Text>
+              <Text size='md'>{word.context || 'No context added'}</Text>
             )}
           </div>
-          
+
           <div>
-            <Text size="sm" fw={500} c="dimmed"></Text>
-            <Stack gap="xs">
+            <Text size='sm' fw={500} c='dimmed'></Text>
+            <Stack gap='xs'>
               {isEditing ? (
                 <>
                   <NumberInput
                     value={editData.chapter}
-                    onChange={(value) => setEditData(prev => ({ ...prev, chapter: value }))}
-                    placeholder="Chapter"
-                    size="sm"
+                    onChange={(value) => setEditData((prev) => ({ ...prev, chapter: value }))}
+                    placeholder='Chapter'
+                    size='sm'
                     min={0}
-                    className="violet-focus"
+                    className='violet-focus'
                   />
                   <NumberInput
                     value={editData.page}
-                    onChange={(value) => setEditData(prev => ({ ...prev, page: value }))}
-                    placeholder="Page"
-                    size="sm"
+                    onChange={(value) => setEditData((prev) => ({ ...prev, page: value }))}
+                    placeholder='Page'
+                    size='sm'
                     min={0}
-                    className="violet-focus"
+                    className='violet-focus'
                   />
                 </>
               ) : (
                 <>
-                  {word.chapter && <Text size="sm">Chapter {word.chapter}</Text>}
-                  {word.page && <Text size="sm">Page {word.page}</Text>}
+                  {word.chapter && <Text size='sm'>Chapter {word.chapter}</Text>}
+                  {word.page && <Text size='sm'>Page {word.page}</Text>}
                 </>
               )}
             </Stack>
           </div>
 
           <div>
-            <Text size="sm" fw={500} c="dimmed">Status:</Text>
+            <Text size='sm' fw={500} c='dimmed'>
+              Status:
+            </Text>
             {isEditing ? (
               <Radio.Group
                 value={editData.status}
-                onChange={(value) => setEditData(prev => ({ ...prev, status: value }))}
-                className="violet-focus"
+                onChange={(value) => setEditData((prev) => ({ ...prev, status: value }))}
+                className='violet-focus'
               >
-                <Group gap="md" mt="xs">
-                  <Radio value="learning" label="Learning" size="sm" />
-                  <Radio value="known" label="Known" size="sm" />
-                  <Radio value="unknown" label="Unknown" size="sm" />
+                <Group gap='md' mt='xs'>
+                  <Radio value='learning' label='Learning' size='sm' />
+                  <Radio value='known' label='Known' size='sm' />
+                  <Radio value='unknown' label='Unknown' size='sm' />
                 </Group>
               </Radio.Group>
             ) : (
-              <Badge 
-                color={getStatusColor(word.status)}
-                variant="light"
-                size="sm"
-              >
+              <Badge color={getStatusColor(word.status)} variant='light' size='sm'>
                 {word.status}
               </Badge>
             )}
@@ -330,54 +367,48 @@ const WordDetailModal = ({ opened, onClose, word, onEdit, onDelete }) => {
 
           {word.mangaTitle && (
             <div>
-              <Text size="sm" fw={500} c="dimmed">From:</Text>
-              <Text size="md">{word.mangaTitle}</Text>
+              <Text size='sm' fw={500} c='dimmed'>
+                From:
+              </Text>
+              <Text size='md'>{word.mangaTitle}</Text>
             </div>
           )}
         </Stack>
-
-        
 
         {/* Action Buttons */}
         <Group grow>
           {isEditing ? (
             <>
-              <Button 
-                variant="filled"             
-                radius="12px"
+              <Button
+                variant='filled'
+                radius='12px'
                 onClick={handleSave}
                 loading={updateWordMutation.isPending}
-                disabled={updateWordMutation.isPending || !editData.word.trim() || !editData.translation.trim()}
-                color="violet"
+                disabled={
+                  updateWordMutation.isPending ||
+                  !editData.word.trim() ||
+                  !editData.translation.trim()
+                }
+                color='violet'
               >
                 Save
               </Button>
-                <Button 
-                  variant="outline" 
-                  color="red"
-                  radius="12px"
-                  onClick={handleCancelEdit}
-                  disabled={updateWordMutation.isPending}
-                >
-                  Cancel
-                </Button>
+              <Button
+                variant='outline'
+                color='red'
+                radius='12px'
+                onClick={handleCancelEdit}
+                disabled={updateWordMutation.isPending}
+              >
+                Cancel
+              </Button>
             </>
           ) : (
             <>
-              <Button 
-                variant="filled" 
-                radius="12px"
-                onClick={handleEdit}
-                color="violet"
-              >
+              <Button variant='filled' radius='12px' onClick={handleEdit} color='violet'>
                 Edit
               </Button>
-              <Button 
-                variant="outline" 
-                color="red"
-                radius="12px"
-                onClick={handleDelete}
-              >
+              <Button variant='outline' color='red' radius='12px' onClick={handleDelete}>
                 Delete
               </Button>
             </>

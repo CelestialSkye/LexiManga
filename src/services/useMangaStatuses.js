@@ -9,7 +9,7 @@ export const useMangaStatuses = (uid) => {
     queryKey: ['mangaStatuses', uid],
     queryFn: () => fetchMangaStatuses(uid),
     enabled: !!uid,
-    staleTime: 5 * 60 * 1000, 
+    staleTime: 0,
   });
 };
 
@@ -22,20 +22,20 @@ const fetchMangaStatuses = async (uid) => {
       const mangaStatus = {
         id: doc.id,
         ...doc.data(),
-        title: doc.data() 
+        title: doc.data(),
       };
 
       try {
         if (mangaStatus.mangaId) {
           const details = await getMangaDetails(mangaStatus.mangaId);
           const coverImage = details.data?.Media?.coverImage?.large;
-          const anilistTitle = details.data?.Media?.title?.romaji || details.data?.Media?.title?.english;
-         
+          const anilistTitle =
+            details.data?.Media?.title?.romaji || details.data?.Media?.title?.english;
+
           return {
             ...mangaStatus,
             coverImage,
-            title: anilistTitle || mangaStatus.
-mangaTitle || 'Untitled',
+            title: anilistTitle || mangaStatus.mangaTitle || 'Untitled',
           };
         }
       } catch (error) {
