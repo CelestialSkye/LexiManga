@@ -17,6 +17,7 @@ const MangaStatusModal = ({ manga, opened, closeModal }) => {
   const handleSave = async () => {
     if (!user) return;
 
+    const isNew = !existingStatus;
 
     try {
       await saveMutation.mutateAsync({
@@ -32,6 +33,7 @@ const MangaStatusModal = ({ manga, opened, closeModal }) => {
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),
         },
+        isNew,
       });
     } catch (error) {
       console.error('Error saving manga status:', error);
@@ -56,7 +58,7 @@ const MangaStatusModal = ({ manga, opened, closeModal }) => {
         <Select
           value={status}
           onChange={setStatus}
-          className="violet-focus"
+          className='violet-focus'
           data={[
             { value: 'reading', label: 'Reading' },
             { value: 'completed', label: 'Completed' },
@@ -66,19 +68,23 @@ const MangaStatusModal = ({ manga, opened, closeModal }) => {
           ]}
         />
         <Text>Progress</Text>
-        <NumberInput value={progress} onChange={setProgress} className="violet-focus" />
+        <NumberInput value={progress} onChange={setProgress} className='violet-focus' />
         <Text>Score</Text>
-        <NumberInput value={score} onChange={setScore} className="violet-focus" />
+        <NumberInput value={score} onChange={setScore} className='violet-focus' />
         <Text>Notes</Text>
-        <TextInput value={notes} onChange={(e) => setNotes(e.target.value)} className="violet-focus" />
+        <TextInput
+          value={notes}
+          onChange={(e) => setNotes(e.target.value)}
+          className='violet-focus'
+        />
         <Button
           onClick={handleSave}
           loading={saveMutation.isPending}
           disabled={saveMutation.isPending}
-          color="violet"
-          variant="filled"
-          radius="12px"
-          className="mt-4"
+          color='violet'
+          variant='filled'
+          radius='12px'
+          className='mt-4'
         >
           Save
         </Button>
