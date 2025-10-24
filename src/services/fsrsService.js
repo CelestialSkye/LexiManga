@@ -2,6 +2,20 @@ import { FSRS, createEmptyCard, Rating } from 'ts-fsrs';
 
 const fsrs = new FSRS();
 
+export const AUTO_UPDATE_FIELDS = [
+  'due',
+  'elapsed_days',
+  'lapses',
+  'last_review',
+  'reps',
+  'scheduled_days',
+  'stability',
+  'state',
+  'updatedAt',
+];
+
+
+
 export const createCard = (wordData) => {
   const card = createEmptyCard();
   return {

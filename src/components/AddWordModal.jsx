@@ -5,7 +5,7 @@ import { useAddVocabWord } from '../services/vocabService';
 import { useAuth } from '../context/AuthContext';
 import { translateWithGemini } from '../services/geminiApi';
 import { IconLanguage } from '@tabler/icons-react';
-import {  useWordDifficulty } from 'src/services/wordDifficultyService';
+import { useWordDifficulty } from 'src/services/wordDifficultyService';
 
 //testing file saving in lvim
 
@@ -52,45 +52,62 @@ const AddWordModal = ({ manga, opened, closeModal }) => {
     if (!user) return;
 
     if (!word.trim()) {
-      return; 
+      return;
     }
     if (!translation.trim()) {
-      return; 
+      return;
     }
 
     try {
+      const wordData = {
+        mangaId: manga.id.toString(),
+        mangaTitle: manga.title?.english || manga.title?.romaji,
+        word,
+        translation,
+        context,
+        chapter,
+        page,
+        status,
+      };
+      console.log('Saving word:', wordData);
       await saveMutation.mutateAsync({
         uid: user.uid,
         mangaId: manga.id.toString(),
         wordId: `${manga.id}_${Date.now()}`,
-        wordData: {
-          mangaId: manga.id.toString(),
-          mangaTitle: manga.title?.english || manga.title?.romaji,
-          word,
-          translation,
-          context,
-          chapter,
-          page,
-          status,
-        },
+        wordData,
       });
+      console.log('Word saved successfully');
+      resetForm();
+      closeModal();
     } catch (error) {
       console.error('Error saving vocabulary word:', error);
-    } finally {
-      closeModal();
     }
+  };
+
+  const resetForm = () => {
+    setWord('');
+    setTranslation('');
+    setContext('');
+    setChapter('');
+    setPage('');
+    setStatus('learning');
+    setTranslationError('');
+  };
+
+  const handleCloseModal = () => {
+    resetForm();
+    closeModal();
   };
 
   return (
     <Modal
       opened={opened}
-      onClose={closeModal}
+      onClose={handleCloseModal}
       centered={true}
       withCloseButton={false}
       size='sm'
       radius='24px'
     >
-
       <div className='p-2'>
         <div className='pb-3'>
           <Text>

@@ -171,6 +171,7 @@ const SRSGame = ({ manga, words: initialWords }) => {
           ? new Date(newCard.last_review).toISOString()
           : now.toISOString(),
       },
+      isSRSUpdate: true,
     });
 
     // remove the current card from the session
