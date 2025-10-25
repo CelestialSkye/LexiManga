@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { ActionButton } from '../components';
 import LanguageSelect from '../components/LanguageSelect';
+import { getAuth, sendPasswordResetEmail } from 'firebase/auth';
 
 const Auth = () => {
   const navigate = useNavigate();
@@ -47,6 +48,19 @@ const Auth = () => {
       setLoading(false);
     }
   };
+
+  //handle forgot password
+  const handleForgotPassword = async (email) => {
+  const auth = getAuth();
+  try {
+    await sendPasswordResetEmail(auth, email);
+    alert("Password reset email sent! Please check your inbox.");
+  } catch (error) {
+    console.error("Error sending reset email:", error.message);
+    alert(error.message);
+  }
+};
+
 
   // Redirect if already logged in
   if (user) {
@@ -108,6 +122,7 @@ const Auth = () => {
                 >
                   Sign In
                 </ActionButton>
+                <ActionButton onClick={() => handleForgotPassword(email)}>Forgot Password?</ActionButton>
               </form>
             </Tabs.Panel>
 
