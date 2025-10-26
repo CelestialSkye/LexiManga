@@ -8,6 +8,9 @@ import Dashboard from './pages/Dashboard';
 import MangaPage from './pages/MangaPage';
 import Auth from './pages/Auth';
 import ProfilePage from './pages/ProfilePage';
+import SettingsPage from './pages/SettingsPage';
+
+
 
 const App = () => {
   return (
@@ -22,6 +25,7 @@ const App = () => {
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/manga/:id" element={<MangaPage />} />
             <Route path="/profile" element={<ProfilePage />} />
+            <Route path="/settings" element={<SettingsPage />} />
           </Routes>
         </BrowserRouter>
         </AuthProvider>

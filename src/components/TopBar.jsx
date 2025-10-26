@@ -112,6 +112,10 @@ useEffect(() => {
                       <button className="w-full text-sm py-2 px-4 hover:bg-gray-100 rounded transition-colors text-left" onClick={() => navigate('/profile')}>
                         Profile
                       </button>
+                          <button className="w-full text-sm py-2 px-4 hover:bg-gray-100 rounded transition-colors text-left" onClick={() => navigate('/settings')}>
+                            Settings
+                          </button>
+
                       <button className="w-full text-sm py-2 px-4 hover:bg-red-100 text-red-600 rounded transition-colors text-left" onClick={logout}>
                         Logout
                       </button>
