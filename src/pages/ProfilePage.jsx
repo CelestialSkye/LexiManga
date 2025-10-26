@@ -10,6 +10,7 @@ import ActivityTab from '../features/profile/tabs/ActivityTab';
 import ScoresTab from '../features/profile/tabs/ScoresTab';
 import StudyTab from '../features/profile/tabs/StudyTab';
 import VocabularyTab from '../features/profile/tabs/VocabularyTab';
+import ProfileTab from '../features/profile/tabs/ProfileTab';
 
 const ProfilePage = () => {
   const [activeTab, setActiveTab] = useState('overview');
@@ -25,6 +26,7 @@ const ProfilePage = () => {
     { id: 'scores', label: 'Scores' },
     { id: 'study', label: 'Study' },
     { id: 'vocabulary', label: 'Vocabulary' },
+    { id: 'profileinfo', label: 'Profile'},
   ];
 
   // Placeholder profile data
@@ -144,6 +146,8 @@ const ProfilePage = () => {
                 {activeTab === 'study' && <StudyTab profile={profileData} />}
 
                 {activeTab === 'vocabulary' && <VocabularyTab profile={profileData} />}
+
+                {activeTab === 'profileinfo' && <ProfileTab profile={profileData} />}
               </div>
             </div>
           </div>
