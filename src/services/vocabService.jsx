@@ -178,14 +178,11 @@ const deleteVocabWord = async (uid, mangaId, wordId) => {
 };
 
 const logActivity = async (type, data) => {
-  console.log('Incoming data keys:', Object.keys(data));
-  console.log('AUTO_UPDATE_FIELDS:', AUTO_UPDATE_FIELDS);
 
   try {
     const auth = getAuth();
     const user = auth.currentUser;
     if (!user) {
-      console.warn('No user logged in for activity logging');
       return;
     }
 
@@ -193,7 +190,6 @@ const logActivity = async (type, data) => {
       Object.entries(data).filter(([key]) => !AUTO_UPDATE_FIELDS.includes(key))
     );
 
-    console.log('Logging activity:', { type, filteredData, userId: user.uid });
 
     const result = await addDoc(collection(db, 'activities'), {
       type,
@@ -202,7 +198,6 @@ const logActivity = async (type, data) => {
       timestamp: new Date(),
     });
 
-    console.log('Activity logged successfully:', result.id);
   } catch (error) {
     console.error('Error logging activity:', error);
   }

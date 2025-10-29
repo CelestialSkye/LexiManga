@@ -1,6 +1,8 @@
 import { useState } from 'react';
+import { ErrorBoundary } from 'react-error-boundary';
 import { useAuth } from '../context/AuthContext';
 import { useMediaQuery } from '@mantine/hooks';
+import { useProfileStats } from '../hooks/useProfileStats';
 import TopBar from '../components/TopBar';
 import AvatarUpload from '../components/AvatarUpload';
 import BannerUpload from '../components/BannerUpload';
@@ -11,10 +13,25 @@ import ScoresTab from '../features/profile/tabs/ScoresTab';
 import StudyTab from '../features/profile/tabs/StudyTab';
 import VocabularyTab from '../features/profile/tabs/VocabularyTab';
 import ProfileTab from '../features/profile/tabs/ProfileTab';
+import ProfileSideScrollinfo from '@components/ProfileSideScrollInfo';
+
+// Error fallback component
+function ErrorFallback({ error, resetErrorBoundary }) {
+  return (
+    <div role='alert' className='rounded-lg bg-red-50 p-4 text-red-800'>
+      <p>Something went wrong loading the user information:</p>
+      <pre className='text-sm'>{error.message}</pre>
+      <button onClick={resetErrorBoundary} className='mt-2 rounded bg-red-500 px-4 py-2 text-white'>
+        Try again
+      </button>
+    </div>
+  );
+}
 
 const ProfilePage = () => {
   const [activeTab, setActiveTab] = useState('overview');
   const { user, profile } = useAuth();
+  const { wordCount, mangaCount, learnedCount, unknownCount, learningCount } = useProfileStats();
 
   const isMobile = useMediaQuery('(max-width: 768px)');
   const isDesktop = useMediaQuery('(min-width: 769px)');
@@ -26,7 +43,7 @@ const ProfilePage = () => {
     { id: 'scores', label: 'Scores' },
     { id: 'study', label: 'Study' },
     { id: 'vocabulary', label: 'Vocabulary' },
-    { id: 'profileinfo', label: 'Profile'},
+    { id: 'profileinfo', label: 'Profile' },
   ];
 
   // Placeholder profile data
@@ -102,6 +119,16 @@ const ProfilePage = () => {
 
       <div className='page-container pb-6'>
         <div className='relative mt-6'>
+          {isMobile && (
+            <ErrorBoundary
+              FallbackComponent={ErrorFallback}
+              onReset={() => {
+                // Optional: Add any reset logic here
+              }}
+            >
+              <ProfileSideScrollinfo />
+            </ErrorBoundary>
+          )}
           {/* left section - fixed position on desktop */}
           {isDesktop && (
             <div className='absolute left-0 w-48'>
@@ -109,24 +136,24 @@ const ProfilePage = () => {
                 <h3 className='mb-3 text-xs font-bold'>Quick Info</h3>
                 <div className='space-y-2'>
                   <div>
-                    <span className='text-xs text-gray-600'>Member Since:</span>
-                    <span className='ml-2 text-xs'>{profileData.memberSince}</span>
+                    <span className='text-xs text-gray-600'>Manga Tracking:</span>
+                    <span className='ml-2 text-xs'>{mangaCount ?? 'N/A'}</span>
                   </div>
                   <div>
-                    <span className='text-xs text-gray-600'>Study Time:</span>
-                    <span className='ml-2 text-xs'>{profileData.studyTime}</span>
+                    <span className='text-xs text-gray-600'>Words:</span>
+                    <span className='ml-2 text-xs'>{wordCount ?? 'N/A'}</span>
                   </div>
                   <div>
-                    <span className='text-xs text-gray-600'>Current Streak:</span>
-                    <span className='ml-2 text-xs'>{profileData.streak}</span>
+                    <span className='text-xs text-gray-600'>Learned:</span>
+                    <span className='ml-2 text-xs'>{learnedCount ?? 'N/A'}</span>
                   </div>
                   <div>
-                    <span className='text-xs text-gray-600'>Words Learned:</span>
-                    <span className='ml-2 text-xs'>{profileData.wordsLearned}</span>
+                    <span className='text-xs text-gray-600'>Unknown:</span>
+                    <span className='ml-2 text-xs'>{unknownCount ?? 'N/A'}</span>
                   </div>
                   <div>
-                    <span className='text-xs text-gray-600'>Native Language:</span>
-                    <span className='ml-2 text-xs'>{profileData.nativeLang}</span>
+                    <span className='text-xs text-gray-600'>Learning:</span>
+                    <span className='ml-2 text-xs'>{learningCount ?? 'N/A'}</span>
                   </div>
                 </div>
               </div>

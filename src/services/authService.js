@@ -1,11 +1,12 @@
 // Authentication service
-import { 
-  signInWithEmailAndPassword, 
-  createUserWithEmailAndPassword, 
-  signOut, 
-  onAuthStateChanged 
+import {
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
+  signOut,
+  onAuthStateChanged,
 } from 'firebase/auth';
-import { auth } from '../config/firebase';
+import { collection, getDocs, doc, deleteDoc, writeBatch, query, where } from 'firebase/firestore';
+import { auth, db } from '../config/firebase';
 import firestoreService from './firestoreService';
 
 export const authService = {
@@ -24,17 +25,17 @@ export const authService = {
   async signUp(email, password, userData = {}) {
     try {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-      
+
       // Save additional user data to Firestore
       if (userData) {
         await firestoreService.add('users', {
           uid: userCredential.user.uid,
           email: userCredential.user.email,
           ...userData,
-          createdAt: new Date()
+          createdAt: new Date(),
         });
       }
-      
+
       return userCredential.user;
     } catch (error) {
       console.error('Error signing up:', error);
@@ -60,7 +61,100 @@ export const authService = {
   // Listen to auth state changes
   onAuthStateChanged(callback) {
     return onAuthStateChanged(auth, callback);
-  }
+  },
+
+  async updateUserLanguage(uid, targetLang) {
+    try {
+      await firestoreService.update('users', uid, { targetLang });
+      return true;
+    } catch (error) {
+      throw error;
+    }
+  },
+
+  async deleteUserWords(uid) {
+    try {
+      const wordsRef = collection(db, `users/${uid}/words`);
+      const wordsSnapshot = await getDocs(wordsRef);
+
+      if (wordsSnapshot.empty) {
+        return true;
+      }
+
+      const batch = writeBatch(db);
+      wordsSnapshot.docs.forEach((wordDoc) => {
+        batch.delete(doc(db, `users/${uid}/words`, wordDoc.id));
+      });
+
+      await batch.commit();
+      return true;
+    } catch (error) {
+      throw error;
+    }
+  },
+
+  async changeLanguageAndResetWords(uid, targetLang) {
+    try {
+      await this.updateUserLanguage(uid, targetLang);
+
+      await this.deleteUserWords(uid);
+
+      return true;
+    } catch (error) {
+      throw error;
+    }
+  },
+
+  async getUserWordCount(uid) {
+    try {
+      const wordsCollection = await firestoreService.query(`users/${uid}/words`, []);
+      return wordsCollection.length;
+    } catch (error) {
+      throw error;
+    }
+  },
+
+  async getUserMangaCount(uid) {
+    try {
+      const mangaCollection = await firestoreService.query(`users/${uid}/mangaStatus`, []);
+      return mangaCollection.length;
+    } catch {
+      throw error;
+    }
+  },
+
+  async getUserLearnedWords(uid) {
+    try {
+      const learnedWords = await firestoreService.query(`users/${uid}/words`, [
+        { field: 'status', operator: '==', value: 'known' },
+      ]);
+      return learnedWords.length;
+    } catch (error) {
+      throw error;
+    }
+  },
+
+  async getUserUnknownWords(uid) {
+    try {
+      const unknownWords = await firestoreService.query(`users/${uid}/words`, [
+        { field: 'status', operator: '==', value: 'unknown' },
+      ]);
+      return unknownWords.length;
+    } catch (error) {
+      throw error;
+    }
+  },
+  
+ async getUserLearningWords(uid) {
+    try {
+      const learningWords = await firestoreService.query(`users/${uid}/words`, [
+        { field: 'status', operator: '==', value: 'learning' },
+      ]);
+      return learningWords.length;
+    } catch (error) {
+      throw error;
+    }
+  }, 
 };
 
 export default authService;

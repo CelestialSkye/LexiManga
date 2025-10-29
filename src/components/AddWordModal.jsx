@@ -1,15 +1,16 @@
 import { useState } from 'react';
-import { Modal, Radio, Group, ActionIcon, Stack } from '@mantine/core';
+import { Modal, Radio, Group, ActionIcon, Stack, Select } from '@mantine/core';
 import { TextInput, NumberInput, Button, Text } from '@mantine/core';
 import { useAddVocabWord } from '../services/vocabService';
 import { useAuth } from '../context/AuthContext';
 import { translateWithGemini } from '../services/geminiApi';
 import { IconLanguage } from '@tabler/icons-react';
 import { useWordDifficulty } from 'src/services/wordDifficultyService';
+import { useMangaStatuses } from '../services/useMangaStatuses';
 
 //testing file saving in lvim
 
-const AddWordModal = ({ manga, opened, closeModal }) => {
+const AddWordModal = ({ manga, opened, closeModal, showMangaSelector = false }) => {
   const { user, profile } = useAuth();
   const saveMutation = useAddVocabWord();
   const [word, setWord] = useState('');
@@ -20,6 +21,16 @@ const AddWordModal = ({ manga, opened, closeModal }) => {
   const [status, setStatus] = useState('learning');
   const [isTranslating, setIsTranslating] = useState(false);
   const [translationError, setTranslationError] = useState('');
+  const [selectedMangaId, setSelectedMangaId] = useState('');
+
+  // Fetch user's manga for selector
+  const { data: userManga = [], isLoading: mangaLoading } = useMangaStatuses(user?.uid);
+
+  // Transform to Select format
+  const mangaOptions = userManga.map((m) => ({
+    value: m.id,
+    label: m.title || m.mangaTitle,
+  }));
 
   //calling the word difficulty hook
   const { data: difficulty, isLoading: difficultyLoading } = useWordDifficulty(
@@ -41,7 +52,6 @@ const AddWordModal = ({ manga, opened, closeModal }) => {
       );
       setTranslation(translatedText);
     } catch (error) {
-      console.error('Translation error:', error);
       setTranslationError(error.message);
     } finally {
       setIsTranslating(false);
@@ -58,10 +68,19 @@ const AddWordModal = ({ manga, opened, closeModal }) => {
       return;
     }
 
+    // Determine which manga to use
+    const currentManga = showMangaSelector
+      ? userManga.find((m) => m.id === selectedMangaId)
+      : manga;
+
+    if (!currentManga) {
+      return;
+    }
+
     try {
       const wordData = {
-        mangaId: manga.id.toString(),
-        mangaTitle: manga.title?.english || manga.title?.romaji,
+        mangaId: currentManga.id.toString(),
+        mangaTitle: currentManga.title || currentManga.mangaTitle,
         word,
         translation,
         context,
@@ -69,14 +88,12 @@ const AddWordModal = ({ manga, opened, closeModal }) => {
         page,
         status,
       };
-      console.log('Saving word:', wordData);
       await saveMutation.mutateAsync({
         uid: user.uid,
-        mangaId: manga.id.toString(),
-        wordId: `${manga.id}_${Date.now()}`,
+        mangaId: currentManga.id.toString(),
+        wordId: `${currentManga.id}_${Date.now()}`,
         wordData,
       });
-      console.log('Word saved successfully');
       resetForm();
       closeModal();
     } catch (error) {
@@ -92,6 +109,7 @@ const AddWordModal = ({ manga, opened, closeModal }) => {
     setPage('');
     setStatus('learning');
     setTranslationError('');
+    setSelectedMangaId('');
   };
 
   const handleCloseModal = () => {
@@ -109,6 +127,28 @@ const AddWordModal = ({ manga, opened, closeModal }) => {
       radius='24px'
     >
       <div className='p-2'>
+        {showMangaSelector && (
+          <div className='pb-3'>
+            <Text>
+              Manga
+              <Text span c='red'>
+                *
+              </Text>
+            </Text>
+            <Select
+              placeholder='Select a manga'
+              value={selectedMangaId}
+              onChange={setSelectedMangaId}
+              data={mangaOptions}
+              searchable
+              clearable={false}
+              className='violet-focus'
+              error={!selectedMangaId ? 'Manga is required' : ''}
+              disabled={mangaLoading}
+            />
+          </div>
+        )}
+
         <div className='pb-3'>
           <Text>
             Word{' '}
@@ -231,7 +271,12 @@ const AddWordModal = ({ manga, opened, closeModal }) => {
           <Button
             onClick={handleSave}
             loading={saveMutation.isPending}
-            disabled={saveMutation.isPending || !word.trim() || !translation.trim()}
+            disabled={
+              saveMutation.isPending ||
+              !word.trim() ||
+              !translation.trim() ||
+              (showMangaSelector && !selectedMangaId)
+            }
             color='violet'
             variant='filled'
             radius='12px'
