@@ -159,6 +159,7 @@ const WordDetailModal = ({ opened, onClose, word, onEdit, onDelete }) => {
           uid: user.uid,
           mangaId: word.mangaId,
           wordId: word.id,
+          wordData: word,
         });
         onClose();
         onDelete?.(word);

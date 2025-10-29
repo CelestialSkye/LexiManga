@@ -2,6 +2,8 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { db } from '../config/firebase';
 import { doc, getDoc, setDoc, addDoc, collection, deleteDoc } from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
+import { getMangaDetails } from './anilistApi';
+import { AUTO_UPDATE_FIELDS } from './fsrsService';
 
 export const useMangaStatus = (uid, mangaId) => {
   return useQuery({
@@ -51,16 +53,30 @@ export const useSaveMangaStatus = () => {
 
       if (!isNew && previousData) {
         Object.keys(newData).forEach((key) => {
-          if (previousData[key] !== newData[key]) {
+          // Skip auto-updated fields like createdAt, updatedAt, etc.
+          if (!AUTO_UPDATE_FIELDS.includes(key) && previousData[key] !== newData[key]) {
             changes[key] = { from: previousData[key], to: newData[key] };
           }
         });
+      }
+
+      let coverImage = null;
+      try {
+        const mangaDetails = await getMangaDetails(mangaId);
+        // The API returns { data: { Media: {...} }, cached: true }
+        coverImage =
+          mangaDetails?.data?.Media?.coverImage?.large ??
+          mangaDetails?.data?.Media?.coverImage?.medium ??
+          null;
+      } catch (err) {
+        console.warn('Failed to fetch cover image:', err);
       }
 
       const activityPayload = {
         mangaId,
         mangaTitle: newData.mangaTitle,
         status: newData.status,
+        coverImage,
         data: newData,
       };
 
@@ -102,10 +118,21 @@ const saveMangaStatus = async (uid, mangaId, statusData) => {
   return dataToSave;
 };
 
-export const deleteMangaStatus = async (uid, mangaId) => {
+export const deleteMangaStatus = async (uid, mangaId, mangaTitle) => {
   try {
     if (!uid || !mangaId) {
       throw new Error('User ID and Manga ID are required');
+    }
+
+    let coverImage = null;
+    try {
+      const mangaDetails = await getMangaDetails(mangaId);
+      coverImage =
+        mangaDetails?.data?.Media?.coverImage?.large ??
+        mangaDetails?.data?.Media?.coverImage?.medium ??
+        null;
+    } catch (err) {
+      console.warn('Failed to fetch cover image:', err);
     }
 
     const mangaDocRef = doc(db, 'users', uid, 'mangaStatus', mangaId);
@@ -114,7 +141,8 @@ export const deleteMangaStatus = async (uid, mangaId) => {
     // Log activity for deletion
     await logActivity('manga_delete', {
       mangaId,
-      mangaTitle: null, // You might want to pass the title if available
+      mangaTitle,
+      coverImage,
     });
 
     console.log(`Manga with ID ${mangaId} deleted successfully.`);

@@ -23,6 +23,9 @@ const StatusFilter = ({
       data={statusOptions}
       size={size}
       style={{ minWidth: 150 }}
+        classNames={{
+        input: 'focus:ring-2 focus:ring-violet-500 focus:outline-none',
+      }}
       {...props}
     />
   );
