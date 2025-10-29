@@ -9,6 +9,7 @@ import {
 import { useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { openDeleteConfirmation } from './DeleteConfirmationModal';
 
 const MangaStatusModal = ({ manga, opened, closeModal }) => {
   const { user } = useAuth();
@@ -16,7 +17,12 @@ const MangaStatusModal = ({ manga, opened, closeModal }) => {
   const { data: existingStatus, isLoading } = useMangaStatus(user?.uid, manga?.id?.toString());
   const saveMutation = useSaveMangaStatus();
   const deleteMutation = useMutation({
-    mutationFn: () => deleteMangaStatus(user?.uid, manga?.id?.toString()),
+    mutationFn: () =>
+      deleteMangaStatus(
+        user?.uid,
+        manga?.id?.toString(),
+        manga?.title?.english || manga?.title?.romaji
+      ),
     onMutate: async () => {
       // Optimistically remove the manga status from the cache
       await queryClient.cancelQueries({
@@ -36,7 +42,7 @@ const MangaStatusModal = ({ manga, opened, closeModal }) => {
     onSuccess: (_, __, context) => {
       // Invalidate queries to ensure fresh data
       queryClient.invalidateQueries({
-        queryKey: ['mangaStatus', user?.uid],
+        queryKey: ['mangaStatuses', user?.uid],
       });
       closeModal();
     },
@@ -150,7 +156,13 @@ const MangaStatusModal = ({ manga, opened, closeModal }) => {
           </Button>
           {existingStatus && (
             <Button
-              onClick={() => deleteMutation.mutate()}
+              onClick={() =>
+                openDeleteConfirmation(
+                  manga.title?.romaji || manga.title?.english || 'this manga',
+                  'manga',
+                  () => deleteMutation.mutate()
+                )
+              }
               loading={deleteMutation.isPending}
               disabled={saveMutation.isPending || deleteMutation.isPending}
               color='red'

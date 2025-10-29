@@ -29,10 +29,14 @@ const VocabularyTab = ({ manga }) => {
     { header: 'Translation', key: 'translation' },
     { header: 'Chapter', key: 'chapter' },
     {
-      header: 'Manga',
-      key: 'mangaTitle',
-      render: (row) => <span className='font-medium'>{row.mangaTitle || '—'}</span>,
-    },
+  header: 'Manga',
+  key: 'mangaTitle',
+  render: (row) => (
+    <span className="font-small max-w-[150px] block truncate">
+      {row.mangaTitle || '—'}
+    </span>
+  )
+},
     {
       header: 'Status',
       key: 'status',

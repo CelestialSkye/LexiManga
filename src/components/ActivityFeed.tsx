@@ -1,12 +1,7 @@
-import { useEffect, useState } from "react";
-import { db } from "../config/firebase";
-import {
-  collection,
-  query,
-  orderBy,
-  onSnapshot,
-  limit,
-} from "firebase/firestore";
+import { useEffect, useState } from 'react';
+import { db } from '../config/firebase';
+import { collection, query, orderBy, onSnapshot, limit } from 'firebase/firestore';
+import { getMangaDetails } from 'src/services/anilistApi';
 
 interface Activity {
   id: string;
@@ -14,6 +9,7 @@ interface Activity {
   userId: string;
   mangaId?: string;
   mangaTitle?: string;
+  coverImage?: string;
   word?: string;
   translation?: string;
   context?: string;
@@ -22,18 +18,8 @@ interface Activity {
   timestamp?: { seconds: number; nanoseconds: number } | null;
 }
 
-
-const activityIcons: Record<string, string> = {
-  manga_add: "📚",
-  manga_update: "✏️",
-  word_add: "📝",
-  word_update: "🔄",
-};
-
-const formatTimestamp = (
-  timestamp: Activity["timestamp"]
-): string => {
-  if (!timestamp?.seconds) return "Just now";
+const formatTimestamp = (timestamp: Activity['timestamp']): string => {
+  if (!timestamp?.seconds) return 'Just now';
   const date = new Date(timestamp.seconds * 1000);
   return date.toLocaleString();
 };
@@ -43,13 +29,11 @@ const ActivityFeed = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const q = query(collection(db, "activities"), orderBy("timestamp", "desc") ,limit(20));
+    const q = query(collection(db, 'activities'), orderBy('timestamp', 'desc'), limit(20));
 
     const unsubscribe = onSnapshot(q, (snapshot) => {
-      const fetched: Activity[] = []; 
-      snapshot.forEach((doc) =>
-      fetched.push({ ...(doc.data() as Activity), id: doc.id }),
-      );
+      const fetched: Activity[] = [];
+      snapshot.forEach((doc) => fetched.push({ ...(doc.data() as Activity), id: doc.id }));
       setActivities(fetched);
       setLoading(false);
     });
@@ -57,71 +41,101 @@ const ActivityFeed = () => {
     return () => unsubscribe();
   }, []);
 
-const renderActivityMessage = (activity: Activity) => {
-  const { type, mangaTitle, mangaId, word, translation, data = {}, changes = {} } = activity;
-  const changeText =
-    Object.keys(changes).length > 0
-      ? Object.entries(changes)
-          .map(([key, val]) => `${key}: ${val.from ?? "N/A"} → ${val.to ?? "N/A"}`)
-          .join(", ")
-      : "No changes";
+  const renderActivityMessage = (activity: Activity) => {
+    const { type, mangaTitle, mangaId, word, translation, data = {}, changes = {} } = activity;
+    const changeEntries =
+      Object.keys(changes).length > 0
+        ? Object.entries(changes).map(
+            ([key, val]) => `${key}: ${val.from ?? 'N/A'} → ${val.to ?? 'N/A'}`
+          )
+        : [];
 
-  switch (type) {
-    case "manga_add":
-      return `➕ Added manga: ${activity.mangaTitle ?? data.mangaTitle ?? "Unknown"}`;
+    switch (type) {
+      case 'manga_add':
+        return { title: activity.mangaTitle ?? data.mangaTitle ?? 'Unknown', changes: [] };
 
-    case "manga_update":
-      return `✏️ Updated manga (${activity.mangaTitle ?? data.mangaTitle ?? mangaId ?? "Unknown"}): ${changeText}`;
+      case 'manga_update': {
+        const title = activity.mangaTitle ?? data.mangaTitle ?? mangaId ?? 'Unknown';
+        return { title, changes: changeEntries };
+      }
 
-    case "word_add":
-      return `📝 Added word: ${activity.word ?? data.word ?? "Unknown"} (${activity.translation ?? data.translation ?? ""})`;
+      case 'manga_delete':
+        return {
+          title: `(${activity.mangaTitle ?? data.mangaTitle ?? mangaId ?? 'Unknown'})`,
+          changes: [],
+        };
 
-    case "word_update":
-      return `🔄 Updated word: ${activity.word ?? data.word ?? "Unknown"} (${changeText})`;
+      case 'word_add':
+        return {
+          title: `${activity.mangaTitle}: ${activity.word ?? data.word ?? 'Unknown'} (${activity.translation ?? data.translation ?? ''})`,
+          changes: [],
+        };
 
-    default:
-      return "Performed an activity";
-  }
-};
+      case 'word_update': {
+        return { title: activity.mangaTitle, changes: changeEntries };
+      }
 
+      case 'word_delete':
+        return {
+          title: `${activity.mangaTitle}: ${activity.word ?? data.word ?? 'Unknown'}`,
+          changes: [],
+        };
+
+      default:
+        return { title: 'Performed an activity', changes: [] };
+    }
+  };
 
   if (loading) {
     return (
-      <div className="p-4 bg-white rounded-lg shadow-md">
-        <h2 className="text-xl font-bold mb-4">Activity Feed</h2>
-        <div className="animate-pulse space-y-2">
-          <div className="h-4 bg-gray-200 rounded w-full"></div>
-          <div className="h-4 bg-gray-200 rounded w-3/4"></div>
-          <div className="h-4 bg-gray-200 rounded w-5/6"></div>
+      <div className='rounded-lg bg-white p-4'>
+        <h2 className='mb-4 text-xl font-bold'>Activity Feed</h2>
+        <div className='animate-pulse space-y-2'>
+          <div className='h-4 w-full rounded bg-gray-200'></div>
+          <div className='h-4 w-3/4 rounded bg-gray-200'></div>
+          <div className='h-4 w-5/6 rounded bg-gray-200'></div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="p-4 rounded-[16px] bg-white shadow-md">
-      <h2 className="text-xl font-bold mb-4">Activity Feed</h2>
+    <div className='rounded-lg bg-white p-4'>
       {activities.length === 0 ? (
-        <div className="text-gray-500">No activities yet.</div>
+        <div className='py-8 text-center text-gray-400'>No activities yet.</div>
       ) : (
-        <ul className="space-y-2 max-h-[500px] overflow-y-auto">
+        <ul className='max-h-[500px] space-y-3 overflow-y-auto'>
           {activities.map((activity) => (
-            <li
-              key={activity.id}
-              className="p-3 border border-gray-100 rounded-lg hover:bg-gray-50 transition flex justify-between items-start"
-            >
-              <div className="flex items-start space-x-2">
-                <span className="text-xl">
-                  {activityIcons[activity.type] ?? "✨"}
-                </span>
-                <div>
-                  <p className="text-sm font-medium">
-                    {renderActivityMessage(activity)}
-                  </p>
-                  <p className="text-xs text-gray-500">
-                    {formatTimestamp(activity.timestamp)}
-                  </p>
+            <li key={activity.id} className='flex gap-3 rounded-md p-3 transition hover:bg-gray-50'>
+              {activity.coverImage &&
+                (activity.type === 'manga_add' ||
+                  activity.type === 'manga_update' ||
+                  activity.type === 'manga_delete' ||
+                  activity.type === 'word_add' ||
+                  activity.type === 'word_update' ||
+                  activity.type === 'word_delete') && (
+                  <img
+                    src={activity.coverImage}
+                    alt={activity.mangaTitle ?? 'Manga'}
+                    className='h-28 w-16 flex-shrink-0 rounded-[8px] object-cover'
+                  />
+                )}
+              <div className='flex flex-1 flex-col'>
+                <div className='flex items-center gap-2'>
+                  <div>
+                    <p className='text-sm font-medium text-violet-600'>
+                      {renderActivityMessage(activity).title}
+                    </p>
+                    {renderActivityMessage(activity).changes.length > 0 && (
+                      <div className='mt-1 text-sm text-gray-900'>
+                        {renderActivityMessage(activity).changes.map((change, i) => (
+                          <div key={i}>{change}</div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
                 </div>
+                <p className='mt-1 text-xs text-gray-500'>{formatTimestamp(activity.timestamp)}</p>
               </div>
             </li>
           ))}
@@ -132,4 +146,3 @@ const renderActivityMessage = (activity: Activity) => {
 };
 
 export default ActivityFeed;
-

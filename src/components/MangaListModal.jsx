@@ -21,7 +21,7 @@ const MangaListModal = () => {
   if (error) {
     console.error('Detailed error:', error);
     return (
-      <div className='text-red-500'>⚠ Error loading manga statuses. Please try again later.</div>
+      <div className='text-red-500'>Error loading manga statuses. Please try again later.</div>
     );
   }
 

@@ -11,6 +11,7 @@ const SRSGame = ({ manga, words: initialWords }) => {
   const [showAnswer, setShowAnswer] = useState(false);
   const [sessionStarted, setSessionStarted] = useState(false);
   const [selectedMangaFilter, setSelectedMangaFilter] = useState(null);
+  const [totalCards, setTotalCards] = useState(0);
 
   const fsrs = new FSRS();
   const updateWordMutation = useUpdateVocabWord();
@@ -106,6 +107,7 @@ const SRSGame = ({ manga, words: initialWords }) => {
       });
 
       setCards(dueCards);
+      setTotalCards(dueCards.length);
       setCurrentCardIndex(0);
       setSessionStarted(true);
     }
@@ -229,7 +231,7 @@ const SRSGame = ({ manga, words: initialWords }) => {
   if (cards.length === 0) {
     return (
       <Card shadow='sm' padding='lg' radius='md' withBorder>
-        <Text ta='center' c='green' size='lg' fw={700}>
+        <Text ta='center' c='violet' size='lg' fw={700}>
           All caught up!
         </Text>
         <Text ta='center' c='dimmed' mt='md'>
@@ -243,7 +245,7 @@ const SRSGame = ({ manga, words: initialWords }) => {
     const mangaOptions = getMangaOptions();
 
     return (
-      <div className='mx-auto max-w-md p-6'>
+      <div className='mx-auto max-w-md p-6 max-w-lg'>
         <Card shadow='sm' padding='lg' radius='md' withBorder>
           <Stack gap='md'>
             {isProfileMode && mangaOptions.length > 0 && (
@@ -310,9 +312,9 @@ const SRSGame = ({ manga, words: initialWords }) => {
             <Text size='lg' fw={700}>
               SRS Review
             </Text>
-            <Progress value={(currentCardIndex / cards.length) * 100} size='sm' mt='xs' />
+            <Progress value={(currentCardIndex / totalCards) * 100} size='sm' mt='xs' />
             <Text size='sm' c='dimmed' mt='xs'>
-              Card {currentCardIndex + 1} of {cards.length}
+              Card {cards.length} of {totalCards}
             </Text>
           </div>
 

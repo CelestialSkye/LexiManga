@@ -15,6 +15,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 // Internal modules
 import { db } from '../config/firebase';
+import { getMangaDetails } from './anilistApi';
 
 // get 1 word
 export const useVocabWord = (uid, mangaId, wordId) => {
@@ -50,11 +51,23 @@ export const useAddVocabWord = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async ({ uid, mangaId, wordId, wordData }) => {
+      let coverImage = null;
+      try {
+        const mangaDetails = await getMangaDetails(mangaId);
+        coverImage =
+          mangaDetails?.data?.Media?.coverImage?.large ??
+          mangaDetails?.data?.Media?.coverImage?.medium ??
+          null;
+      } catch (err) {
+        console.warn('Failed to fetch cover image:', err);
+      }
+
       await saveVocabWord(uid, mangaId, wordId, wordData);
       await logActivity('word_add', {
         word: wordData.word,
         mangaTitle: wordData.mangaTitle,
         mangaId,
+        coverImage,
       });
     },
     onSuccess: () => {
@@ -76,18 +89,30 @@ export const useUpdateVocabWord = () => {
       const changes = {};
 
       if (previousData) {
-        Object.keys(newData).forEach(key => {
-          if (previousData[key] !== newData[key]) {
+        Object.keys(newData).forEach((key) => {
+          if (!AUTO_UPDATE_FIELDS.includes(key) && previousData[key] !== newData[key]) {
             changes[key] = { from: previousData[key], to: newData[key] };
           }
         });
+
+        let coverImage = null;
+        try {
+          const mangaDetails = await getMangaDetails(mangaId);
+          coverImage =
+            mangaDetails?.data?.Media?.coverImage?.large ??
+            mangaDetails?.data?.Media?.coverImage?.medium ??
+            null;
+        } catch (err) {
+          console.warn('Failed to fetch cover image:', err);
+        }
 
         await logActivity('word_update', {
           word: newData.word,
           mangaTitle: newData.mangaTitle,
           mangaId,
           wordId,
-          changes, 
+          changes,
+          coverImage,
         });
       }
 
@@ -98,14 +123,33 @@ export const useUpdateVocabWord = () => {
   });
 };
 
-  
-
-
 export const useDeleteVocabWord = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ uid, mangaId, wordId }) => deleteVocabWord(uid, mangaId, wordId),
-    onSuccess: (data, variables) => {
+    mutationFn: async ({ uid, mangaId, wordId, wordData }) => {
+      await deleteVocabWord(uid, mangaId, wordId);
+      return { wordData };
+    },
+    onSuccess: async (data, variables) => {
+      let coverImage = null;
+      try {
+        const mangaDetails = await getMangaDetails(variables.mangaId);
+        coverImage =
+          mangaDetails?.data?.Media?.coverImage?.large ??
+          mangaDetails?.data?.Media?.coverImage?.medium ??
+          null;
+      } catch (err) {
+        console.warn('Failed to fetch cover image:', err);
+      }
+
+      await logActivity('word_delete', {
+        word: data.wordData?.word,
+        mangaTitle: data.wordData?.mangaTitle,
+        mangaId: variables.mangaId,
+        wordId: variables.wordId,
+        coverImage,
+      });
+
       queryClient.invalidateQueries({
         queryKey: ['vocabWord', variables.uid, variables.mangaId, variables.wordId],
       });
@@ -178,7 +222,6 @@ const deleteVocabWord = async (uid, mangaId, wordId) => {
 };
 
 const logActivity = async (type, data) => {
-
   try {
     const auth = getAuth();
     const user = auth.currentUser;
@@ -190,17 +233,13 @@ const logActivity = async (type, data) => {
       Object.entries(data).filter(([key]) => !AUTO_UPDATE_FIELDS.includes(key))
     );
 
-
     const result = await addDoc(collection(db, 'activities'), {
       type,
       ...filteredData,
       userId: user.uid,
       timestamp: new Date(),
     });
-
   } catch (error) {
     console.error('Error logging activity:', error);
   }
 };
-
-
