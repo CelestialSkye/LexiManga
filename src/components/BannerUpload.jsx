@@ -1,124 +1,110 @@
 import { useState, useRef } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { Alert, Modal } from '@mantine/core';
+import { Modal, Alert } from '@mantine/core';
 import ActionButton from './ActionButton';
-import InfoModal from './InfoModal';
 import { useMediaQuery } from '@mantine/hooks';
 const defaultBanner = new URL('../assets/defaultBanner.jpg', import.meta.url).href;
 
-const BannerUpload = ({ size = "sm" }) => {
-    const { profile, updateBanner } = useAuth();
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    
-    const [selectedFile, setSelectedFile] = useState(null);
-    const [preview, setPreview] = useState(null);
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState('');
-    const fileInputRef = useRef(null);
+const BannerUpload = () => {
+  const { profile, updateBanner } = useAuth();
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [preview, setPreview] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const fileInputRef = useRef(null);
 
-    const isMobile = useMediaQuery('(max-width: 768px)');
-    const isDesktop = useMediaQuery('(min-width: 769px)');
+  const isMobile = useMediaQuery('(max-width: 768px)');
 
-    
-
-    const handleFileChange = (e) => {
-        const file = e.target.files[0];
-        setSelectedFile(file);
-        setPreview(URL.createObjectURL(file));
-    };
-
-    const handleUpload = async () => {
-        if (!selectedFile) return;
-        
-        setLoading(true);
-        setError('');
-        try {
-            await updateBanner(selectedFile);
-            setIsModalOpen(false);
-            setSelectedFile(null);
-            setPreview(null);
-        } catch (error) {
-            setError(error.message);
-        } finally {
-            setLoading(false);
-        }
-    };
-  
-    return (
-      <>
-        <div className="relative">
-        {profile?.bannerUrl ? (
-    // User's banner - check mobile/desktop
-    isMobile ? (
-        <img src={profile.bannerUrl} className="w-full h-52 rounded-[16px] object-cover" />
-    ) : (
-        <img src={profile.bannerUrl} className="w-full h-96 rounded-[16px] object-cover" />
-    )
-) : (
-    // Default banner - check mobile/desktop  
-    isMobile ? (
-        <img src={defaultBanner} className="w-full h-52 rounded-[16px] object-cover" />
-    ) : (
-        <img src={defaultBanner} className="w-full h-96 rounded-[16px] object-cover" />
-    )
-)}
-            
-            {/* Edit Button */}
-            <button 
-                onClick={() => {
-                    
-                    setIsModalOpen(true);
-                }}
-                className="absolute top-2 right-2 bg-black/50 hover:bg-black/70 text-white px-3 py-1 rounded text-sm transition-colors z-20"
-            >
-                Edit
-            </button>
-        </div>
-  
-        <Modal 
-          opened={isModalOpen}
-          onClose={() => setIsModalOpen(false)}
-          title="Upload Banner"
-          centered
-          zIndex={1000}
-        >
-            <div className="p-4">
-                <input 
-                    id="fileInput"
-                    type="file" 
-                    accept="image/*" 
-                    onChange={handleFileChange} 
-                    ref={fileInputRef} 
-                    className="hidden" 
-                />
-                
-                <button 
-                    onClick={() => fileInputRef.current?.click()}
-                    className="mb-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-                >
-                    Choose File
-                </button>
-                
-                {preview && (
-                    <div className="mb-4">
-                        <img src={preview} alt="Preview" className="w-full h-24 rounded-lg object-cover mx-auto" />
-                    </div>
-                )}
-                
-                <ActionButton 
-                    onClick={handleUpload} 
-                    loading={loading} 
-                    disabled={loading || !selectedFile}
-                    className="w-full"
-                >
-                    Upload Banner
-                </ActionButton>
-                
-                {error && <Alert color="red" className="mt-4">{error}</Alert>}
-            </div>
-        </Modal>
-      </>
-    );
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    setSelectedFile(file);
+    setPreview(URL.createObjectURL(file));
   };
+
+  const handleUpload = async () => {
+    if (!selectedFile) return;
+    setLoading(true);
+    setError('');
+    try {
+      await updateBanner(selectedFile);
+      setIsModalOpen(false);
+      setSelectedFile(null);
+      setPreview(null);
+    } catch (error) {
+      setError(error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <>
+      {/* 🔵 Banner Display - Size unchanged */}
+      <div className="relative">
+        <img
+          src={profile?.bannerUrl || defaultBanner}
+          className={`w-full ${isMobile ? 'h-52' : 'h-96'} rounded-[16px] object-cover`}
+        />
+
+        {/* Edit Button */}
+        <button
+          onClick={() => setIsModalOpen(true)}
+          className="absolute top-3 right-3 bg-black/60 text-white px-4 py-2 rounded-md text-sm backdrop-blur-sm hover:bg-black/80 transition"
+        >
+          Edit Banner
+        </button>
+      </div>
+
+      {/* 🔵 Modal */}
+      <Modal
+        opened={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        title="Upload Banner"
+        centered
+        zIndex={2000}
+        overlayProps={{ blur: 3, opacity: 0.4 }}
+      >
+        <div className="space-y-4">
+          <input
+            id="fileInput"
+            type="file"
+            accept="image/*"
+            onChange={handleFileChange}
+            ref={fileInputRef}
+            className="hidden"
+          />
+
+          <button
+            onClick={() => fileInputRef.current?.click()}
+            className="w-full border border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-200 rounded-lg py-3 font-medium hover:bg-gray-100 dark:hover:bg-gray-800 transition"
+          >
+            Select Image
+          </button>
+
+          {preview && (
+            <img
+              src={preview}
+              alt="Preview"
+              className="w-full h-32 rounded-lg object-cover border border-gray-200 dark:border-gray-700"
+            />
+          )}
+
+         <div className="flex justify-center mt-4">
+  <ActionButton
+    onClick={handleUpload}
+    loading={loading}
+    disabled={!selectedFile}
+    className="px-6" 
+  >
+    Upload Banner
+  </ActionButton>
+</div>
+          {error && <Alert color="red">{error}</Alert>}
+        </div>
+      </Modal>
+    </>
+  );
+};
 
 export default BannerUpload;

@@ -100,7 +100,7 @@ const ActivityFeed = () => {
   }
 
   return (
-    <div className='rounded-lg bg-white p-4'>
+    <div className='rounded-lg bg-white '>
       {activities.length === 0 ? (
         <div className='py-8 text-center text-gray-400'>No activities yet.</div>
       ) : (

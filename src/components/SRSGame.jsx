@@ -230,7 +230,7 @@ const SRSGame = ({ manga, words: initialWords }) => {
 
   if (cards.length === 0) {
     return (
-      <Card shadow='sm' padding='lg' radius='md' withBorder>
+      <Card padding='lg' radius='md' >
         <Text ta='center' c='violet' size='lg' fw={700}>
           All caught up!
         </Text>
