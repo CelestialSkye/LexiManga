@@ -12,7 +12,7 @@ import ActivityTab from '../features/profile/tabs/ActivityTab';
 import ScoresTab from '../features/profile/tabs/ScoresTab';
 import StudyTab from '../features/profile/tabs/StudyTab';
 import VocabularyTab from '../features/profile/tabs/VocabularyTab';
-import ProfileTab from '../features/profile/tabs/ProfileTab';
+import ProfileTab from '../features/profile/tabs/FavouritesTab';
 import ProfileSideScrollinfo from '@components/ProfileSideScrollInfo';
 
 // Error fallback component

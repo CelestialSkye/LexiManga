@@ -62,7 +62,7 @@ export const useFavoritedManga = (uid) => {
   });
 };
 
-const getFavoritedManga = async (uid) => {
+export const getFavoritedManga = async (uid) => {
   const favoritesRef = collection(db, 'users', uid, 'favorites');
   const favoritesSnapshot = await getDocs(favoritesRef);
 
