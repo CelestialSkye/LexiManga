@@ -1,17 +1,17 @@
 // Firestore service for database operations
-import { 
-  collection, 
-  doc, 
-  getDocs, 
-  getDoc, 
-  addDoc, 
-  updateDoc, 
-  deleteDoc, 
-  query, 
-  where, 
-  orderBy, 
+import {
+  collection,
+  doc,
+  getDocs,
+  getDoc,
+  addDoc,
+  updateDoc,
+  deleteDoc,
+  query,
+  where,
+  orderBy,
   limit,
-  onSnapshot
+  onSnapshot,
 } from 'firebase/firestore';
 import { db } from '../config/firebase';
 
@@ -21,9 +21,9 @@ export const firestoreService = {
   async getAll(collectionName) {
     try {
       const querySnapshot = await getDocs(collection(db, collectionName));
-      return querySnapshot.docs.map(doc => ({
+      return querySnapshot.docs.map((doc) => ({
         id: doc.id,
-        ...doc.data()
+        ...doc.data(),
       }));
     } catch (error) {
       console.error('Error getting documents:', error);
@@ -36,11 +36,11 @@ export const firestoreService = {
     try {
       const docRef = doc(db, collectionName, docId);
       const docSnap = await getDoc(docRef);
-      
+
       if (docSnap.exists()) {
         return {
           id: docSnap.id,
-          ...docSnap.data()
+          ...docSnap.data(),
         };
       } else {
         return null;
@@ -57,7 +57,7 @@ export const firestoreService = {
       const docRef = await addDoc(collection(db, collectionName), data);
       return {
         id: docRef.id,
-        ...data
+        ...data,
       };
     } catch (error) {
       console.error('Error adding document:', error);
@@ -72,7 +72,7 @@ export const firestoreService = {
       await updateDoc(docRef, data);
       return {
         id: docId,
-        ...data
+        ...data,
       };
     } catch (error) {
       console.error('Error updating document:', error);
@@ -95,27 +95,29 @@ export const firestoreService = {
   // Query documents with filters
   async query(collectionName, filters = [], orderByField = null, limitCount = null) {
     try {
-      let q = collection(db, collectionName);
-      
+      const collectionRef = collection(db, collectionName);
+      const constraints = [];
+
       // Apply filters
-      filters.forEach(filter => {
-        q = query(q, where(filter.field, filter.operator, filter.value));
+      filters.forEach((filter) => {
+        constraints.push(where(filter.field, filter.operator, filter.value));
       });
-      
+
       // Apply ordering
       if (orderByField) {
-        q = query(q, orderBy(orderByField));
+        constraints.push(orderBy(orderByField));
       }
-      
+
       // Apply limit
       if (limitCount) {
-        q = query(q, limit(limitCount));
+        constraints.push(limit(limitCount));
       }
-      
+
+      const q = constraints.length > 0 ? query(collectionRef, ...constraints) : collectionRef;
       const querySnapshot = await getDocs(q);
-      return querySnapshot.docs.map(doc => ({
+      return querySnapshot.docs.map((doc) => ({
         id: doc.id,
-        ...doc.data()
+        ...doc.data(),
       }));
     } catch (error) {
       console.error('Error querying documents:', error);
@@ -126,9 +128,9 @@ export const firestoreService = {
   // Real-time listener for a collection
   subscribeToCollection(collectionName, callback) {
     return onSnapshot(collection(db, collectionName), (snapshot) => {
-      const documents = snapshot.docs.map(doc => ({
+      const documents = snapshot.docs.map((doc) => ({
         id: doc.id,
-        ...doc.data()
+        ...doc.data(),
       }));
       callback(documents);
     });
@@ -140,13 +142,13 @@ export const firestoreService = {
       if (docSnap.exists()) {
         callback({
           id: docSnap.id,
-          ...docSnap.data()
+          ...docSnap.data(),
         });
       } else {
         callback(null);
       }
     });
-  }
+  },
 };
 
 export default firestoreService;

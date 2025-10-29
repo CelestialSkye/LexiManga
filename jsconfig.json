@@ -7,7 +7,7 @@
     "resolveJsonModule": true,
     "skipLibCheck": true,
     "baseUrl": "./",
-    "moduleResolution": "bundler",
+    "moduleResolution": "node",
     "paths": {
       "@app/*": ["src/app/*"],
       "@components/*": ["./src/components/*"],

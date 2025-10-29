@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { db } from '../config/firebase';
-import { doc, getDoc, setDoc, addDoc, collection } from 'firebase/firestore';
+import { doc, getDoc, setDoc, addDoc, collection, deleteDoc } from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
 
 export const useMangaStatus = (uid, mangaId) => {
@@ -28,6 +28,22 @@ export const useSaveMangaStatus = () => {
       await saveMangaStatus(uid, mangaId, statusData);
 
       return { previousData, newData: statusData, isNew, mangaId, uid };
+    },
+
+    onMutate: async ({ uid, mangaId, statusData }) => {
+      // Cancel any outgoing refetches
+      await queryClient.cancelQueries({
+        queryKey: ['mangaStatus', uid, mangaId],
+      });
+
+      // Snapshot the previous value
+      const previousStatus = queryClient.getQueryData(['mangaStatus', uid, mangaId]);
+
+      // Optimistically update to the new value
+      queryClient.setQueryData(['mangaStatus', uid, mangaId], statusData);
+
+      // Return context with the previous value
+      return { previousStatus };
     },
 
     onSuccess: async ({ previousData, newData, isNew, mangaId, uid }) => {
@@ -58,6 +74,17 @@ export const useSaveMangaStatus = () => {
         queryKey: ['mangaStatus', uid, mangaId],
       });
     },
+
+    onError: (error, variables, context) => {
+      // Rollback to the previous value on error
+      if (context?.previousStatus !== undefined) {
+        queryClient.setQueryData(
+          ['mangaStatus', variables.uid, variables.mangaId],
+          context.previousStatus
+        );
+      }
+      console.error('Error saving manga status:', error);
+    },
   });
 };
 
@@ -73,6 +100,29 @@ const saveMangaStatus = async (uid, mangaId, statusData) => {
 
   await setDoc(statusRef, dataToSave);
   return dataToSave;
+};
+
+export const deleteMangaStatus = async (uid, mangaId) => {
+  try {
+    if (!uid || !mangaId) {
+      throw new Error('User ID and Manga ID are required');
+    }
+
+    const mangaDocRef = doc(db, 'users', uid, 'mangaStatus', mangaId);
+    await deleteDoc(mangaDocRef);
+
+    // Log activity for deletion
+    await logActivity('manga_delete', {
+      mangaId,
+      mangaTitle: null, // You might want to pass the title if available
+    });
+
+    console.log(`Manga with ID ${mangaId} deleted successfully.`);
+    return true;
+  } catch (error) {
+    console.error('Error deleting manga:', error);
+    throw error;
+  }
 };
 
 const logActivity = async (type, data) => {

@@ -1,14 +1,56 @@
 import { useState } from 'react';
 import { Modal } from '@mantine/core';
 import { TextInput, NumberInput, Select, Button, Group, Text, Divider } from '@mantine/core';
-import { useMangaStatus, useSaveMangaStatus } from '../services/mangaStatusService.js';
+import {
+  useMangaStatus,
+  useSaveMangaStatus,
+  deleteMangaStatus,
+} from '../services/mangaStatusService.js';
 import { useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 const MangaStatusModal = ({ manga, opened, closeModal }) => {
   const { user } = useAuth();
+  const queryClient = useQueryClient();
   const { data: existingStatus, isLoading } = useMangaStatus(user?.uid, manga?.id?.toString());
   const saveMutation = useSaveMangaStatus();
+  const deleteMutation = useMutation({
+    mutationFn: () => deleteMangaStatus(user?.uid, manga?.id?.toString()),
+    onMutate: async () => {
+      // Optimistically remove the manga status from the cache
+      await queryClient.cancelQueries({
+        queryKey: ['mangaStatus', user?.uid, manga?.id?.toString()],
+      });
+
+      const previousStatus = queryClient.getQueryData([
+        'mangaStatus',
+        user?.uid,
+        manga?.id?.toString(),
+      ]);
+
+      queryClient.setQueryData(['mangaStatus', user?.uid, manga?.id?.toString()], null);
+
+      return { previousStatus };
+    },
+    onSuccess: (_, __, context) => {
+      // Invalidate queries to ensure fresh data
+      queryClient.invalidateQueries({
+        queryKey: ['mangaStatus', user?.uid],
+      });
+      closeModal();
+    },
+    onError: (error, _, context) => {
+      // Rollback the optimistic update if deletion fails
+      if (context?.previousStatus) {
+        queryClient.setQueryData(
+          ['mangaStatus', user?.uid, manga?.id?.toString()],
+          context.previousStatus
+        );
+      }
+      console.error('Error deleting manga status:', error);
+    },
+  });
   const [status, setStatus] = useState('plan-to-read');
   const [progress, setProgress] = useState(0);
   const [notes, setNotes] = useState('');
@@ -70,24 +112,55 @@ const MangaStatusModal = ({ manga, opened, closeModal }) => {
         <Text>Progress</Text>
         <NumberInput value={progress} onChange={setProgress} className='violet-focus' />
         <Text>Score</Text>
-        <NumberInput value={score} onChange={setScore} className='violet-focus' />
+        {/* <NumberInput value={score} onChange={setScore} className='violet-focus' /> */}
+        <Select
+          value={score}
+          onChange={setScore}
+          className='violet-focus'
+          placeholder='Select Score'
+          data={[
+            { value: '1', label: '1 - Terrible' },
+            { value: '2', label: '2 - Poor' },
+            { value: '3', label: '3 - Bad' },
+            { value: '4', label: '4 - Below Average' },
+            { value: '5', label: '5 - Average' },
+            { value: '6', label: '6 - Fine' },
+            { value: '7', label: '7 - Good' },
+            { value: '8', label: '8 - Very Good' },
+            { value: '9', label: '9 - Excellent' },
+            { value: '10', label: '10 - Masterpiece' },
+          ]}
+        />
         <Text>Notes</Text>
         <TextInput
           value={notes}
           onChange={(e) => setNotes(e.target.value)}
           className='violet-focus'
         />
-        <Button
-          onClick={handleSave}
-          loading={saveMutation.isPending}
-          disabled={saveMutation.isPending}
-          color='violet'
-          variant='filled'
-          radius='12px'
-          className='mt-4'
-        >
-          Save
-        </Button>
+        <Group justify='space-between' className='mt-4'>
+          <Button
+            onClick={handleSave}
+            loading={saveMutation.isPending}
+            disabled={saveMutation.isPending || deleteMutation.isPending}
+            color='violet'
+            variant='filled'
+            radius='12px'
+          >
+            Save
+          </Button>
+          {existingStatus && (
+            <Button
+              onClick={() => deleteMutation.mutate()}
+              loading={deleteMutation.isPending}
+              disabled={saveMutation.isPending || deleteMutation.isPending}
+              color='red'
+              variant='outline'
+              radius='12px'
+            >
+              Delete
+            </Button>
+          )}
+        </Group>
       </div>
     </Modal>
   );
