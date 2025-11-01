@@ -1,0 +1,6 @@
+30th oct:
+
+move the hero banner to the welcome page -> index
+import an animated tooltip
+design the home page
+build components for the home page
