@@ -1,0 +1,257 @@
+import { collection, query, where, getDocs, Timestamp, orderBy, limit } from 'firebase/firestore';
+import { db } from '../config/firebase';
+import { getAuth } from 'firebase/auth';
+
+export interface DailyActivity {
+  readManga: boolean;
+  mangaStartedCount: number;
+  addedWordsCount: number;
+  learnedWordsCount: number;
+  streak: number;
+  lastActivityDate: string | null;
+}
+
+/**
+ * Get today's date at midnight (start of day)
+ */
+const getStartOfDay = (date: Date = new Date()): Date => {
+  const startOfDay = new Date(date);
+  startOfDay.setHours(0, 0, 0, 0);
+  return startOfDay;
+};
+
+/**
+ * Get tomorrow's date at midnight (end of current day)
+ */
+const getEndOfDay = (date: Date = new Date()): Date => {
+  const endOfDay = new Date(date);
+  endOfDay.setHours(23, 59, 59, 999);
+  return endOfDay;
+};
+
+/**
+ * Get yesterday's date at midnight
+ */
+const getYesterdayStart = (): Date => {
+  const yesterday = new Date();
+  yesterday.setDate(yesterday.getDate() - 1);
+  return getStartOfDay(yesterday);
+};
+
+/**
+ * Fetch today's daily activities
+ */
+export const getDailyActivities = async (): Promise<DailyActivity> => {
+  const auth = getAuth();
+  const user = auth.currentUser;
+
+  if (!user) {
+    return {
+      readManga: false,
+      mangaStartedCount: 0,
+      addedWordsCount: 0,
+      learnedWordsCount: 0,
+      streak: 0,
+      lastActivityDate: null,
+    };
+  }
+
+  try {
+    const startOfDay = getStartOfDay();
+    const endOfDay = getEndOfDay();
+
+    const activitiesRef = collection(db, 'activities');
+    // Query only by userId to avoid composite index requirement
+    const userActivitiesQuery = query(activitiesRef, where('userId', '==', user.uid));
+
+    const activitiesSnapshot = await getDocs(userActivitiesQuery);
+    const allActivities = activitiesSnapshot.docs.map((doc) => ({
+      ...doc.data(),
+      timestamp: doc.data().timestamp?.toDate?.(),
+    }));
+
+    // Sort by timestamp descending and filter activities to only today's activities
+    const activities = allActivities
+      .sort((a, b) => b.timestamp - a.timestamp)
+      .filter((activity) => {
+        const activityDate = getStartOfDay(activity.timestamp);
+        return activityDate.getTime() === startOfDay.getTime();
+      });
+
+    // Count different activity types
+    const mangaReadActivities = activities.filter(
+      (a) => a.type === 'manga_update' && a.chapterRead
+    );
+    const mangaStartedActivities = activities.filter((a) => a.type === 'manga_add');
+    const wordAddedActivities = activities.filter((a) => a.type === 'word_add');
+    const learnedWordsActivities = activities.filter(
+      (a) => a.type === 'word_update' && a.newStatus === 'learned'
+    );
+
+    // Calculate streak
+    const streak = await calculateStreak(user.uid);
+
+    return {
+      readManga: mangaReadActivities.length > 0,
+      mangaStartedCount: mangaStartedActivities.length,
+      addedWordsCount: wordAddedActivities.length,
+      learnedWordsCount: learnedWordsActivities.length,
+      streak,
+      lastActivityDate:
+        activities.length > 0 ? (activities[0].timestamp?.toISOString() ?? null) : null,
+    };
+  } catch (error) {
+    console.error('Error fetching daily activities:', error);
+    return {
+      readManga: false,
+      mangaStartedCount: 0,
+      addedWordsCount: 0,
+      learnedWordsCount: 0,
+      streak: 0,
+      lastActivityDate: null,
+    };
+  }
+};
+
+/**
+ * Calculate the current reading streak for the user
+ * A streak is maintained when the user has activities on consecutive days
+ */
+export const calculateStreak = async (userId: string): Promise<number> => {
+  try {
+    const activitiesRef = collection(db, 'activities');
+
+    // Get all activities for the user
+    const userActivitiesQuery = query(activitiesRef, where('userId', '==', userId));
+
+    const activitiesSnapshot = await getDocs(userActivitiesQuery);
+    const activities = activitiesSnapshot.docs
+      .map((doc) => ({
+        ...doc.data(),
+        timestamp: doc.data().timestamp?.toDate?.(),
+      }))
+      .sort((a, b) => b.timestamp - a.timestamp);
+
+    if (activities.length === 0) {
+      return 0;
+    }
+
+    let streak = 0;
+    let currentDate = getStartOfDay();
+
+    for (const activity of activities) {
+      const activityDate = getStartOfDay(activity.timestamp);
+
+      // Check if activity is on the current date we're checking
+      if (activityDate.getTime() === currentDate.getTime()) {
+        // Activity on this date exists, move to previous day
+        currentDate.setDate(currentDate.getDate() - 1);
+        // Increment streak only if we haven't already counted this day
+        if (
+          streak === 0 ||
+          getStartOfDay(activities[0].timestamp).getTime() !== getStartOfDay().getTime()
+        ) {
+          streak++;
+        }
+      } else if (activityDate.getTime() < currentDate.getTime()) {
+        // Activity is from an earlier date
+        const daysDifference = Math.floor(
+          (currentDate.getTime() - activityDate.getTime()) / (1000 * 60 * 60 * 24)
+        );
+
+        if (daysDifference === 1) {
+          // Activity is from yesterday, continue streak
+          currentDate = activityDate;
+          streak++;
+        } else {
+          // Gap in days, streak is broken
+          break;
+        }
+      }
+    }
+
+    return streak;
+  } catch (error) {
+    console.error('Error calculating streak:', error);
+    return 0;
+  }
+};
+
+/**
+ * Check if user had activity yesterday (for streak maintenance)
+ */
+export const hadActivityYesterday = async (userId: string): Promise<boolean> => {
+  try {
+    const yesterdayStart = getYesterdayStart();
+
+    const activitiesRef = collection(db, 'activities');
+    const userActivitiesQuery = query(activitiesRef, where('userId', '==', userId));
+
+    const activitiesSnapshot = await getDocs(userActivitiesQuery);
+    const allActivities = activitiesSnapshot.docs.map((doc) => ({
+      ...doc.data(),
+      timestamp: doc.data().timestamp?.toDate?.(),
+    }));
+
+    // Filter to check for yesterday's activity
+    return allActivities.some((activity) => {
+      const activityDate = getStartOfDay(activity.timestamp);
+      return activityDate.getTime() === yesterdayStart.getTime();
+    });
+  } catch (error) {
+    console.error('Error checking yesterday activity:', error);
+    return false;
+  }
+};
+
+/**
+ * Get activity statistics for a specific date range
+ */
+export const getActivityStats = async (
+  userId: string,
+  startDate: Date,
+  endDate: Date
+): Promise<{
+  totalActivities: number;
+  mangaStarted: number;
+  wordsAdded: number;
+  wordsLearned: number;
+  daysActive: number;
+}> => {
+  try {
+    const activitiesRef = collection(db, 'activities');
+    const userActivitiesQuery = query(activitiesRef, where('userId', '==', userId));
+
+    const activitiesSnapshot = await getDocs(userActivitiesQuery);
+    const allActivities = activitiesSnapshot.docs.map((doc) => ({
+      ...doc.data(),
+      timestamp: doc.data().timestamp?.toDate?.(),
+    }));
+
+    // Filter activities by date range client-side
+    const activities = allActivities.filter((activity) => {
+      const activityTime = activity.timestamp.getTime();
+      return activityTime >= startDate.getTime() && activityTime <= endDate.getTime();
+    });
+
+    const uniqueDays = new Set(activities.map((a) => getStartOfDay(a.timestamp).toISOString()));
+
+    return {
+      totalActivities: activities.length,
+      mangaStarted: activities.filter((a) => a.type === 'manga_add').length,
+      wordsAdded: activities.filter((a) => a.type === 'word_add').length,
+      wordsLearned: activities.filter((a) => a.type === 'word_update' && a.newStatus === 'learned')
+        .length,
+      daysActive: uniqueDays.size,
+    };
+  } catch (error) {
+    console.error('Error getting activity stats:', error);
+    return {
+      totalActivities: 0,
+      mangaStarted: 0,
+      wordsAdded: 0,
+      wordsLearned: 0,
+      daysActive: 0,
+    };
+  }
+};

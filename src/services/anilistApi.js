@@ -1,14 +1,14 @@
 import { useQuery } from '@tanstack/react-query';
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3003';
+const BASE_URL = 'https://graphql.anilist.co';
 
 /**
  * Search for manga
  */
 export const searchManga = async (query, limit = 10) => {
   try {
-    const response = await fetch(
-      `${BACKEND_URL}/api/search?q=${encodeURIComponent(query)}&limit=${limit}`
+    const response = await fetch(`${BACKEND_URL}/api/search?q=${encodeURIComponent(query)}&limit=${limit}`
     );
 
     if (!response.ok) {
@@ -42,8 +42,55 @@ export const getMangaDetails = async (id) => {
   }
 };
 
+export const useTrendingManga = (limit = 10) => {
+  return useQuery({
+    queryKey: ['trendingManga', limit],
+    queryFn: () => getTrendingManga(limit),
+    staleTime: 5 * 60 * 1000, 
+    retry: 2, 
+  });
+};
+
+
+export const getTrendingManga = async (limit = 10) => {
+  const query = `
+    query ($perPage: Int) {
+      Page(perPage: $perPage) {
+        media(type: MANGA, sort: TRENDING_DESC) {
+          id
+          title {
+            romaji
+            english
+          }
+          coverImage {
+            large
+          }
+          averageScore
+          staff(sort: RELEVANCE, perPage: 10) {
+            edges {
+              role
+              node {
+                name {
+                  full
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  `;
+  const response = await fetch(BASE_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ query, variables: { perPage: limit } }),
+  });
+  const json = await response.json();
+  return json.data.Page.media;
+};
+
 /**
- * Check if backend is healthy
+ * backend
  */
 export const checkHealth = async () => {
   try {
@@ -73,10 +120,12 @@ export const useMangaDetails = (id) => {
 };
 
 const anilistApi = {
-  searchManga,
+   searchManga,
   useSearchManga,
   getMangaDetails,
   useMangaDetails,
+  getTrendingManga,
+  useTrendingManga,
   checkHealth,
 };
 

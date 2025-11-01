@@ -1,6 +1,7 @@
 /* body styling */
-html, body {
-  background-color: #F9FAFB !important;
+html,
+body {
+  background-color: #f9fafb !important;
   margin: 0;
   padding: 0;
   min-height: 100vh;
@@ -23,12 +24,6 @@ html, body {
   }
 }
 
-
-
-
-
-
-
 /* SpotlightSearch styling */
 .spotlight-action-item {
   display: flex !important;
@@ -38,7 +33,6 @@ html, body {
   padding: 12px 16px !important;
   background-color: white !important;
 }
-
 
 .spotlight-action-item:last-child {
   border-bottom: none !important;
@@ -107,11 +101,11 @@ html, body {
   opacity: 0.3;
 }
 
-[data-favorited="true"] .heart-icon {
+[data-favorited='true'] .heart-icon {
   opacity: 1;
 }
 
-[data-favorited="false"] .heart-icon {
+[data-favorited='false'] .heart-icon {
   opacity: 0.3;
 }
 
@@ -152,19 +146,19 @@ html, body {
 
 /* Hide scrollbars  */
 * {
-  -ms-overflow-style: none;  
-  scrollbar-width: none;  
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
-*::-webkit-scrollbar { 
-  display: none;  
+*::-webkit-scrollbar {
+  display: none;
 }
 
 .scrollbar-hide {
-  -ms-overflow-style: none;  /* Internet Explorer 10+ */
-  scrollbar-width: none;  /* Firefox */
+  -ms-overflow-style: none; /* Internet Explorer 10+ */
+  scrollbar-width: none; /* Firefox */
 }
-.scrollbar-hide::-webkit-scrollbar { 
-  display: none;  
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
 }
 
 /* Custom tab styling */
@@ -196,35 +190,32 @@ html, body {
   padding: 12px 6px !important;
 }
 
-
-
-
 /* Violet focus for inputs */
 .violet-focus input:focus {
-  border-color: #8B5CF6 !important;
-  box-shadow: 0 0 0 1px #8B5CF6 !important;
+  border-color: #8b5cf6 !important;
+  box-shadow: 0 0 0 1px #8b5cf6 !important;
   outline: none !important;
 }
 
 .violet-focus input:focus-visible {
-  border-color: #8B5CF6 !important;
-  box-shadow: 0 0 0 1px #8B5CF6 !important;
+  border-color: #8b5cf6 !important;
+  box-shadow: 0 0 0 1px #8b5cf6 !important;
   outline: none !important;
 }
 
 /* Violet focus for radio buttons */
-.violet-focus input[type="radio"]:focus {
-  border-color: #8B5CF6 !important;
-  box-shadow: 0 0 0 1px #8B5CF6 !important;
+.violet-focus input[type='radio']:focus {
+  border-color: #8b5cf6 !important;
+  box-shadow: 0 0 0 1px #8b5cf6 !important;
   outline: none !important;
 }
 
-.violet-focus input[type="radio"]:checked {
-  background-color: #8B5CF6 !important;
-  border-color: #8B5CF6 !important;
+.violet-focus input[type='radio']:checked {
+  background-color: #8b5cf6 !important;
+  border-color: #8b5cf6 !important;
 }
 
-.violet-focus input[type="radio"]:checked::before {
+.violet-focus input[type='radio']:checked::before {
   background-color: white !important;
 }
 
@@ -261,10 +252,5 @@ html, body {
 button {
   cursor: pointer;
 }
-
-
-
-
-
 
 

@@ -1,67 +1,22 @@
-import { Text } from '@mantine/core';
-import { useNavigate } from 'react-router-dom';
-import { ActionButton } from '../components';
 import TopBar from '../components/TopBar';
-import HeroBanner from '../components/HeroBanner';
-import WordDifficultyTest from '../components/WordDifficultyTest';
-import { useMediaQuery } from '@mantine/hooks';
+import Trending from '../components/HomePage/Trending';
+import TopBarMobile from '@components/HomePage/TopbarMobile';
 
 const Home = () => {
-  const navigate = useNavigate();
-  const isMobile = useMediaQuery('(max-width: 768px)'); 
-  const isDesktop = useMediaQuery('(min-width: 769px)'); 
-
   return (
-    <>
-      <div className="min-h-screen overflow-x-hidden">
-        {/* TopBar positioned at the top */}
-        <div className={`${isDesktop ? 'absolute top-0 left-0 right-0 z-10' : ''}`}>
-          <TopBar />
-        </div>
-        
-        {/* Hero Banner */}
-        <HeroBanner />
-        
-        {/* Content Section - Flows naturally after hero banner */}
-        <div className="relative z-20 bg-white">
-          <div className="page-container py-8">
-            <div className="bg-white rounded-2xl shadow-sm p-8">
-              {/* Header */}
-              <div className="text-center mb-8">
-                <Text size="3xl" fw={700} className="text-gray-800 mb-4">
-                  Welcome to Vocabulary Manga
-                </Text>
-                <Text size="lg" c="dimmed" className="text-gray-600">
-                  Start your journey to learn vocabulary through manga and anime
-                </Text>
-              </div>
+    <div className="min-h-screen flex flex-col bg-white text-gray-900">
+      {/* Top Bar */}
+      <header className="w-full">
+        <TopBar />
+        <TopBarMobile/>
+      </header>
 
-              {/* Main Content */}
-              <div className="text-center mb-8">
-                <Text size="md" className="text-gray-700 mb-6">
-                  Learn Japanese vocabulary by reading manga and watching anime. 
-                  Track your progress, study with spaced repetition, and build your language skills.
-                </Text>
-              </div>
-
-                      {/* Word Difficulty Test */}
-                      <div className="mb-8">
-                        <WordDifficultyTest />
-                      </div>
-
-                      {/* SRS Game - Removed from here, now only in StudyTab */}
-
-              {/* Back to Landing */}
-              <div className="text-center mt-6">
-                <ActionButton variant="filled" onClick={() => navigate('/')}>
-                  ← Back to Landing
-                </ActionButton>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </>
+      {/* Main Content */}
+      <main className="flex-1 w-full px-4 py-6 sm:px-6 md:px-8">
+        <h2 className="mb-3 text-lg font-semibold text-gray-800">Trending Manga</h2>
+        <Trending />
+      </main>
+    </div>
   );
 };
 

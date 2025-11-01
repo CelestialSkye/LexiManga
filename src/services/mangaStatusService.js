@@ -53,7 +53,7 @@ export const useSaveMangaStatus = () => {
 
       if (!isNew && previousData) {
         Object.keys(newData).forEach((key) => {
-          // Skip auto-updated fields like createdAt, updatedAt, etc.
+          // Skip auto-updated fields 
           if (!AUTO_UPDATE_FIELDS.includes(key) && previousData[key] !== newData[key]) {
             changes[key] = { from: previousData[key], to: newData[key] };
           }
@@ -63,7 +63,6 @@ export const useSaveMangaStatus = () => {
       let coverImage = null;
       try {
         const mangaDetails = await getMangaDetails(mangaId);
-        // The API returns { data: { Media: {...} }, cached: true }
         coverImage =
           mangaDetails?.data?.Media?.coverImage?.large ??
           mangaDetails?.data?.Media?.coverImage?.medium ??
@@ -92,7 +91,6 @@ export const useSaveMangaStatus = () => {
     },
 
     onError: (error, variables, context) => {
-      // Rollback to the previous value on error
       if (context?.previousStatus !== undefined) {
         queryClient.setQueryData(
           ['mangaStatus', variables.uid, variables.mangaId],
@@ -176,3 +174,5 @@ const logActivity = async (type, data) => {
     console.error('Error logging activity:', error);
   }
 };
+
+

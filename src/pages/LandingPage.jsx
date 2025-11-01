@@ -2,13 +2,13 @@ import { Container, Text } from '@mantine/core';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { ActionButton } from '../components';
+import HeroBanner from '@components/HeroBanner';
 
 const LandingPage = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
 
   const handleGoToWebsite = () => {
-    // If user is logged in, go to dashboard. Otherwise, go to home
     if (user) {
       navigate('/home');
   
@@ -16,10 +16,10 @@ const LandingPage = () => {
   };
 
   return (
-    <div className='min-h-screen bg-gradient-to-br from-purple-50 to-blue-50 flex items-center justify-center'>
-      <Container size="sm" className="text-center">
-        <div className="bg-white rounded-2xl shadow-2xl p-12">
-          {/* Header */}
+      <div className="min-h-screen overflow-x-hidden">
+
+          <HeroBanner></HeroBanner>
+          
           <Text size="3xl" fw={700} className="text-gray-800 mb-8">
             Vocabulary Manga
           </Text>
@@ -29,12 +29,12 @@ const LandingPage = () => {
           </Text>
           
           {/* Main Button */}
+          <div className=''>
           <ActionButton onClick={handleGoToWebsite}>
             Go to Website
           </ActionButton>
+          </div>
         </div>
-      </Container>
-    </div>
   );
 };
 
