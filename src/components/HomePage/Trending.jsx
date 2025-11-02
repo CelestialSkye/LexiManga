@@ -75,7 +75,7 @@ const Trending = () => {
   const imgHeightClass = isMobile ? 'h-44' : 'h-56';
 
   return (
-    <section className='w-full rounded-2xl px-4 py-2'>
+    <section className='w-full rounded-2xl py-2'>
       <Carousel
         slideSize={isMobile ? '80%' : '20%'}
         height='auto'

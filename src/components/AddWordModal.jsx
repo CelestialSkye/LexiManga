@@ -78,9 +78,20 @@ const AddWordModal = ({ manga, opened, closeModal, showMangaSelector = false }) 
     }
 
     try {
+      // Extract the proper manga title string
+      let mangaTitleString = 'Unknown';
+      if (typeof currentManga.title === 'string') {
+        mangaTitleString = currentManga.title;
+      } else if (currentManga.title?.english || currentManga.title?.romaji) {
+        // If title is an object (from AniList API), get the english or romaji
+        mangaTitleString = currentManga.title.english || currentManga.title.romaji;
+      } else if (currentManga.mangaTitle) {
+        mangaTitleString = currentManga.mangaTitle;
+      }
+
       const wordData = {
         mangaId: currentManga.id.toString(),
-        mangaTitle: currentManga.title || currentManga.mangaTitle,
+        mangaTitle: mangaTitleString,
         word,
         translation,
         context,
