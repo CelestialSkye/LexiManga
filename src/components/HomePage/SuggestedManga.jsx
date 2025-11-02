@@ -6,8 +6,8 @@ import { FaStar } from 'react-icons/fa6';
 const SuggestionManga = () => {
 const navigate = useNavigate();
   const { data: suggestions, isLoading } = useSuggestedManga(
-    3, 
-    ['Romance', 'Comedy', 'Slice of Life', 'Drama', ], 
+    4, 
+    ['Romance', 'Comedy', 'Slice of Life', 'Drama' ], 
     ['Hentai', 'Ecchi', 'Action', 'Horror']
   );
 
