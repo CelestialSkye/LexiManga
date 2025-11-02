@@ -53,11 +53,14 @@ const SRSGame = ({ manga, words: initialWords }) => {
     if (!allUserWords) return [];
     const mangaMap = new Map();
     allUserWords.forEach((word) => {
-      if (word.mangaId && word.mangaTitle) {
+      if (word.mangaId && word.mangaTitle && typeof word.mangaTitle === 'string') {
         mangaMap.set(word.mangaId, word.mangaTitle);
       }
     });
-    return Array.from(mangaMap, ([id, title]) => ({ value: id, label: title }));
+    return Array.from(mangaMap, ([id, title]) => ({
+      value: id,
+      label: typeof title === 'string' ? title : String(title),
+    }));
   };
 
   useEffect(() => {
@@ -230,7 +233,7 @@ const SRSGame = ({ manga, words: initialWords }) => {
 
   if (cards.length === 0) {
     return (
-      <Card padding='lg' radius='md' >
+      <Card padding='lg' radius='md'>
         <Text ta='center' c='violet' size='lg' fw={700}>
           All caught up!
         </Text>
@@ -245,7 +248,7 @@ const SRSGame = ({ manga, words: initialWords }) => {
     const mangaOptions = getMangaOptions();
 
     return (
-      <div className='mx-auto max-w-md p-6 max-w-lg'>
+      <div className='mx-auto max-w-lg max-w-md p-6'>
         <Card shadow='sm' padding='lg' radius='md' withBorder>
           <Stack gap='md'>
             {isProfileMode && mangaOptions.length > 0 && (

@@ -65,7 +65,10 @@ export const useAddVocabWord = () => {
       await saveVocabWord(uid, mangaId, wordId, wordData);
       await logActivity('word_add', {
         word: wordData.word,
-        mangaTitle: wordData.mangaTitle,
+        mangaTitle:
+          typeof wordData.mangaTitle === 'string'
+            ? wordData.mangaTitle
+            : String(wordData.mangaTitle || 'Unknown'),
         mangaId,
         coverImage,
       });
@@ -91,7 +94,10 @@ export const useUpdateVocabWord = () => {
       if (previousData) {
         Object.keys(newData).forEach((key) => {
           if (!AUTO_UPDATE_FIELDS.includes(key) && previousData[key] !== newData[key]) {
-            changes[key] = { from: previousData[key], to: newData[key] };
+            changes[key] = {
+              from: previousData[key] ?? null,
+              to: newData[key] ?? null,
+            };
           }
         });
 

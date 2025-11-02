@@ -22,7 +22,6 @@ const fetchMangaStatuses = async (uid) => {
       const mangaStatus = {
         id: doc.id,
         ...doc.data(),
-        title: doc.data(),
       };
 
       try {

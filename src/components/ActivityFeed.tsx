@@ -52,32 +52,48 @@ const ActivityFeed = () => {
 
     switch (type) {
       case 'manga_add':
-        return { title: activity.mangaTitle ?? data.mangaTitle ?? 'Unknown', changes: [] };
+        return {
+          title: `Added manga: ${activity.mangaTitle ?? data.mangaTitle ?? 'Unknown'}`,
+          changes: [],
+        };
 
       case 'manga_update': {
         const title = activity.mangaTitle ?? data.mangaTitle ?? mangaId ?? 'Unknown';
-        return { title, changes: changeEntries };
+        return { title: `Updated manga: ${title}`, changes: changeEntries };
       }
 
       case 'manga_delete':
         return {
-          title: `(${activity.mangaTitle ?? data.mangaTitle ?? mangaId ?? 'Unknown'})`,
+          title: `Deleted manga: ${activity.mangaTitle ?? data.mangaTitle ?? mangaId ?? 'Unknown'}`,
           changes: [],
         };
 
-      case 'word_add':
+      case 'word_add': {
+        const translation = activity.translation ?? data.translation;
+        const translationText = translation ? ` - ${translation}` : '';
         return {
-          title: `${activity.mangaTitle}: ${activity.word ?? data.word ?? 'Unknown'} (${activity.translation ?? data.translation ?? ''})`,
+          title: `Added "${activity.word ?? data.word ?? 'Unknown'}"${translationText} from ${activity.mangaTitle}`,
           changes: [],
         };
+      }
 
-      case 'word_update': {
-        return { title: activity.mangaTitle, changes: changeEntries };
+       case 'word_update': {
+         const wordName = activity.word ?? data.word ?? 'Unknown';
+         return { title: `Updated "${wordName}" from ${activity.mangaTitle}`, changes: changeEntries };
+       }
+
+       case 'word_delete': {
+         const wordName = activity.word ?? data.word ?? 'Unknown';
+         return {
+           title: `Deleted "${wordName}" from ${activity.mangaTitle}`,
+           changes: [],
+         };
+       }
       }
 
       case 'word_delete':
         return {
-          title: `${activity.mangaTitle}: ${activity.word ?? data.word ?? 'Unknown'}`,
+          title: `Deleted word: ${activity.mangaTitle}: ${activity.word ?? data.word ?? 'Unknown'}`,
           changes: [],
         };
 
@@ -100,7 +116,7 @@ const ActivityFeed = () => {
   }
 
   return (
-    <div className='rounded-lg bg-white '>
+    <div className='rounded-lg bg-white'>
       {activities.length === 0 ? (
         <div className='py-8 text-center text-gray-400'>No activities yet.</div>
       ) : (

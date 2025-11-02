@@ -114,7 +114,7 @@ const TopBarMobile = () => {
               )}
             </div>
 
-            {/* Reading Streak */}
+            {/* Learning Streak */}
             <div className='rounded-lg bg-green-50 p-4'>
               <p className='text-sm text-gray-600'>Learning Streak</p>
               {loading ? (
