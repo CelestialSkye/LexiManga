@@ -9,7 +9,7 @@ import MangaPage from './pages/MangaPage';
 import Auth from './pages/Auth';
 import ProfilePage from './pages/ProfilePage';
 import SettingsPage from './pages/SettingsPage';
-
+import Browse from './pages/Browse';
 
 
 const App = () => {
@@ -26,6 +26,7 @@ const App = () => {
             <Route path="/manga/:id" element={<MangaPage />} />
             <Route path="/profile" element={<ProfilePage />} />
             <Route path="/settings" element={<SettingsPage />} />
+            <Route path="/browse" element={<Browse />} />
           </Routes>
         </BrowserRouter>
         </AuthProvider>

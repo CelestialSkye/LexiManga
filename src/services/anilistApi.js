@@ -8,7 +8,8 @@ const BASE_URL = 'https://graphql.anilist.co';
  */
 export const searchManga = async (query, limit = 10) => {
   try {
-    const response = await fetch(`${BACKEND_URL}/api/search?q=${encodeURIComponent(query)}&limit=${limit}`
+    const response = await fetch(
+      `${BACKEND_URL}/api/search?q=${encodeURIComponent(query)}&limit=${limit}`
     );
 
     if (!response.ok) {
@@ -46,23 +47,20 @@ export const useTrendingManga = (limit = 10) => {
   return useQuery({
     queryKey: ['trendingManga', limit],
     queryFn: () => getTrendingManga(limit),
-    staleTime: 5 * 60 * 1000, 
-    retry: 2, 
+    staleTime: 5 * 60 * 1000,
+    retry: 2,
   });
 };
 
-
-
-// for suggested manga                               
+// for suggested manga
 export const useSuggestedManga = (limit = 2, genres = [], excludeGenres = []) => {
   return useQuery({
     queryKey: ['suggestedManga', limit, genres, excludeGenres],
     queryFn: () => getSuggestedManga(limit, genres, excludeGenres),
     staleTime: 5 * 60 * 1000,
-    retry: 2, 
+    retry: 2,
   });
 };
-
 
 export const getTrendingManga = async (limit = 10) => {
   const query = `
@@ -102,7 +100,7 @@ export const getTrendingManga = async (limit = 10) => {
 };
 
 //suggested manga
-export const getSuggestedManga = async (limit = 2, genres = [], excludeGenres = []) => {
+export const getSuggestedManga = async (limit = 4, genres = [], excludeGenres = []) => {
   const query = `
     query ($perPage: Int, $genres: [String], $excludeGenres: [String]) {
       Page(perPage: $perPage) {
@@ -163,12 +161,12 @@ export const getSuggestedManga = async (limit = 2, genres = [], excludeGenres = 
   });
 
   const json = await response.json();
-  
+
   const modernManga = json.data.Page.media
-    .filter(m => m.startDate?.year >= 2015)
-    .map(m => ({
+    .filter((m) => m.startDate?.year >= 2015)
+    .map((m) => ({
       ...m,
-      hiddenGemScore: (m.averageScore / 10) * 3 - (m.popularity / 5000)
+      hiddenGemScore: (m.averageScore / 10) * 3 - m.popularity / 5000,
     }))
     .sort((a, b) => b.hiddenGemScore - a.hiddenGemScore);
 
@@ -178,7 +176,129 @@ export const getSuggestedManga = async (limit = 2, genres = [], excludeGenres = 
   return shuffled.slice(0, limit);
 };
 
+// browse function
+export const getBrowseManga = async (page = 1, filters = {}) => {
+  const { search, genre, sort = 'POPULARITY_DESC', status, year } = filters;
 
+  const query = `
+    query ($page: Int, $perPage: Int, $search: String, $genres: [String], $sort: [MediaSort], $statusIn: [MediaStatus], $excludeGenres: [String]) {
+      Page(page: $page, perPage: $perPage) {
+        pageInfo {
+          total
+          currentPage
+          lastPage
+          hasNextPage
+        }
+        media(
+          type: MANGA,
+          search: $search,
+          genre_in: $genres,
+          genre_not_in: $excludeGenres,
+          sort: $sort,
+          status_in: $statusIn
+        ) {
+          id
+          title {
+            romaji
+            english
+          }
+          coverImage {
+            large
+          }
+          averageScore
+          genres
+          status
+          chapters
+          description
+          popularity
+          startDate {
+            year
+          }
+          staff(sort: RELEVANCE, perPage: 5) {
+            edges {
+              role
+              node {
+                name {
+                  full
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  `;
+
+  // Determine which statuses to filter by
+  let statusInValues = null;
+  if (status) {
+    // If a specific status is selected, use only that
+    statusInValues = [status];
+  } else if (search) {
+    // When searching without a status filter, include both RELEASING and FINISHED
+    statusInValues = ['RELEASING', 'FINISHED'];
+  } else {
+    // When not searching and no status filter, also include both
+    statusInValues = ['RELEASING', 'FINISHED'];
+  }
+
+  const response = await fetch(BASE_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      query,
+      variables: {
+        page,
+        perPage: 20,
+        search: search || null,
+        genres: genre ? [genre] : null,
+        excludeGenres: ['Hentai', 'Ecchi'],
+        sort: [sort],
+        statusIn: statusInValues,
+      },
+    }),
+  });
+
+  const json = await response.json();
+
+  if (json.errors) {
+    console.error('GraphQL errors:', json.errors);
+    throw new Error(json.errors[0]?.message || 'Failed to fetch manga');
+  }
+
+  let media = json.data?.Page?.media || [];
+
+  // Client-side filtering by year since AniList doesn't support startDate_greater
+  if (year && year !== '' && !isNaN(parseInt(year))) {
+    const yearInt = parseInt(year);
+    media = media.filter((m) => m.startDate?.year >= yearInt);
+  }
+
+  console.log(
+    'First 3 results:',
+    media.slice(0, 3).map((m) => ({
+      title: m.title.english || m.title.romaji,
+      popularity: m.popularity,
+      year: m.startDate?.year,
+    }))
+  );
+
+  return {
+    ...json.data.Page,
+    media: media,
+  };
+};
+
+// browse hook
+export const useBrowseManga = (page = 1, filters = {}) => {
+  return useQuery({
+    queryKey: ['browseManga', page, filters],
+    queryFn: () => getBrowseManga(page, filters),
+    staleTime: 10 * 60 * 1000,
+    keepPreviousData: true,
+    retry: 2,
+  });
+};
 
 export const checkHealth = async () => {
   try {
@@ -208,12 +328,16 @@ export const useMangaDetails = (id) => {
 };
 
 const anilistApi = {
-   searchManga,
+  searchManga,
   useSearchManga,
   getMangaDetails,
   useMangaDetails,
   getTrendingManga,
   useTrendingManga,
+  getSuggestedManga,
+  useSuggestedManga,
+  getBrowseManga,
+  useBrowseManga,
   checkHealth,
 };
 
