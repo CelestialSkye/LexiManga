@@ -56,7 +56,6 @@ function getMainCreators(staffEdges) {
     return creators.author[0];
   }
 
-  // return first staff member
   return staffEdges[0]?.node?.name?.full || 'Unknown';
 }
 
@@ -71,15 +70,12 @@ const Trending = () => {
     return <div className='p-4 text-red-500'>Failed to load trending manga.</div>;
   }
 
-  const carouselHeight = isMobile ? 260 : 340;
-  const imgHeightClass = isMobile ? 'h-44' : 'h-56';
-
   return (
     <section className='w-full rounded-2xl py-2'>
       <Carousel
-        slideSize={isMobile ? '80%' : '20%'}
+        slideSize={isMobile ? '20%' : '18%'}
         height='auto'
-        slideGap='md'
+        slideGap={26}
         withIndicators={false}
         emblaOptions={{
           loop: true,
@@ -88,7 +84,7 @@ const Trending = () => {
         }}
         styles={{
           viewport: { overflow: 'hidden', height: 'auto' },
-          container: { alignItems: 'stretch', height: 'auto' },
+          container: { alignItems: 'stretch', height: 'auto', gap: '8px' },
           slide: { height: 'auto' },
         }}
       >
@@ -96,9 +92,11 @@ const Trending = () => {
           <Carousel.Slide key={manga.id}>
             <div className='flex flex-col items-center text-center'>
               <div
-                className={`relative w-full overflow-hidden rounded-lg shadow-md ${
-                  isMobile ? 'h-100' : 'h-110'
-                }`}
+                className='relative overflow-hidden rounded-[16px] shadow-md'
+                style={{
+                  width: isMobile ? '245px' : '210px',
+                  height: isMobile ? '345px' : '314px',
+                }}
               >
                 <img
                   src={manga.coverImage?.large}
@@ -114,23 +112,21 @@ const Trending = () => {
                     </p>
                   </div>
                 )}
-
                 {isMobile && (
                   <div className='absolute bottom-0 flex h-1/3 w-full items-end bg-gradient-to-t from-black/85 via-black/40 to-transparent px-3 py-3'>
                     <div className='flex w-full items-end justify-between'>
                       <p className='line-clamp-2 text-left text-sm font-semibold text-white drop-shadow-md'>
                         {manga.title?.english || manga.title?.romaji}
                       </p>
-                      <p className='text-xs font-medium text-gray-200 drop-shadow-md'>
+                      <p className='line-clamp-2 text-xs font-medium text-gray-200 drop-shadow-md'>
                         {getMainCreators(manga.staff?.edges)}
                       </p>
                     </div>
                   </div>
                 )}
               </div>
-
               {!isMobile && (
-                <p className='mt-2 line-clamp-2 w-full px-1 text-sm font-medium text-gray-700'>
+                <p className='mt-2 line-clamp-2 w-[195px] px-1 text-xs font-medium text-gray-700'>
                   {manga.title?.english || manga.title?.romaji}
                 </p>
               )}

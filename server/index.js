@@ -417,6 +417,307 @@ app.get('/api/user-words', async (req, res) => {
   }
 });
 
+const TRENDING_QUERY = `
+  query ($perPage: Int) {
+    Page(perPage: $perPage) {
+      media(type: MANGA, sort: TRENDING_DESC) {
+        id
+        title {
+          romaji
+          english
+        }
+        coverImage {
+          large
+        }
+        averageScore
+        staff(sort: RELEVANCE, perPage: 10) {
+          edges {
+            role
+            node {
+              name {
+                full
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+`;
+
+const SUGGESTED_QUERY = `
+  query ($perPage: Int, $genres: [String], $excludeGenres: [String]) {
+    Page(perPage: $perPage) {
+      media(
+        type: MANGA, 
+        sort: [POPULARITY_DESC],
+        genre_in: $genres,
+        genre_not_in: $excludeGenres,
+        averageScore_greater: 75,
+        popularity_greater: 3000,
+        popularity_lesser: 50000,
+        status_in: [RELEASING, FINISHED]
+      ) {
+        id
+        title {
+          romaji
+          english
+        }
+        coverImage {
+          large
+        }
+        bannerImage
+        averageScore
+        popularity
+        trending
+        genres
+        description
+        chapters
+        status
+        startDate {
+          year
+        }
+        staff(sort: RELEVANCE, perPage: 5) {
+          edges {
+            role
+            node {
+              name {
+                full
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+`;
+
+app.get('/api/trending', async (req, res) => {
+  try {
+    const { limit = 10 } = req.query;
+    console.log(`Fetching trending manga with limit: ${limit}`);
+
+    const cacheKey = `trending:${limit}`;
+    const cached = cache.get(cacheKey);
+
+    if (cached) {
+      console.log('Returning cached trending manga');
+      return res.json({ data: cached, cached: true });
+    }
+
+    const response = await fetch(ANILIST_API, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        query: TRENDING_QUERY,
+        variables: { perPage: parseInt(limit) },
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`AniList API error: ${response.status}`);
+    }
+
+    const data = await response.json();
+
+    if (data.errors) {
+      console.error('AniList errors:', data.errors);
+      throw new Error('AniList API error');
+    }
+
+    const media = data.data.Page.media;
+    cache.set(cacheKey, media, 1800);
+    res.json({ data: media, cached: false });
+  } catch (error) {
+    console.error('Trending manga error:', error);
+    res.status(500).json({ error: 'Failed to fetch trending manga' });
+  }
+});
+
+app.get('/api/suggested', async (req, res) => {
+  try {
+    const { limit = 4, genres = '', excludeGenres = '' } = req.query;
+    console.log(`Fetching suggested manga: limit=${limit}, genres=${genres}`);
+
+    const genreArray = genres ? genres.split(',').filter((g) => g.trim()) : [];
+    const excludeGenreArray = excludeGenres
+      ? excludeGenres.split(',').filter((g) => g.trim())
+      : ['Hentai', 'Ecchi'];
+
+    const cacheKey = `suggested:${limit}:${genreArray.join(',')}:${excludeGenreArray.join(',')}`;
+    const cached = cache.get(cacheKey);
+
+    if (cached) {
+      console.log('Returning cached suggested manga');
+      return res.json({ data: cached, cached: true });
+    }
+
+    const response = await fetch(ANILIST_API, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        query: SUGGESTED_QUERY,
+        variables: {
+          perPage: 30,
+          genres: genreArray.length ? genreArray : null,
+          excludeGenres: excludeGenreArray,
+        },
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`AniList API error: ${response.status}`);
+    }
+
+    const data = await response.json();
+
+    if (data.errors) {
+      console.error('AniList errors:', data.errors);
+      throw new Error('AniList API error');
+    }
+
+    // Filter and sort logic
+    const modernManga = data.data.Page.media
+      .filter((m) => m.startDate?.year >= 2015)
+      .map((m) => ({
+        ...m,
+        hiddenGemScore: (m.averageScore / 10) * 3 - m.popularity / 5000,
+      }))
+      .sort((a, b) => b.hiddenGemScore - a.hiddenGemScore);
+
+    const topGems = modernManga.slice(0, 15);
+    const shuffled = topGems.sort(() => Math.random() - 0.5);
+    const result = shuffled.slice(0, parseInt(limit));
+
+    cache.set(cacheKey, result, 1800);
+    res.json({ data: result, cached: false });
+  } catch (error) {
+    console.error('Suggested manga error:', error);
+    res.status(500).json({ error: 'Failed to fetch suggested manga' });
+  }
+});
+
+const BROWSE_QUERY = `
+  query ($page: Int, $perPage: Int, $search: String, $genres: [String], $sort: [MediaSort], $statusIn: [MediaStatus], $excludeGenres: [String]) {
+    Page(page: $page, perPage: $perPage) {
+      pageInfo {
+        total
+        currentPage
+        lastPage
+        hasNextPage
+      }
+      media(
+        type: MANGA,
+        search: $search,
+        genre_in: $genres,
+        genre_not_in: $excludeGenres,
+        sort: $sort,
+        status_in: $statusIn
+      ) {
+        id
+        title {
+          romaji
+          english
+        }
+        coverImage {
+          large
+        }
+        bannerImage
+        averageScore
+        genres
+        status
+        chapters
+        description
+        popularity
+        startDate {
+          year
+        }
+        staff(sort: RELEVANCE, perPage: 5) {
+          edges {
+            role
+            node {
+              name {
+                full
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+`;
+
+app.get('/api/browse', async (req, res) => {
+  try {
+    const {
+      page = 1,
+      search = '',
+      genre = '',
+      sort = 'POPULARITY_DESC',
+      status = '',
+      year = '',
+    } = req.query;
+    console.log(`Fetching browse manga: page=${page}, search=${search}, genre=${genre}`);
+
+    // Determine which statuses to filter by
+    let statusInValues = null;
+    if (status) {
+      statusInValues = [status];
+    } else if (search) {
+      statusInValues = ['RELEASING', 'FINISHED'];
+    } else {
+      statusInValues = ['RELEASING', 'FINISHED'];
+    }
+
+    const genreArray = genre ? [genre] : null;
+    const excludeGenres = ['Hentai', 'Ecchi'];
+
+    const response = await fetch(ANILIST_API, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        query: BROWSE_QUERY,
+        variables: {
+          page: parseInt(page),
+          perPage: 20,
+          search: search || null,
+          genres: genreArray,
+          excludeGenres,
+          sort: [sort],
+          statusIn: statusInValues,
+        },
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`AniList API error: ${response.status}`);
+    }
+
+    const data = await response.json();
+
+    if (data.errors) {
+      console.error('AniList errors:', data.errors);
+      throw new Error(data.errors[0]?.message || 'Failed to fetch manga');
+    }
+
+    let media = data.data?.Page?.media || [];
+
+    // Client-side filtering by year since AniList doesn't support startDate_greater
+    if (year && year !== '' && !isNaN(parseInt(year))) {
+      const yearInt = parseInt(year);
+      media = media.filter((m) => m.startDate?.year >= yearInt);
+    }
+
+    res.json({
+      pageInfo: data.data.Page.pageInfo,
+      media,
+    });
+  } catch (error) {
+    console.error('Browse manga error:', error);
+    res.status(500).json({ error: 'Failed to fetch browse manga' });
+  }
+});
+
 app.get('/api/health', (req, res) => {
   res.json({ status: 'OK', port: PORT });
 });

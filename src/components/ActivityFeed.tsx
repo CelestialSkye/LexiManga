@@ -77,25 +77,21 @@ const ActivityFeed = () => {
         };
       }
 
-       case 'word_update': {
-         const wordName = activity.word ?? data.word ?? 'Unknown';
-         return { title: `Updated "${wordName}" from ${activity.mangaTitle}`, changes: changeEntries };
-       }
-
-       case 'word_delete': {
-         const wordName = activity.word ?? data.word ?? 'Unknown';
-         return {
-           title: `Deleted "${wordName}" from ${activity.mangaTitle}`,
-           changes: [],
-         };
-       }
+      case 'word_update': {
+        const wordName = activity.word ?? data.word ?? 'Unknown';
+        return {
+          title: `Updated "${wordName}" from ${activity.mangaTitle}`,
+          changes: changeEntries,
+        };
       }
 
-      case 'word_delete':
+      case 'word_delete': {
+        const wordName = activity.word ?? data.word ?? 'Unknown';
         return {
-          title: `Deleted word: ${activity.mangaTitle}: ${activity.word ?? data.word ?? 'Unknown'}`,
+          title: `Deleted "${wordName}" from ${activity.mangaTitle}`,
           changes: [],
         };
+      }
 
       default:
         return { title: 'Performed an activity', changes: [] };
