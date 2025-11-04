@@ -1,20 +1,34 @@
 import React, { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { useBrowseManga } from 'src/services/anilistApi';
 import BrowseFilters from '../components/BrowseFilters';
 import BrowseResults from '../components/BrowseResults';
 import TopBar from '@components/TopBar';
 
 const Browse = () => {
+  const [searchParams] = useSearchParams();
   const [page, setPage] = useState(1);
   const [filters, setFilters] = useState({
-    search: '',
-    genre: '',
+    search: searchParams.get('search') || '',
+    genre: searchParams.get('genre') || '',
     sort: 'POPULARITY_DESC',
-    status: '',
-    year: '',
+    status: searchParams.get('status') || '',
+    year: searchParams.get('year') || '',
   });
 
   const [debouncedFilters, setDebouncedFilters] = useState(filters);
+
+  // Sync URL query parameters to filters on mount and when URL changes
+  useEffect(() => {
+    setFilters({
+      search: searchParams.get('search') || '',
+      genre: searchParams.get('genre') || '',
+      sort: searchParams.get('sort') || 'POPULARITY_DESC',
+      status: searchParams.get('status') || '',
+      year: searchParams.get('year') || '',
+    });
+    setPage(1);
+  }, [searchParams]);
 
   useEffect(() => {
     const timer = setTimeout(() => {
