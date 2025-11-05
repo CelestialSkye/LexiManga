@@ -59,7 +59,8 @@ const GenreCarousel = () => {
   const [displayGenres, setDisplayGenres] = useState([]);
   const navigate = useNavigate();
   const isSmallScreen = useMediaQuery('(max-width: 1024px)');
-  const isMobile = useMediaQuery('(max-width: 554px)');
+  const isMobile = useMediaQuery('(max-width: 639px)');
+  const isTinyScreen = useMediaQuery('(max-width: 300px)');
 
   useEffect(() => {
     const shuffleGenres = () => {
@@ -81,7 +82,7 @@ const GenreCarousel = () => {
 
       <Grid gutter='md'>
         {displayGenres.map((genre) => (
-          <Grid.Col key={genre} span={{ base: 6, sm: 6, md: 6, lg: 6 }}>
+          <Grid.Col key={genre} span={{ base: isTinyScreen ? 12 : 6, sm: 6, md: 6, lg: 6 }}>
             <GenreTile genre={genre} onNavigate={navigate} isSmallScreen={isSmallScreen} isMobile={isMobile} />
           </Grid.Col>
         ))}
@@ -109,11 +110,11 @@ const GenreTile = ({ genre, onNavigate, isSmallScreen, isMobile }) => {
 
   const bgColor = GENRE_COLORS[genre] || '#4A5568';
 
-  // Mobile layout
+  // Mobile layout: vertical stacked (genre badge, then image, then description)
   if (isMobile) {
     return (
       <div className='flex flex-col gap-2'>
-        {/* Genre */}
+        {/* Genre Badge */}
         <div
           onClick={handleGenreClick}
           className='flex h-22 w-auto cursor-pointer items-center justify-center rounded-[16px] px-6'
@@ -124,7 +125,7 @@ const GenreTile = ({ genre, onNavigate, isSmallScreen, isMobile }) => {
           </p>
         </div>
 
-        {/* Manga Card */}
+        {/* Manga Card - Vertical Layout */}
         <div
           onClick={handleMangaClick}
           className='flex flex-col cursor-pointer overflow-hidden rounded-[16px] transition-transform duration-200 hover:shadow-lg'
@@ -168,13 +169,27 @@ const GenreTile = ({ genre, onNavigate, isSmallScreen, isMobile }) => {
           ) : (
             <>
               {/* Manga Image */}
-              <div className='flex justify-center bg-gray-100'>
+              <div className='relative overflow-hidden flex justify-center bg-gray-100'>
                 <img
                   src={data.coverImage.large}
                   alt={data.title.romaji}
-                  className='h-auto w-auto object-contain'
+                  className='h-full w-full object-cover'
                   loading='lazy'
                 />
+                {/* Rating at Top Left */}
+                {data.averageScore && (
+                  <div className='absolute top-2 left-2 rounded-md bg-black/70 px-2 py-1 backdrop-blur-sm'>
+                    <p className='flex items-center gap-1 text-xs font-bold text-white'>
+                      <FaStar className='text-violet-400' /> {(data.averageScore / 10).toFixed(1)}
+                    </p>
+                  </div>
+                )}
+                {/* Title at Bottom */}
+                <div className='absolute bottom-0 flex h-1/3 w-full items-end bg-gradient-to-t from-black/85 via-black/40 to-transparent px-3 py-3'>
+                  <p className='line-clamp-2 text-left text-sm font-semibold text-white drop-shadow-md'>
+                    {data.title.english || data.title.romaji}
+                  </p>
+                </div>
               </div>
 
               {/* Manga Description */}
@@ -205,11 +220,11 @@ const GenreTile = ({ genre, onNavigate, isSmallScreen, isMobile }) => {
     );
   }
 
-  // Small screen layout 
+  // Small screen layout: horizontal (genre on top, then image + description below)
   if (isSmallScreen) {
     return (
       <div className='flex flex-col gap-2'>
-        {/* Genre */}
+        {/* Genre Badge */}
         <div
           onClick={handleGenreClick}
           className='flex h-22 w-auto cursor-pointer items-center justify-center rounded-[16px] px-6'
@@ -220,7 +235,7 @@ const GenreTile = ({ genre, onNavigate, isSmallScreen, isMobile }) => {
           </p>
         </div>
 
-        {/* Manga Card */}
+        {/* Manga Card with Image and Description */}
         <div
           onClick={handleMangaClick}
           className='flex cursor-pointer gap-3 overflow-hidden rounded-[16px] transition-transform duration-200 hover:shadow-lg'
@@ -301,10 +316,10 @@ const GenreTile = ({ genre, onNavigate, isSmallScreen, isMobile }) => {
     );
   }
 
-  // Desktop layout 
+  // Desktop layout: genre on left, then manga image + description on right
   return (
     <div className='flex gap-2' style={{ minHeight: '220px' }}>
-      {/* Genre */}
+      {/* Genre tile on left */}
       <div
         onClick={handleGenreClick}
         className='flex w-32 flex-shrink-0 cursor-pointer items-center justify-center rounded-[16px] px-3 transition-opacity duration-200 hover:opacity-80'
@@ -313,7 +328,7 @@ const GenreTile = ({ genre, onNavigate, isSmallScreen, isMobile }) => {
         <p className='text-center text-xs font-semibold'>{genre}</p>
       </div>
 
-      {/* Manga Card */}
+      {/* Manga Card on right */}
       <div
         onClick={handleMangaClick}
         className='flex flex-1 cursor-pointer gap-2 overflow-hidden rounded-[16px]  transition-transform duration-200 hover:shadow-lg'
