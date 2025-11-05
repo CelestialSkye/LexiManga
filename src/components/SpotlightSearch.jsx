@@ -3,7 +3,7 @@ import { Spotlight, spotlight } from '@mantine/spotlight';
 import { useDebouncedValue } from '@mantine/hooks';
 import { IconSearch } from '@tabler/icons-react';
 import { useSearchManga } from '../services/anilistApi';
-import {useNavigate} from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 // Helper functions
 const cleanSearchQuery = (query) => {
@@ -15,72 +15,80 @@ const cleanSearchQuery = (query) => {
 };
 
 const titleCase = (query) => {
-  return query.replace(/\w\S*/g, (txt) => 
-    txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase()
+  return query.replace(
+    /\w\S*/g,
+    (txt) => txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase()
   );
 };
 
-
-const SpotlightSearch = ({ 
-  actions = [], 
-  onActionClick, 
+const SpotlightSearch = ({
+  actions = [],
+  onActionClick,
   placeholder = 'Search manga...',
   limit = 10,
   className = '',
-  ...props 
+  ...props
 }) => {
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
   const [debouncedQuery] = useDebouncedValue(searchQuery, 300);
-  
+
+  // Detect platform 
+  const isMac = /Mac|iPhone|iPad|iPod/.test(navigator.platform);
+  const shortcutDisplay = isMac ? '⌘K' : 'Ctrl K';
+
   const queryForAPI = searchQuery.trim() === '' ? '' : titleCase(cleanSearchQuery(debouncedQuery));
   const { data: searchResults, isLoading, error } = useSearchManga(queryForAPI, limit);
 
-  const transformedActions = searchResults?.data?.Page?.media?.map(manga => ({
-    id: manga.id.toString(),
-    label: titleCase(manga.title.english || manga.title.romaji),
-    description: `${manga.genres?.slice(0, 2).join(', ') || 'No genres'}${manga.averageScore ? ` • ★ ${(manga.averageScore / 10).toFixed(1)}` : ''}`,
-    leftSection: manga.coverImage?.large ? (
-      <img 
-        src={manga.coverImage.large} 
-        alt={titleCase(manga.title.english || manga.title.romaji)}
-        style={{ 
-          width: 40, 
-          height: 56, 
-          objectFit: 'cover', 
-          borderRadius: 4 
-        }}
-      />
-    ) : (
-      <div 
-        style={{ 
-          width: 40, 
-          height: 56, 
-          backgroundColor: '#f0f0f0', 
-          borderRadius: 4,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          fontSize: 12,
-          color: '#666'
-        }}
-      >
-        No Image
-      </div>
-    ),
-    onClick: () => navigate(`/manga/${manga.id}`)
-  })) || [];
+  const transformedActions =
+    searchResults?.data?.Page?.media?.map((manga) => ({
+      id: manga.id.toString(),
+      label: titleCase(manga.title.english || manga.title.romaji),
+      description: `${manga.genres?.slice(0, 2).join(', ') || 'No genres'}${manga.averageScore ? ` • ★ ${(manga.averageScore / 10).toFixed(1)}` : ''}`,
+      leftSection: manga.coverImage?.large ? (
+        <img
+          src={manga.coverImage.large}
+          alt={titleCase(manga.title.english || manga.title.romaji)}
+          style={{
+            width: 40,
+            height: 56,
+            objectFit: 'cover',
+            borderRadius: 4,
+          }}
+        />
+      ) : (
+        <div
+          style={{
+            width: 40,
+            height: 56,
+            backgroundColor: '#f0f0f0',
+            borderRadius: 4,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontSize: 12,
+            color: '#666',
+          }}
+        >
+          No Image
+        </div>
+      ),
+      onClick: () => navigate(`/manga/${manga.id}`),
+    })) || [];
 
   const finalActions = transformedActions.length > 0 ? transformedActions : actions;
 
   return (
     <>
-      <button 
+      <button
         onClick={spotlight.open}
-        className="w-12 h-12 bg-white rounded-full flex items-center justify-center transition-all duration-200"
-        title="Search"
+        className='flex h-10 items-center gap-2 rounded-full border border-gray-200 bg-white px-4 transition-colors duration-200 hover:border-gray-300'
+        title={`Search (${shortcutDisplay})`}
       >
-        <IconSearch size={20} stroke={1.5} className="text-gray-500 hover:text-purple-600 transition-colors duration-200" />
+        <IconSearch size={18} stroke={1.5} className='text-gray-500' />
+        <span className='text-sm text-gray-500'>
+          Search... <span className='text-base text-gray-400'>{shortcutDisplay}</span>
+        </span>
       </button>
 
       <Spotlight
@@ -88,6 +96,7 @@ const SpotlightSearch = ({
         nothingFound={isLoading ? 'Searching...' : ''}
         highlightQuery
         limit={limit}
+        shortcut={['mod + K']}
         searchProps={{
           leftSection: <IconSearch size={20} stroke={1.5} />,
           placeholder,
