@@ -3,7 +3,7 @@ import { Spotlight, spotlight } from '@mantine/spotlight';
 import { useDebouncedValue } from '@mantine/hooks';
 import { IconSearch } from '@tabler/icons-react';
 import { useSearchManga } from '../services/anilistApi';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 // Helper functions
 const cleanSearchQuery = (query) => {
@@ -30,12 +30,20 @@ const SpotlightSearch = ({
   ...props
 }) => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [searchQuery, setSearchQuery] = useState('');
   const [debouncedQuery] = useDebouncedValue(searchQuery, 300);
 
-  // Detect platform 
+  // Detect platform
   const isMac = /Mac|iPhone|iPad|iPod/.test(navigator.platform);
   const shortcutDisplay = isMac ? '⌘K' : 'Ctrl K';
+
+  // Detect if on dark topbar pages
+  const isDarkTopbar = location.pathname === '/profile' || location.pathname.startsWith('/manga/');
+  const buttonBorderClass = isDarkTopbar ? 'border-gray-500/60' : 'border-gray-400';
+  const iconColorClass = isDarkTopbar ? 'text-gray-300' : 'text-gray-500';
+  const textColorClass = isDarkTopbar ? 'text-gray-300' : 'text-gray-500';
+  const shortcutTextColorClass = isDarkTopbar ? 'text-gray-300' : 'text-gray-400';
 
   const queryForAPI = searchQuery.trim() === '' ? '' : titleCase(cleanSearchQuery(debouncedQuery));
   const { data: searchResults, isLoading, error } = useSearchManga(queryForAPI, limit);
@@ -82,12 +90,12 @@ const SpotlightSearch = ({
     <>
       <button
         onClick={spotlight.open}
-        className='flex h-10 items-center gap-2 rounded-full border border-gray-200 bg-white px-4 transition-colors duration-200 hover:border-gray-300'
+        className={`flex h-10 items-center gap-2 rounded-full border ${buttonBorderClass} bg-transparent px-4 transition-colors duration-200 hover:border-violet-300`}
         title={`Search (${shortcutDisplay})`}
       >
-        <IconSearch size={18} stroke={1.5} className='text-gray-500' />
-        <span className='text-sm text-gray-500'>
-          Search... <span className='text-base text-gray-400'>{shortcutDisplay}</span>
+        <IconSearch size={18} stroke={1.5} className={iconColorClass} />
+        <span className={`text-sm ${textColorClass}`}>
+          Search... <span className={`text-base ${shortcutTextColorClass}`}>{shortcutDisplay}</span>
         </span>
       </button>
 

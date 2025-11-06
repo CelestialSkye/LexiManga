@@ -4,6 +4,7 @@ import { Grid, Paper, Text, Image, Stack, Badge, Group } from '@mantine/core';
 import { useNavigate } from 'react-router-dom';
 import { FaStar } from 'react-icons/fa6';
 import { useMediaQuery } from '@mantine/hooks';
+import logoWhiteBg from '../../assets/logo2.svg';
 
 const ANILIST_GENRES = [
   'Action',
@@ -75,7 +76,7 @@ const GenreCarousel = () => {
   }, []);
 
   return (
-    <div className='mt-4 rounded-[16px] p-2 '>
+    <div className='mt-4 rounded-[16px] p-2'>
       <Text size='lg' fw={600} mb='lg'>
         Explore by Genre
       </Text>
@@ -83,7 +84,12 @@ const GenreCarousel = () => {
       <Grid gutter='md'>
         {displayGenres.map((genre) => (
           <Grid.Col key={genre} span={{ base: isTinyScreen ? 12 : 6, sm: 6, md: 6, lg: 6 }}>
-            <GenreTile genre={genre} onNavigate={navigate} isSmallScreen={isSmallScreen} isMobile={isMobile} />
+            <GenreTile
+              genre={genre}
+              onNavigate={navigate}
+              isSmallScreen={isSmallScreen}
+              isMobile={isMobile}
+            />
           </Grid.Col>
         ))}
       </Grid>
@@ -110,25 +116,26 @@ const GenreTile = ({ genre, onNavigate, isSmallScreen, isMobile }) => {
 
   const bgColor = GENRE_COLORS[genre] || '#4A5568';
 
-  // Mobile layout: vertical stacked (genre badge, then image, then description)
+  // Mobile layout
   if (isMobile) {
     return (
       <div className='flex flex-col gap-2'>
-        {/* Genre Badge */}
+        {/* Genre  */}
         <div
           onClick={handleGenreClick}
           className='flex h-22 w-auto cursor-pointer items-center justify-center rounded-[16px] px-6'
           style={{ backgroundColor: bgColor, color: '#fff' }}
         >
-          <p className='text-sm font-semibold'>
-            {genre} <span>logo placeholder</span>
+          <p className='flex items-center gap-1 text-sm font-semibold'>
+            <img src={logoWhiteBg} alt='Vocabulary Manga' className='h-5 w-5' />
+            {genre}
           </p>
         </div>
 
-        {/* Manga Card - Vertical Layout */}
+        {/* Manga   */}
         <div
           onClick={handleMangaClick}
-          className='flex flex-col cursor-pointer overflow-hidden rounded-[16px] transition-transform duration-200 hover:shadow-lg'
+          className='flex cursor-pointer flex-col overflow-hidden rounded-[16px] transition-transform duration-200 hover:shadow-lg'
           style={{ backgroundColor: '#f9f9f9' }}
           onMouseEnter={(e) => {
             e.currentTarget.style.transform = 'translateY(-4px)';
@@ -169,14 +176,14 @@ const GenreTile = ({ genre, onNavigate, isSmallScreen, isMobile }) => {
           ) : (
             <>
               {/* Manga Image */}
-              <div className='relative overflow-hidden flex justify-center bg-gray-100'>
+              <div className='relative flex justify-center overflow-hidden bg-gray-100'>
                 <img
                   src={data.coverImage.large}
                   alt={data.title.romaji}
-                  className='h-full w-full object-cover'
+                  className='h-auto max-h-90 w-full object-contain'
                   loading='lazy'
                 />
-                {/* Rating at Top Left */}
+                {/* Rating  */}
                 {data.averageScore && (
                   <div className='absolute top-2 left-2 rounded-md bg-black/70 px-2 py-1 backdrop-blur-sm'>
                     <p className='flex items-center gap-1 text-xs font-bold text-white'>
@@ -184,7 +191,7 @@ const GenreTile = ({ genre, onNavigate, isSmallScreen, isMobile }) => {
                     </p>
                   </div>
                 )}
-                {/* Title at Bottom */}
+                {/* Title */}
                 <div className='absolute bottom-0 flex h-1/3 w-full items-end bg-gradient-to-t from-black/85 via-black/40 to-transparent px-3 py-3'>
                   <p className='line-clamp-2 text-left text-sm font-semibold text-white drop-shadow-md'>
                     {data.title.english || data.title.romaji}
@@ -220,18 +227,19 @@ const GenreTile = ({ genre, onNavigate, isSmallScreen, isMobile }) => {
     );
   }
 
-  // Small screen layout: horizontal (genre on top, then image + description below)
+  // Small screen layout
   if (isSmallScreen) {
     return (
       <div className='flex flex-col gap-2'>
-        {/* Genre Badge */}
+        {/* Genre */}
         <div
           onClick={handleGenreClick}
           className='flex h-22 w-auto cursor-pointer items-center justify-center rounded-[16px] px-6'
           style={{ backgroundColor: bgColor, color: '#fff' }}
         >
-          <p className='text-sm font-semibold'>
-            {genre} <span>logo placeholder</span>
+          <p className='flex items-center gap-1 text-sm font-semibold'>
+            <img src={logoWhiteBg} alt='Vocabulary Manga' className='h-5 w-5' />
+            {genre}
           </p>
         </div>
 
@@ -279,7 +287,7 @@ const GenreTile = ({ genre, onNavigate, isSmallScreen, isMobile }) => {
           ) : (
             <>
               {/* Manga Image */}
-              <div className='flex-shrink-0 rounded-[16px] overflow-hidden'>
+              <div className='flex-shrink-0 overflow-hidden rounded-[16px]'>
                 <img
                   src={data.coverImage.large}
                   alt={data.title.romaji}
@@ -316,22 +324,23 @@ const GenreTile = ({ genre, onNavigate, isSmallScreen, isMobile }) => {
     );
   }
 
-  // Desktop layout: genre on left, then manga image + description on right
+  // Desktop layout
   return (
     <div className='flex gap-2' style={{ minHeight: '220px' }}>
-      {/* Genre tile on left */}
+      {/* Genre  */}
       <div
         onClick={handleGenreClick}
-        className='flex w-32 flex-shrink-0 cursor-pointer items-center justify-center rounded-[16px] px-3 transition-opacity duration-200 hover:opacity-80'
+        className='flex w-32 flex-shrink-0 cursor-pointer flex-col items-center justify-center rounded-[16px] px-3 transition-opacity duration-200 hover:opacity-80'
         style={{ backgroundColor: bgColor, color: '#fff' }}
       >
+        <img src={logoWhiteBg} alt='Vocabulary Manga' className='mb-2 h-5 w-5' />
         <p className='text-center text-xs font-semibold'>{genre}</p>
       </div>
 
       {/* Manga Card on right */}
       <div
         onClick={handleMangaClick}
-        className='flex flex-1 cursor-pointer gap-2 overflow-hidden rounded-[16px]  transition-transform duration-200 hover:shadow-lg'
+        className='flex flex-1 cursor-pointer gap-2 overflow-hidden rounded-[16px] transition-transform duration-200 hover:shadow-lg'
         onMouseEnter={(e) => {
           e.currentTarget.style.transform = 'translateY(-4px)';
         }}
@@ -371,17 +380,17 @@ const GenreTile = ({ genre, onNavigate, isSmallScreen, isMobile }) => {
         ) : (
           <>
             {/* Manga Image */}
-            <div className='flex-shrink-0 rounded-[16px] overflow-hidden'>
+            <div className='flex-shrink-0 overflow-hidden rounded-[16px]'>
               <img
                 src={data.coverImage.large}
                 alt={data.title.romaji}
-                className='h-auto w-40 object-cover'
+                className='h-90 w-auto object-cover'
                 loading='lazy'
               />
             </div>
 
             {/* Manga Description */}
-            <div className='flex flex-1 flex-col justify-between pl-2 p-2'>
+            <div className='flex flex-1 flex-col justify-between p-2 pl-2'>
               <div>
                 <p className='line-clamp-2 font-semibold text-gray-800'>
                   {data.title.english || data.title.romaji}
