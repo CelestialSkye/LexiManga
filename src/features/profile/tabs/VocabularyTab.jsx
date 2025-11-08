@@ -58,40 +58,42 @@ const VocabularyTab = ({ manga }) => {
   ];
 
   return (
-    <div className='p-4'>
-      <h2 className='mb-4 text-xl font-bold'>Vocabulary</h2>
+    <div>
+      <h2 className='mb-4 pt-4 pl-4 text-xl font-bold'>Vocabulary</h2>
 
-      <FilterControls
-        searchTerm={searchTerm}
-        setSearchTerm={setSearchTerm}
-        statusFilter={statusFilter}
-        setStatusFilter={setStatusFilter}
-        filteredCount={filteredWords.length}
-        totalCount={words.length}
-        rightAction={
-          <button
-            className='h-9 rounded-lg bg-violet-500 px-3 text-sm text-white transition-colors hover:bg-violet-600'
-            onClick={() => setIsAddWordModalOpen(true)}
-          >
-            Add
-          </button>
-        }
-      />
-
-      <div className='mt-4'>
-        <ResponsiveWordList
-          data={filteredWords}
-          columns={wordColumns}
-          loading={isLoading}
-          emptyMessage={
-            hasActiveFilters
-              ? 'No words match your search criteria. Try adjusting your filters.'
-              : "No vocabulary words added yet. Click 'Add Word' to get started!"
+      <div className='px-4 pb-4'>
+        <FilterControls
+          searchTerm={searchTerm}
+          setSearchTerm={setSearchTerm}
+          statusFilter={statusFilter}
+          setStatusFilter={setStatusFilter}
+          filteredCount={filteredWords.length}
+          totalCount={words.length}
+          rightAction={
+            <button
+              className='h-9 rounded-lg bg-violet-500 px-3 text-sm text-white transition-colors hover:bg-violet-600'
+              onClick={() => setIsAddWordModalOpen(true)}
+            >
+              Add
+            </button>
           }
-          onWordClick={(word) => {}}
-          onEditWord={(word) => {}}
-          onDeleteWord={(word) => {}}
         />
+
+        <div className='mt-4'>
+          <ResponsiveWordList
+            data={filteredWords}
+            columns={wordColumns}
+            loading={isLoading}
+            emptyMessage={
+              hasActiveFilters
+                ? 'No words match your search criteria. Try adjusting your filters.'
+                : "No vocabulary words added yet. Click 'Add Word' to get started!"
+            }
+            onWordClick={(word) => {}}
+            onEditWord={(word) => {}}
+            onDeleteWord={(word) => {}}
+          />
+        </div>
       </div>
 
       <AddWordModal
