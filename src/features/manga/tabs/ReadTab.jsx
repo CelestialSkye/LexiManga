@@ -95,9 +95,9 @@ const ReadTab = ({ manga }) => {
     window.open(url, '_blank');
   };
 
-  return(
-    <div className='rounded-[16px] p-2 pb-4'>
-      <h2 className='mb-4 pt-4 pr-4 text-xl font-bold'>Read Online</h2>
+  return (
+    <div className='p-4'>
+      <h2 className='mb-4 text-xl font-bold'>Read Online</h2>
       <div className='space-y-2'>
         <div className='flex flex-wrap gap-2'>
           <Button onClick={searchMangaDex} variant='outline' size='sm' color='violet'>

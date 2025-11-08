@@ -10,14 +10,27 @@ const MangaListModal = () => {
   const [selectedManga, setSelectedManga] = useState(null);
   const [isStatusModalOpen, setIsStatusModalOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
-  const filteredManga = mangaStatus.filter(manga => 
-  manga.title.toLowerCase().includes(searchTerm.toLowerCase()));
-
-
-
+  const filteredManga = mangaStatus.filter((manga) =>
+    manga.title.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   if (!user) return <div>Please log in to view your manga statuses.</div>;
-  if (isLoading) return <div>Loading manga statuses...</div>;
+  if (isLoading)
+    return (
+      <div className='min-h-[300px]'>
+        <div className='animate-pulse space-y-4'>
+          <div className='grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4'>
+            {[...Array(8)].map((_, i) => (
+              <div key={i} className='flex flex-col items-center'>
+                <div className='mb-2 h-36 w-24 rounded-lg bg-gray-200'></div>
+                <div className='h-4 w-full rounded bg-gray-200'></div>
+                <div className='mt-1 h-3 w-3/4 rounded bg-gray-200'></div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
   if (error) {
     console.error('Detailed error:', error);
     return (
@@ -33,8 +46,12 @@ const MangaListModal = () => {
   return (
     <>
       <div className='rounded-[16px] bg-white p-2 pb-4'>
-        <h2 className='mb-4 pt-4 pr-4 text-xl font-bold'>Manga Scores</h2>
-        <SearchBar className="mb-4" value={searchTerm} onChange={setSearchTerm} placeholder='Search manga..'/>
+        <SearchBar
+          className='mb-4'
+          value={searchTerm}
+          onChange={setSearchTerm}
+          placeholder='Search manga..'
+        />
         {filteredManga.length === 0 ? (
           <div className='text-gray-500'>No manga statuses found</div>
         ) : (

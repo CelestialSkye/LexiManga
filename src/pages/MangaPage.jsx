@@ -16,6 +16,7 @@ import MangaStatusModal from '../components/MangaStatusModal';
 import { useIsFavorited, useToggleFavorite } from '../services/favoriteService';
 import { useAuth } from '../context/AuthContext';
 import { IconHeartFilled } from '@tabler/icons-react';
+import LoadingLogo from '@components/LoadingLogo';
 
 const HeartButton = memo(({ isFavorited, isLoading, onClick }) => (
   <div
@@ -95,7 +96,12 @@ const MangaPage = () => {
     { id: 'characters', label: 'Characters' },
   ];
 
-  if (isLoading) return <div className='page-container'>Loading...</div>;
+  if (isLoading)
+    return (
+      <div className='flex min-h-screen items-center justify-center'>
+        <LoadingLogo />
+      </div>
+    );
   if (error) return <div className='page-container'>Error: {error.message}</div>;
   if (!data?.data?.Media) return <div className='page-container'>Manga not found</div>;
 
@@ -292,21 +298,38 @@ const MangaPage = () => {
           <div className={`w-full ${isDesktop ? 'ml-50 max-w-[calc(100%-200px)] pl-2' : ''}`}>
             {isMobile && <SideScrollinfo manga={manga} />}
 
-            <div className='mt-0 rounded-[16px] bg-white px-4 pb-4 shadow-sm'>
-              {/* scrollbuttons content (for now) */}
-              <div className='mb-4'>
-                {activeTab === 'overview' && <OverviewTab manga={manga} />}
+            <div className='mb-4'>
+              {activeTab === 'overview' && <OverviewTab manga={manga} />}
 
-                {activeTab === 'read' && <ReadTab manga={manga} />}
+              {activeTab === 'read' && (
+                <div className='rounded-[16px] bg-white p-4 shadow-md'>
+                  <ReadTab manga={manga} />
+                </div>
+              )}
 
-                {activeTab === 'vocabulary' && <VocabularyTab manga={manga} />}
+              {activeTab === 'vocabulary' && (
+                <div className='rounded-[16px] bg-white p-4 shadow-md'>
+                  <VocabularyTab manga={manga} />
+                </div>
+              )}
 
-                {activeTab === 'study' && <StudyTab manga={manga} />}
+              {activeTab === 'study' && (
+                <div className='rounded-[16px] bg-white p-4 shadow-md'>
+                  <StudyTab manga={manga} />
+                </div>
+              )}
 
-                {activeTab === 'staff' && <StaffTab manga={manga} />}
+              {activeTab === 'staff' && (
+                <div className='rounded-[16px] bg-white p-4 shadow-md'>
+                  <StaffTab manga={manga} />
+                </div>
+              )}
 
-                {activeTab === 'characters' && <CharactersTab manga={manga} />}
-              </div>
+              {activeTab === 'characters' && (
+                <div className='rounded-[16px] bg-white p-4 shadow-md'>
+                  <CharactersTab manga={manga} />
+                </div>
+              )}
             </div>
           </div>
         </div>
