@@ -10,7 +10,7 @@ const SRSGame = ({ manga, words: initialWords }) => {
   const [currentCardIndex, setCurrentCardIndex] = useState(0);
   const [showAnswer, setShowAnswer] = useState(false);
   const [sessionActive, setSessionActive] = useState(false);
-  const [selectedMangaFilter, setSelectedMangaFilter] = useState(null);
+  const [selectedMangaFilter, setSelectedMangaFilter] = useState('');
   const [totalCards, setTotalCards] = useState(0);
   const [showCompletionMessage, setShowCompletionMessage] = useState(false);
   const timerRef = useRef(null);
@@ -40,9 +40,9 @@ const SRSGame = ({ manga, words: initialWords }) => {
   // Get words based on mode - memoized to prevent infinite loops
   const words = useMemo(() => {
     if (isProfileMode && allUserWords) {
-      // If selectedMangaFilter is null, show all words (including "All Mangas" option)
-      if (selectedMangaFilter && selectedMangaFilter !== null) {
-        return allUserWords.filter((w) => w.mangaId === selectedMangaFilter);
+      // If selectedMangaFilter is empty string or null, show all words
+      if (selectedMangaFilter && selectedMangaFilter !== '' && selectedMangaFilter !== null) {
+        return allUserWords.filter((w) => String(w.mangaId) === selectedMangaFilter);
       }
       return allUserWords;
     }
@@ -59,11 +59,11 @@ const SRSGame = ({ manga, words: initialWords }) => {
       }
     });
     const options = Array.from(mangaMap, ([id, title]) => ({
-      value: id,
+      value: String(id),
       label: typeof title === 'string' ? title : String(title),
     }));
     // Add "All Mangas" option at the beginning
-    return [{ value: null, label: 'All Mangas', group: 'default' }, ...options];
+    return [{ value: '', label: 'All Mangas' }, ...options];
   };
 
   // Load and filter cards when session starts
