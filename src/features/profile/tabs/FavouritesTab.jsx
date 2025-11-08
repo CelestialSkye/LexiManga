@@ -6,13 +6,12 @@ const FavouritesTab = () => {
 
   if (!user) return <p>Please log in to view favorites</p>;
 
-    return (
-    <div className="rounded-[16px] p-2 pb-4 ">
-      <h2 className="text-xl font-bold mb-6 pr-4 pt-4 pb-4">Favourites</h2>
-     <FavouritesModal></FavouritesModal>
-     
+  return (
+    <div className='p-4'>
+      <h2 className='mb-4 text-xl font-bold'>Favourites</h2>
+      <FavouritesModal></FavouritesModal>
     </div>
-  )
+  );
 };
 
 export default FavouritesTab;

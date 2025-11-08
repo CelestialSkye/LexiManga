@@ -3,6 +3,7 @@ import { ErrorBoundary } from 'react-error-boundary';
 import { useAuth } from '../context/AuthContext';
 import { useMediaQuery } from '@mantine/hooks';
 import { useProfileStats } from '../hooks/useProfileStats';
+import { useProfilePageLoading } from '../hooks/useProfilePageLoading';
 import TopBar from '../components/TopBar';
 import AvatarUpload from '../components/AvatarUpload';
 import BannerUpload from '../components/BannerUpload';
@@ -14,6 +15,7 @@ import StudyTab from '../features/profile/tabs/StudyTab';
 import VocabularyTab from '../features/profile/tabs/VocabularyTab';
 import ProfileTab from '../features/profile/tabs/FavouritesTab';
 import ProfileSideScrollinfo from '@components/ProfileSideScrollInfo';
+import LoadingLogo from '@components/LoadingLogo';
 
 // Error fallback component
 function ErrorFallback({ error, resetErrorBoundary }) {
@@ -32,9 +34,19 @@ const ProfilePage = () => {
   const [activeTab, setActiveTab] = useState('overview');
   const { user, profile } = useAuth();
   const { wordCount, mangaCount, learnedCount, unknownCount, learningCount } = useProfileStats();
+  const { isLoading } = useProfilePageLoading();
 
   const isMobile = useMediaQuery('(max-width: 768px)');
   const isDesktop = useMediaQuery('(min-width: 769px)');
+
+  // Show loading screen while data is being fetched
+  if (isLoading) {
+    return (
+      <div className='flex min-h-screen items-center justify-center'>
+        <LoadingLogo />
+      </div>
+    );
+  }
 
   // Tab configuration
   const tabs = [
@@ -43,7 +55,7 @@ const ProfilePage = () => {
     { id: 'scores', label: 'Scores' },
     { id: 'study', label: 'Study' },
     { id: 'vocabulary', label: 'Vocabulary' },
-    { id: 'profileinfo', label: 'Profile' },
+    { id: 'favourites', label: 'Favourites' },
   ];
 
   // Placeholder profile data
@@ -120,11 +132,7 @@ const ProfilePage = () => {
       <div className='page-container pb-6'>
         <div className={`relative mt-6 ${isDesktop ? 'flex gap-4' : ''}`}>
           {isMobile && (
-            <ErrorBoundary
-              FallbackComponent={ErrorFallback}
-              onReset={() => {
-              }}
-            >
+            <ErrorBoundary FallbackComponent={ErrorFallback} onReset={() => {}}>
               <ProfileSideScrollinfo />
             </ErrorBoundary>
           )}
@@ -161,20 +169,38 @@ const ProfilePage = () => {
 
           {/* main container  */}
           <div className={`flex-1 ${isDesktop ? 'pl-0' : ''}`}>
-            <div className='mt-0 rounded-[16px] bg-white px-4 pb-4 shadow-sm'>
-              <div className='mb-4'>
-                {activeTab === 'overview' && <OverviewTab profile={profileData} />}
+            <div className='mb-4'>
+              {activeTab === 'overview' && <OverviewTab profile={profileData} />}
 
-                {activeTab === 'activity' && <ActivityTab profile={profileData} />}
+              {activeTab === 'activity' && (
+                <div className='rounded-[16px] bg-white p-4 shadow-md'>
+                  <ActivityTab profile={profileData} />
+                </div>
+              )}
 
-                {activeTab === 'scores' && <ScoresTab profile={profileData} />}
+              {activeTab === 'scores' && (
+                <div className='rounded-[16px] bg-white p-4 shadow-md'>
+                  <ScoresTab profile={profileData} />
+                </div>
+              )}
 
-                {activeTab === 'study' && <StudyTab profile={profileData} />}
+              {activeTab === 'study' && (
+                <div className='rounded-[16px] bg-white p-4 shadow-md'>
+                  <StudyTab profile={profileData} />
+                </div>
+              )}
 
-                {activeTab === 'vocabulary' && <VocabularyTab profile={profileData} />}
+              {activeTab === 'vocabulary' && (
+                <div className='rounded-[16px] bg-white p-4 shadow-md'>
+                  <VocabularyTab profile={profileData} />
+                </div>
+              )}
 
-                {activeTab === 'profileinfo' && <ProfileTab profile={profileData} />}
-              </div>
+              {activeTab === 'favourites' && (
+                <div className='rounded-[16px] bg-white p-4 shadow-md'>
+                  <ProfileTab profile={profileData} />
+                </div>
+              )}
             </div>
           </div>
         </div>

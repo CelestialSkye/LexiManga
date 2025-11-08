@@ -29,14 +29,20 @@ const VocabularyTab = ({ manga }) => {
     { header: 'Translation', key: 'translation' },
     { header: 'Chapter', key: 'chapter' },
     {
-  header: 'Manga',
-  key: 'mangaTitle',
-  render: (row) => (
-    <span className="font-small max-w-[150px] block truncate">
-      {row.mangaTitle || '—'}
-    </span>
-  )
-},
+      header: 'Manga',
+      key: 'mangaTitle',
+      render: (row) => {
+        let title = '—';
+        if (row.mangaTitle) {
+          if (typeof row.mangaTitle === 'string') {
+            title = row.mangaTitle;
+          } else if (typeof row.mangaTitle === 'object') {
+            title = row.mangaTitle.english || row.mangaTitle.romaji || row.mangaTitle.native || '—';
+          }
+        }
+        return <span className='font-small block max-w-[150px] truncate'>{title}</span>;
+      },
+    },
     {
       header: 'Status',
       key: 'status',
@@ -52,8 +58,8 @@ const VocabularyTab = ({ manga }) => {
   ];
 
   return (
-    <div className='rounded-[16px] p-2 pb-4'>
-      <h2 className='mb-4 pt-4 pr-4 text-xl font-bold'>Vocabulary</h2>
+    <div className='p-4'>
+      <h2 className='mb-4 text-xl font-bold'>Vocabulary</h2>
 
       <FilterControls
         searchTerm={searchTerm}

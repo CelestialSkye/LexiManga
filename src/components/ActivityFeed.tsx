@@ -100,25 +100,33 @@ const ActivityFeed = () => {
 
   if (loading) {
     return (
-      <div className='rounded-lg bg-white p-4'>
-        <h2 className='mb-4 text-xl font-bold'>Activity Feed</h2>
-        <div className='animate-pulse space-y-2'>
-          <div className='h-4 w-full rounded bg-gray-200'></div>
-          <div className='h-4 w-3/4 rounded bg-gray-200'></div>
-          <div className='h-4 w-5/6 rounded bg-gray-200'></div>
+      <div className='min-h-[400px] rounded-lg p-4'>
+        <div className='animate-pulse space-y-3'>
+          {[...Array(6)].map((_, i) => (
+            <div key={i} className='flex gap-3'>
+              <div className='h-28 w-16 flex-shrink-0 rounded-[8px] bg-gray-200'></div>
+              <div className='flex-1 space-y-2'>
+                <div className='h-4 w-3/4 rounded bg-gray-200'></div>
+                <div className='h-3 w-1/2 rounded bg-gray-200'></div>
+                <div className='h-3 w-full rounded bg-gray-200'></div>
+              </div>
+            </div>
+          ))}
         </div>
       </div>
     );
   }
 
   return (
-    <div className='rounded-lg bg-white'>
+    <div className='rounded-lg'>
       {activities.length === 0 ? (
-        <div className='py-8 text-center text-gray-400'>No activities yet.</div>
+        <div className='flex min-h-[400px] items-center justify-center py-8 text-center text-gray-400'>
+          No activities yet.
+        </div>
       ) : (
         <ul className='max-h-[500px] space-y-3 overflow-y-auto'>
           {activities.map((activity) => (
-            <li key={activity.id} className='flex gap-3 rounded-md p-3 transition hover:bg-gray-50'>
+            <li key={activity.id} className='flex cursor-pointer gap-3 rounded-md p-3 transition'>
               {activity.coverImage &&
                 (activity.type === 'manga_add' ||
                   activity.type === 'manga_update' ||

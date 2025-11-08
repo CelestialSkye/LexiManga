@@ -10,13 +10,13 @@ import useWordFiltering from '../../../hooks/useWordFiltering';
 const VocabularyTab = ({ manga }) => {
   const { user } = useAuth();
   const [isAddWordModalOpen, setIsAddWordModalOpen] = useState(false);
-  
 
   // fetch vocab words from the manga
-  const { data: words = [], isLoading, error } = useVocabWordsByManga(
-    user?.uid, 
-    manga?.id?.toString()
-  );
+  const {
+    data: words = [],
+    isLoading,
+    error,
+  } = useVocabWordsByManga(user?.uid, manga?.id?.toString());
 
   // reuse hooks
   const {
@@ -25,32 +25,32 @@ const VocabularyTab = ({ manga }) => {
     statusFilter,
     setStatusFilter,
     filteredWords,
-    hasActiveFilters
+    hasActiveFilters,
   } = useWordFiltering(words);
 
   const wordColumns = [
     { header: 'Word', key: 'word' },
     { header: 'Translation', key: 'translation' },
     { header: 'Chapter', key: 'chapter' },
-    
-    { 
-      header: 'Status', 
+
+    {
+      header: 'Status',
       key: 'status',
       render: (row) => (
-        <Badge 
+        <Badge
           color={row.status === 'known' ? 'green' : row.status === 'learning' ? 'blue' : 'gray'}
-          variant="light"
+          variant='light'
         >
           {row.status}
         </Badge>
-      )
+      ),
     },
   ];
-  
+
   return (
-    <div className="p-2 pb-4 rounded-[16px]">
-      <h2 className='mb-4 text-xl font-bold pr-4 pt-4'>Vocabulary</h2>
-      
+    <div className='p-4'>
+      <h2 className='mb-4 text-xl font-bold'>Vocabulary</h2>
+
       <FilterControls
         searchTerm={searchTerm}
         setSearchTerm={setSearchTerm}
@@ -60,22 +60,22 @@ const VocabularyTab = ({ manga }) => {
         totalCount={words.length}
         rightAction={
           <button
-            className='rounded-lg bg-violet-500 px-3 h-9 text-white text-sm transition-colors hover:bg-violet-600'
+            className='h-9 rounded-lg bg-violet-500 px-3 text-sm text-white transition-colors hover:bg-violet-600'
             onClick={() => setIsAddWordModalOpen(true)}
           >
             Add
           </button>
         }
       />
-      
-      <div className="mt-4">
-        <ResponsiveWordList 
-          data={filteredWords} 
+
+      <div className='mt-4'>
+        <ResponsiveWordList
+          data={filteredWords}
           columns={wordColumns}
           loading={isLoading}
           emptyMessage={
             hasActiveFilters
-              ? "No words match your search criteria. Try adjusting your filters."
+              ? 'No words match your search criteria. Try adjusting your filters.'
               : "No vocabulary words added yet. Click 'Add Word' to get started!"
           }
           onWordClick={(word) => {}}
@@ -83,7 +83,7 @@ const VocabularyTab = ({ manga }) => {
           onDeleteWord={(word) => {}}
         />
       </div>
-      
+
       <AddWordModal
         manga={manga}
         opened={isAddWordModalOpen}

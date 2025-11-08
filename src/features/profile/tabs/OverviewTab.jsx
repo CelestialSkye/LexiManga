@@ -1,9 +1,24 @@
+import ScoresTab from './ScoresTab';
+import VocabularyTab from './VocabularyTab';
+import FavouritesTab from './FavouritesTab';
+
 const OverviewTab = ({ profile }) => {
   return (
-    <div className="p-2 pb-4 rounded-[16px]">
-      <h2 className="text-xl font-bold mb-6">Profile Overview</h2>
-      
-     
+    <div className='space-y-4'>
+      {/* Scores section */}
+      <div className='rounded-[16px] bg-white p-4 shadow-md'>
+        <ScoresTab />
+      </div>
+
+      {/* Vocabulary section */}
+      <div className='rounded-[16px] bg-white p-4 shadow-md'>
+        <VocabularyTab />
+      </div>
+
+      {/* Favourites section */}
+      <div className='rounded-[16px] bg-white p-4 shadow-md'>
+        <FavouritesTab />
+      </div>
     </div>
   );
 };

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { Card, Text, Button, Group, Badge, Progress, Stack, Select } from '@mantine/core';
 import { useAuth } from '../context/AuthContext';
 import { createEmptyCard, FSRS, Rating } from 'ts-fsrs';
@@ -9,9 +9,11 @@ const SRSGame = ({ manga, words: initialWords }) => {
   const [cards, setCards] = useState([]);
   const [currentCardIndex, setCurrentCardIndex] = useState(0);
   const [showAnswer, setShowAnswer] = useState(false);
-  const [sessionStarted, setSessionStarted] = useState(false);
+  const [sessionActive, setSessionActive] = useState(false);
   const [selectedMangaFilter, setSelectedMangaFilter] = useState(null);
   const [totalCards, setTotalCards] = useState(0);
+  const [showCompletionMessage, setShowCompletionMessage] = useState(false);
+  const timerRef = useRef(null);
 
   const fsrs = new FSRS();
   const updateWordMutation = useUpdateVocabWord();
@@ -35,18 +37,17 @@ const SRSGame = ({ manga, words: initialWords }) => {
   const isLoading = isProfileMode ? loadingAll : loadingByManga;
   const error = isProfileMode ? errorAll : errorByManga;
 
-  // Get words based on mode
-  const getWords = () => {
+  // Get words based on mode - memoized to prevent infinite loops
+  const words = useMemo(() => {
     if (isProfileMode && allUserWords) {
-      if (selectedMangaFilter) {
+      // If selectedMangaFilter is null, show all words (including "All Mangas" option)
+      if (selectedMangaFilter && selectedMangaFilter !== null) {
         return allUserWords.filter((w) => w.mangaId === selectedMangaFilter);
       }
       return allUserWords;
     }
     return userWords || [];
-  };
-
-  const words = getWords();
+  }, [isProfileMode, allUserWords, userWords, selectedMangaFilter]);
 
   // Get unique manga for filter dropdown in profile mode
   const getMangaOptions = () => {
@@ -57,64 +58,91 @@ const SRSGame = ({ manga, words: initialWords }) => {
         mangaMap.set(word.mangaId, word.mangaTitle);
       }
     });
-    return Array.from(mangaMap, ([id, title]) => ({
+    const options = Array.from(mangaMap, ([id, title]) => ({
       value: id,
       label: typeof title === 'string' ? title : String(title),
     }));
+    // Add "All Mangas" option at the beginning
+    return [{ value: null, label: 'All Mangas', group: 'default' }, ...options];
   };
 
+  // Load and filter cards when session starts
   useEffect(() => {
-    if (words && words.length > 0 && !sessionStarted) {
-      //load cards or create new ones
-      const cardsWithSRS = words.map((word) => {
-        // Check if card has valid SRS data (not corrupted with NaN or invalid values)
-        const hasValidSRS =
-          word.due &&
-          word.stability !== undefined &&
-          !isNaN(word.stability) &&
-          !isNaN(word.difficulty) &&
-          !isNaN(word.scheduled_days);
-
-        if (hasValidSRS) {
-          return {
-            due: new Date(word.due),
-            stability: word.stability,
-            difficulty: word.difficulty,
-            elapsed_days: word.elapsed_days || 0,
-            scheduled_days: word.scheduled_days || 0,
-            reps: word.reps || 0,
-            lapses: word.lapses || 0,
-            learning_steps: word.learning_steps || 0,
-            state: word.state || 0,
-            last_review: word.last_review ? new Date(word.last_review) : undefined,
-            wordData: word,
-          };
-        } else {
-          // New word or corrupted data > create a fresh card
-          const newCard = createEmptyCard();
-          const now = new Date();
-          newCard.due = now;
-          newCard.last_review = undefined;
-          return {
-            ...newCard,
-            wordData: word,
-          };
-        }
-      });
-
-      // filter to only show cards that are due for review
-      const now = new Date();
-      const dueCards = cardsWithSRS.filter((card) => {
-        const dueDate = new Date(card.due);
-        return dueDate <= now;
-      });
-
-      setCards(dueCards);
-      setTotalCards(dueCards.length);
-      setCurrentCardIndex(0);
-      setSessionStarted(true);
+    if (!sessionActive || !words || words.length === 0) {
+      return;
     }
-  }, [words, sessionStarted]);
+
+    const cardsWithSRS = words.map((word) => {
+      const hasValidSRS =
+        word.due &&
+        word.stability !== undefined &&
+        !isNaN(word.stability) &&
+        !isNaN(word.difficulty) &&
+        !isNaN(word.scheduled_days);
+
+      if (hasValidSRS) {
+        return {
+          due: new Date(word.due),
+          stability: word.stability,
+          difficulty: word.difficulty,
+          elapsed_days: word.elapsed_days || 0,
+          scheduled_days: word.scheduled_days || 0,
+          reps: word.reps || 0,
+          lapses: word.lapses || 0,
+          learning_steps: word.learning_steps || 0,
+          state: word.state || 0,
+          last_review: word.last_review ? new Date(word.last_review) : undefined,
+          wordData: word,
+        };
+      } else {
+        const newCard = createEmptyCard();
+        const now = new Date();
+        newCard.due = now;
+        newCard.last_review = undefined;
+        return {
+          ...newCard,
+          wordData: word,
+        };
+      }
+    });
+
+    const now = new Date();
+    const dueCards = cardsWithSRS.filter((card) => {
+      const dueDate = new Date(card.due);
+      return dueDate <= now;
+    });
+
+    setCards(dueCards);
+    setTotalCards(dueCards.length);
+    setCurrentCardIndex(0);
+
+    if (dueCards.length === 0) {
+      setShowCompletionMessage(true);
+    }
+  }, [sessionActive, words]);
+
+  // Separate effect to handle hiding completion message after 2 seconds
+  useEffect(() => {
+    if (!showCompletionMessage) {
+      return;
+    }
+
+    if (timerRef.current) {
+      clearTimeout(timerRef.current);
+    }
+
+    timerRef.current = setTimeout(() => {
+      setSessionActive(false);
+      setShowCompletionMessage(false);
+      timerRef.current = null;
+    }, 2000);
+
+    return () => {
+      if (timerRef.current) {
+        clearTimeout(timerRef.current);
+      }
+    };
+  }, [showCompletionMessage]);
 
   const handleAnswer = async (rating) => {
     if (currentCardIndex >= cards.length) return;
@@ -179,13 +207,20 @@ const SRSGame = ({ manga, words: initialWords }) => {
       isSRSUpdate: true,
     });
 
-    // remove the current card from the session
     const newCards = cards.filter((_, index) => index !== currentCardIndex);
     setCards(newCards);
 
-    // Update the current card index
     if (newCards.length === 0) {
-      setCurrentCardIndex(0);
+      setShowCompletionMessage(true);
+      // Clear any existing timer
+      if (timerRef.current) {
+        clearTimeout(timerRef.current);
+      }
+      timerRef.current = setTimeout(() => {
+        setSessionActive(false);
+        setShowCompletionMessage(false);
+        timerRef.current = null;
+      }, 2000);
     } else if (currentCardIndex >= newCards.length) {
       setCurrentCardIndex(newCards.length - 1);
     }
@@ -225,62 +260,79 @@ const SRSGame = ({ manga, words: initialWords }) => {
     return (
       <Card shadow='sm' padding='lg' radius='md' withBorder>
         <Text ta='center' c='dimmed'>
-          No vocabulary words found. Add some words first! 📚
+          No vocabulary words found. Add some words first!
         </Text>
       </Card>
     );
   }
 
-  if (cards.length === 0) {
+  // Show completion message (auto-hides after 2 seconds)
+  if (showCompletionMessage) {
     return (
-      <Card padding='lg' radius='md'>
-        <Text ta='center' c='violet' size='lg' fw={700}>
-          All caught up!
-        </Text>
-        <Text ta='center' c='dimmed' mt='md'>
-          No cards are due for review right now. Check back later!
-        </Text>
-      </Card>
+      <div className='mx-auto max-w-3xl p-4'>
+        <Card shadow='md' padding='lg' radius='md' withBorder>
+          <Stack gap='md'>
+            <div className='text-center'>
+              <Text ta='center' c='violet' size='md' fw={700}>
+                All caught up!
+              </Text>
+              <Text ta='center' c='dimmed' mt='sm' size='sm'>
+                No cards are due for review right now. Check back later!
+              </Text>
+            </div>
+          </Stack>
+        </Card>
+      </div>
     );
   }
 
-  if (currentCardIndex >= cards.length) {
+  // If not in a session, show start screen with filters
+  if (!sessionActive || cards.length === 0) {
     const mangaOptions = getMangaOptions();
 
     return (
-      <div className='mx-auto max-w-lg max-w-md p-6'>
-        <Card shadow='sm' padding='lg' radius='md' withBorder>
+      <div className='mx-auto max-w-3xl p-4'>
+        <Card shadow='md' padding='lg' radius='md' withBorder>
           <Stack gap='md'>
             {isProfileMode && mangaOptions.length > 0 && (
-              <Select
-                label='Filter by Manga (optional)'
-                placeholder='Study all words'
-                data={mangaOptions}
-                value={selectedMangaFilter}
-                onChange={(value) => {
-                  setSelectedMangaFilter(value);
-                  setSessionStarted(false);
-                  setCurrentCardIndex(0);
-                  setShowAnswer(false);
-                }}
-                clearable
-                searchable
-              />
+              <div style={{ display: 'flex', gap: '12px', alignItems: 'flex-end' }}>
+                <div style={{ flex: 1 }}>
+                  <Select
+                    label='Filter by Manga (optional)'
+                    placeholder='Study all words'
+                    data={mangaOptions}
+                    value={selectedMangaFilter}
+                    onChange={(value) => {
+                      setSelectedMangaFilter(value);
+                    }}
+                    clearable
+                    searchable
+                    size='sm'
+                  />
+                </div>
+                <Button
+                  size='md'
+                  onClick={() => {
+                    setSessionActive(true);
+                  }}
+                  style={{ height: '36px' }}
+                >
+                  Start
+                </Button>
+              </div>
             )}
 
-            <Text ta='center' c='green' size='lg' fw={700}>
-              Session Complete! 🎉
-            </Text>
-            <Button
-              fullWidth
-              onClick={() => {
-                setCurrentCardIndex(0);
-                setShowAnswer(false);
-                setSessionStarted(false);
-              }}
-            >
-              Start New Session
-            </Button>
+            {(!isProfileMode || mangaOptions.length === 0) && (
+              <Button
+                fullWidth
+                size='md'
+                onClick={() => {
+                  setSessionActive(true);
+                }}
+              >
+                Start Study Session
+              </Button>
+            )}
           </Stack>
         </Card>
       </div>
@@ -291,82 +343,105 @@ const SRSGame = ({ manga, words: initialWords }) => {
   const mangaOptions = getMangaOptions();
 
   return (
-    <div className='mx-auto max-w-md p-6'>
-      <Card shadow='sm' padding='lg' radius='md' withBorder>
+    <div className='mx-auto max-w-3xl p-4'>
+      <Card shadow='md' padding='lg' radius='md' withBorder>
         <Stack gap='md'>
           {isProfileMode && mangaOptions.length > 0 && (
-            <Select
-              label='Filter by Manga (optional)'
-              placeholder='Study all words'
-              data={mangaOptions}
-              value={selectedMangaFilter}
-              onChange={(value) => {
-                setSelectedMangaFilter(value);
-                setSessionStarted(false);
-                setCurrentCardIndex(0);
-                setShowAnswer(false);
-              }}
-              clearable
-              searchable
-            />
+            <div style={{ display: 'flex', gap: '12px', alignItems: 'flex-end' }}>
+              <div style={{ flex: 1 }}>
+                <Select
+                  label='Filter by Manga (optional)'
+                  placeholder='Study all words'
+                  data={mangaOptions}
+                  value={selectedMangaFilter}
+                  onChange={(value) => {
+                    setSelectedMangaFilter(value);
+                    setSessionActive(false);
+                    setCurrentCardIndex(0);
+                    setShowAnswer(false);
+                  }}
+                  clearable
+                  searchable
+                  size='sm'
+                />
+              </div>
+              <Button
+                size='md'
+                onClick={() => {
+                  setSessionActive(false);
+                  setCurrentCardIndex(0);
+                  setShowAnswer(false);
+                }}
+                style={{ height: '36px' }}
+              >
+                Reset
+              </Button>
+            </div>
           )}
 
           <div className='text-center'>
-            <Text size='lg' fw={700}>
+            <Text size='md' fw={700}>
               SRS Review
             </Text>
-            <Progress value={(currentCardIndex / totalCards) * 100} size='sm' mt='xs' />
-            <Text size='sm' c='dimmed' mt='xs'>
+            <Progress value={(currentCardIndex / totalCards) * 100} size='sm' mt='sm' />
+            <Text size='xs' c='dimmed' mt='xs'>
               Card {cards.length} of {totalCards}
             </Text>
           </div>
 
-          <Card padding='md' bg='gray.0' radius='md'>
-            <Stack gap='sm'>
-              <Text size='xl' fw={600} ta='center'>
+          <Card
+            padding='lg'
+            bg='gray.0'
+            radius='md'
+            style={{
+              minHeight: '180px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            <Stack gap='md' style={{ width: '100%' }}>
+              <Text size='xl' fw={700} ta='center' style={{ wordBreak: 'break-word' }}>
                 {currentCard.wordData.word}
               </Text>
 
               {showAnswer && (
                 <div className='text-center'>
-                  <Text size='lg' c='blue' fw={500}>
+                  <Text size='md' c='blue' fw={600} style={{ wordBreak: 'break-word' }}>
                     {currentCard.wordData.translation}
                   </Text>
-                  <Badge size='sm' variant='light' mt='xs'>
-                    {currentCard.wordData.context}
-                  </Badge>
+                  {currentCard.wordData.context && (
+                    <Badge size='sm' variant='light' mt='sm'>
+                      {currentCard.wordData.context}
+                    </Badge>
+                  )}
                 </div>
-              )}
-
-              {!showAnswer && (
-                <Button fullWidth variant='outline' onClick={() => setShowAnswer(true)}>
-                  Show Answer
-                </Button>
-              )}
-
-              {showAnswer && (
-                <Group justify='center' gap='xs'>
-                  <Button size='sm' color='red' variant='outline' onClick={() => handleAnswer(1)}>
-                    Again
-                  </Button>
-                  <Button
-                    size='sm'
-                    color='yellow'
-                    variant='outline'
-                    onClick={() => handleAnswer(2)}
-                  >
-                    Hard
-                  </Button>
-                  <Button size='sm' color='blue' variant='outline' onClick={() => handleAnswer(3)}>
-                    Good
-                  </Button>
-                  <Button size='sm' color='green' variant='outline' onClick={() => handleAnswer(4)}>
-                    Easy
-                  </Button>
-                </Group>
               )}
             </Stack>
           </Card>
+
+          {!showAnswer && (
+            <Button fullWidth size='md' variant='outline' onClick={() => setShowAnswer(true)}>
+              Show Answer
+            </Button>
+          )}
+
+          {showAnswer && (
+            <Group justify='center' gap='xs'>
+              <Button size='sm' color='red' variant='filled' onClick={() => handleAnswer(1)}>
+                Again
+              </Button>
+              <Button size='sm' color='yellow' variant='filled' onClick={() => handleAnswer(2)}>
+                Hard
+              </Button>
+              <Button size='sm' color='blue' variant='filled' onClick={() => handleAnswer(3)}>
+                Good
+              </Button>
+              <Button size='sm' color='green' variant='filled' onClick={() => handleAnswer(4)}>
+                Easy
+              </Button>
+            </Group>
+          )}
         </Stack>
       </Card>
     </div>
