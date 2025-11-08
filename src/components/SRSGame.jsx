@@ -302,6 +302,7 @@ const SRSGame = ({ manga, words: initialWords }) => {
                     placeholder='Study all words'
                     data={mangaOptions}
                     value={selectedMangaFilter}
+                         className='violet-focus'
                     onChange={(value) => {
                       setSelectedMangaFilter(value);
                     }}

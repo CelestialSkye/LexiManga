@@ -74,7 +74,7 @@ const Trending = () => {
   // Mobile layout
   if (isMobile) {
     return (
-      <section className='mt-4 w-full overflow-hidden rounded-[16px] bg-black px-6 py-8'>
+      <section className='mt-4 w-full overflow-hidden rounded-[16px] bg-black px-6 py-8 mb-4'>
         {/* Text */}
         <div className='mb-6'>
           <h2 className='mb-2 text-2xl font-bold text-white whitespace-nowrap'>Monthly Manga Picks</h2>
