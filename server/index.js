@@ -3,6 +3,7 @@ const cors = require('cors');
 const NodeCache = require('node-cache');
 const fs = require('fs');
 const path = require('path');
+const nodemailer = require('nodemailer');
 
 const app = express();
 const PORT = process.env.PORT || 3003;
@@ -802,6 +803,51 @@ app.get('/api/browse', async (req, res) => {
   } catch (error) {
     console.error('Browse manga error:', error);
     res.status(500).json({ error: 'Failed to fetch browse manga' });
+  }
+});
+
+// Email endpoint for feedback
+app.post('/api/feedback', async (req, res) => {
+  try {
+    const { email, type, message, userId } = req.body;
+
+    if (!message || !message.trim()) {
+      return res.status(400).json({ error: 'Message is required' });
+    }
+
+    // Configure email transporter (using Gmail SMTP)
+    const transporter = nodemailer.createTransport({
+      service: 'gmail',
+      auth: {
+        user: process.env.EMAIL_USER || 'derpthulu1@gmail.com',
+        pass: process.env.EMAIL_PASS, // Use Gmail App Password
+      },
+    });
+
+    // Email content
+    const mailOptions = {
+      from: process.env.EMAIL_USER || 'derpthulu1@gmail.com',
+      to: 'derpthulu1@gmail.com',
+      subject: `Lexicon Feedback - ${type}`,
+      html: `
+        <h2>New Feedback from Lexicon</h2>
+        <p><strong>Type:</strong> ${type}</p>
+        <p><strong>User Email:</strong> ${email}</p>
+        <p><strong>User ID:</strong> ${userId}</p>
+        <p><strong>Message:</strong></p>
+        <p>${message.replace(/\n/g, '<br>')}</p>
+        <hr>
+        <p><small>Sent at: ${new Date().toISOString()}</small></p>
+      `,
+    };
+
+    // Send email
+    await transporter.sendMail(mailOptions);
+
+    res.json({ success: true, message: 'Feedback sent successfully' });
+  } catch (error) {
+    console.error('Feedback email error:', error);
+    res.status(500).json({ error: 'Failed to send feedback' });
   }
 });
 
