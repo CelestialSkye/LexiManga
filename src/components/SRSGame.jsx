@@ -311,7 +311,9 @@ const SRSGame = ({ manga, words: initialWords }) => {
                   />
                 </div>
                 <Button
+                  color='violet'
                   size='md'
+                  radius={16}
                   onClick={() => {
                     setSessionActive(true);
                   }}
@@ -324,8 +326,10 @@ const SRSGame = ({ manga, words: initialWords }) => {
 
             {(!isProfileMode || mangaOptions.length === 0) && (
               <Button
+                color='violet'
                 fullWidth
                 size='md'
+                radius={8}
                 onClick={() => {
                   setSessionActive(true);
                 }}
@@ -366,7 +370,9 @@ const SRSGame = ({ manga, words: initialWords }) => {
                 />
               </div>
               <Button
+                color='violet'
                 size='md'
+                radius={8}
                 onClick={() => {
                   setSessionActive(false);
                   setCurrentCardIndex(0);
