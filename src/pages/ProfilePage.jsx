@@ -66,7 +66,7 @@ const ProfilePage = () => {
       <div className='rounded-b-[16px] bg-white shadow-sm'>
         {/* banner section */}
         <div className={`relative w-full bg-white ${isMobile ? 'h-52' : 'h-96'}`}>
-          {/* TopBar overlap with the banner */}
+          {/* TopBar  */}
           <div className={`${isDesktop ? 'absolute top-0 right-0 left-0 z-10' : ''}`}>
             <TopBar />
           </div>
@@ -74,7 +74,7 @@ const ProfilePage = () => {
           {/* banner */}
           <div className='relative mb-6'>
             <BannerUpload size='lg' />
-            {/* black fading effect for top of the banner */}
+            {/* black fading effect  */}
             <div className='pointer-events-none absolute top-0 left-0 h-1/3 w-full bg-gradient-to-b from-black/70 to-transparent'></div>
             {/* bottom */}
             <div className='pointer-events-none absolute bottom-0 left-0 h-1/3 w-full bg-gradient-to-t from-black/70 to-transparent'></div>
@@ -84,7 +84,7 @@ const ProfilePage = () => {
               className={`absolute ${isMobile ? '-bottom-14' : '-bottom-18'} flex items-end gap-4`}
             >
               <div
-                className={`${isMobile ? 'ml-[calc((100vw-min(95vw,1200px))/2+2px)]' : 'ml-[calc((100vw-min(85vw,1200px))/2)]'}`}
+                className={`${isMobile ? 'ml-[calc((100vw-min(95vw,1200px))/2+2px)]' : 'ml-[calc((100vw-min(80vw,1200px))/2)]'}`}
               >
                 <div
                   className={`${isMobile ? 'w-[96px] max-w-[96px] min-w-[96px]' : 'w-48'} h-[auto]`}
@@ -106,7 +106,7 @@ const ProfilePage = () => {
         {/* Tab Navigation */}
         <div className='mt-18 mb-2 md:mt-18'>
           {isDesktop ? (
-            <div className='mr-[calc((100vw-min(85vw,1200px))/2)] ml-[calc((100vw-min(85vw,1200px))/2+192px)] pl-4'>
+            <div className='mr-[calc((100vw-min(80vw,1200px))/2)] ml-[calc((100vw-min(80vw,1200px))/2+192px)] pl-4'>
               <ScrollButtons items={tabs} activeItem={activeTab} onItemClick={setActiveTab} />
             </div>
           ) : (
@@ -118,21 +118,20 @@ const ProfilePage = () => {
       </div>
 
       <div className='page-container pb-6'>
-        <div className='relative mt-6'>
+        <div className={`relative mt-6 ${isDesktop ? 'flex gap-4' : ''}`}>
           {isMobile && (
             <ErrorBoundary
               FallbackComponent={ErrorFallback}
               onReset={() => {
-                // Optional: Add any reset logic here
               }}
             >
               <ProfileSideScrollinfo />
             </ErrorBoundary>
           )}
-          {/* left section - fixed position on desktop */}
+          {/* left section - fixed position  */}
           {isDesktop && (
-            <div className='absolute left-0 w-48'>
-              <div className='mt-0 rounded-[16px] bg-white p-4 shadow-sm'>
+            <div className='w-48 flex-shrink-0'>
+              <div className='sticky top-6 mt-0 rounded-[16px] bg-white p-4 shadow-sm'>
                 <h3 className='mb-3 text-xs font-bold'>Quick Info</h3>
                 <div className='space-y-2'>
                   <div>
@@ -160,8 +159,8 @@ const ProfilePage = () => {
             </div>
           )}
 
-          {/* main container - positioned to the right of sidebar */}
-          <div className={`w-full ${isDesktop ? 'ml-48 max-w-[calc(100%-192px)] pl-4' : ''}`}>
+          {/* main container  */}
+          <div className={`flex-1 ${isDesktop ? 'pl-0' : ''}`}>
             <div className='mt-0 rounded-[16px] bg-white px-4 pb-4 shadow-sm'>
               <div className='mb-4'>
                 {activeTab === 'overview' && <OverviewTab profile={profileData} />}

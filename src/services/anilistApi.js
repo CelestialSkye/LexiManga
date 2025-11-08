@@ -52,6 +52,15 @@ export const useTrendingManga = (limit = 10) => {
   });
 };
 
+export const useMonthlyManga = (limit = 15) => {
+  return useQuery({
+    queryKey: ['monthlyManga', limit],
+    queryFn: () => getMonthlyManga(limit),
+    staleTime: 5 * 60 * 1000,
+    retry: 2,
+  });
+};
+
 // for suggested manga
 export const useSuggestedManga = (limit = 2, genres = [], excludeGenres = []) => {
   return useQuery({
@@ -74,6 +83,22 @@ export const getTrendingManga = async (limit = 10) => {
     return result.data;
   } catch (error) {
     console.error('Trending manga error:', error);
+    throw error;
+  }
+};
+
+export const getMonthlyManga = async (limit = 15) => {
+  try {
+    const response = await fetch(`${BACKEND_URL}/api/monthly?limit=${limit}`);
+
+    if (!response.ok) {
+      throw new Error('Failed to fetch monthly manga');
+    }
+
+    const result = await response.json();
+    return result.data;
+  } catch (error) {
+    console.error('Monthly manga error:', error);
     throw error;
   }
 };
@@ -181,6 +206,8 @@ const anilistApi = {
   useMangaDetails,
   getTrendingManga,
   useTrendingManga,
+  getMonthlyManga,
+  useMonthlyManga,
   getSuggestedManga,
   useSuggestedManga,
   getBrowseManga,

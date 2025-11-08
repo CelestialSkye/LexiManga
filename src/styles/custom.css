@@ -9,7 +9,7 @@ body {
 }
 
 .page-container {
-  width: 85% !important;
+  width: 80% !important;
   margin: 0 auto !important;
   max-width: 1200px;
   min-width: 0;
@@ -252,5 +252,3 @@ body {
 button {
   cursor: pointer;
 }
-
-

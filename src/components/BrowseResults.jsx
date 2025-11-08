@@ -17,8 +17,8 @@ const BrowseResults = ({ data, isLoading, isError, page, onPageChange }) => {
 
   if (isLoading) {
     return (
-      <Center p='xl'>
-        <Loader />
+      <Center p='xl' style={{ minHeight: '400px' }}>
+        <Text c='gray'>Loading...</Text>
       </Center>
     );
   }
@@ -33,16 +33,14 @@ const BrowseResults = ({ data, isLoading, isError, page, onPageChange }) => {
 
   return (
     <Stack gap='md'>
-      <Text size='sm' c='gray'>
-        {data.pageInfo.total.toLocaleString()} results found
-      </Text>
+      <Text size='sm '>{data.pageInfo.total.toLocaleString()} results found</Text>
 
       <div className='grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5'>
         {data.media.map((manga) => (
           <div
             key={manga.id}
             onClick={() => navigate(`/manga/${manga.id}`)}
-            className='cursor-pointer overflow-hidden rounded-lg border border-gray-200 transition-all hover:scale-105'
+            className='cursor-pointer overflow-hidden rounded-[16px] border border-gray-200 transition-all hover:scale-105'
             style={{ borderColor: 'rgba(0, 0, 0, 0.1)' }}
           >
             <div className='relative'>
@@ -106,7 +104,7 @@ const BrowseResults = ({ data, isLoading, isError, page, onPageChange }) => {
 
               <Group gap={6}>
                 {manga.genres.slice(0, 2).map((genre) => (
-                  <Badge key={genre} color='violet' variant='light' size='xs'>
+                  <Badge key={genre} color='violet' size='xs'>
                     {genre}
                   </Badge>
                 ))}

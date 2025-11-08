@@ -41,7 +41,7 @@ const BannerUpload = () => {
   return (
     <>
       {/* 🔵 Banner Display - Size unchanged */}
-      <div className="relative">
+      <div className='relative'>
         <img
           src={profile?.bannerUrl || defaultBanner}
           className={`w-full ${isMobile ? 'h-52' : 'h-96'} rounded-[16px] object-cover`}
@@ -50,57 +50,88 @@ const BannerUpload = () => {
         {/* Edit Button */}
         <button
           onClick={() => setIsModalOpen(true)}
-          className="absolute top-3 right-3 bg-black/60 text-white px-4 py-2 rounded-md text-sm backdrop-blur-sm hover:bg-black/80 transition"
+          className='absolute right-3 bottom-3 z-50 rounded-md bg-black/30 px-4 py-2 text-sm text-white backdrop-blur-sm transition hover:bg-black'
         >
           Edit Banner
         </button>
       </div>
 
-      {/* 🔵 Modal */}
+      {/* Modal */}
       <Modal
         opened={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        title="Upload Banner"
+        title='Upload New Banner'
         centered
         zIndex={2000}
-        overlayProps={{ blur: 3, opacity: 0.4 }}
+        overlayProps={{ blur: 6, opacity: 0.5 }}
+        radius='lg'
+        classNames={{
+          title: 'text-xl font-semibold text-gray-800 dark:text-gray-100',
+          body: 'p-6 space-y-5',
+        }}
       >
-        <div className="space-y-4">
-          <input
-            id="fileInput"
-            type="file"
-            accept="image/*"
-            onChange={handleFileChange}
-            ref={fileInputRef}
-            className="hidden"
-          />
-
+        <div className='flex flex-col items-center gap-5'>
+          {/* File Selector */}
           <button
             onClick={() => fileInputRef.current?.click()}
-            className="w-full border border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-200 rounded-lg py-3 font-medium hover:bg-gray-100 dark:hover:bg-gray-800 transition"
+            className='relative w-full rounded-xl border-2 border-dashed border-gray-300 py-8 font-medium text-gray-600 transition hover:bg-gray-50 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-800'
           >
-            Select Image
+            <span className='block'>📁 Click to choose an image</span>
+            <span className='mt-1 block text-sm text-gray-400'>Recommended size: 1500×500px</span>
+            <input
+              id='fileInput'
+              type='file'
+              accept='image/*'
+              onChange={handleFileChange}
+              ref={fileInputRef}
+              className='hidden'
+            />
           </button>
 
-          {preview && (
-            <img
-              src={preview}
-              alt="Preview"
-              className="w-full h-32 rounded-lg object-cover border border-gray-200 dark:border-gray-700"
-            />
+          {/* Image Preview */}
+          {preview ? (
+            <div className='relative w-full'>
+              <img
+                src={preview}
+                alt='Preview'
+                className='h-40 w-full rounded-lg border border-gray-200 object-cover shadow-sm dark:border-gray-700'
+              />
+              <button
+                onClick={() => {
+                  setPreview(null);
+                  setSelectedFile(null);
+                  if (fileInputRef.current) fileInputRef.current.value = ''; // 🔧 reset input
+                }}
+                className='absolute top-2 right-2 rounded bg-black/60 px-2 py-1 text-xs text-white hover:bg-black/80'
+              >
+                Remove
+              </button>
+            </div>
+          ) : (
+            <div className='flex h-40 w-full items-center justify-center rounded-lg border border-gray-200 text-sm text-gray-400 dark:border-gray-700'>
+              No image selected
+            </div>
           )}
 
-         <div className="flex justify-center mt-4">
-  <ActionButton
-    onClick={handleUpload}
-    loading={loading}
-    disabled={!selectedFile}
-    className="px-6" 
-  >
-    Upload Banner
-  </ActionButton>
-</div>
-          {error && <Alert color="red">{error}</Alert>}
+          {/* File Details */}
+          {selectedFile && (
+            <p className='text-center text-sm text-gray-500'>
+              {selectedFile.name} • {(selectedFile.size / 1024).toFixed(1)} KB
+            </p>
+          )}
+
+          {/* Error Message */}
+          {error && <Alert color='red'>{error}</Alert>}
+
+          {/* Upload Button */}
+          <ActionButton
+            onClick={handleUpload}
+            loading={loading}
+            disabled={!selectedFile}
+            className='w-full px-6 py-3 text-base'
+          >
+            Upload Banner
+          </ActionButton>
         </div>
       </Modal>
     </>
