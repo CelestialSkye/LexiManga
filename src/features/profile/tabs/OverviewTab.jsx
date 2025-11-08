@@ -6,7 +6,7 @@ const OverviewTab = ({ profile }) => {
   return (
     <div className='space-y-4'>
       {/* Scores section */}
-      <div className='rounded-[16px] bg-white pt-4 pl-4 shadow-md'>
+      <div className='rounded-[16px] bg-white pt-4 pl-4 pr-4 shadow-md'>
         <ScoresTab />
       </div>
 

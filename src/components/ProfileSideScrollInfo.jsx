@@ -19,7 +19,7 @@ function ProfileSideScrollinfo() {
           </div>
 
           {/* Words Count */}
-          <div className='w-24 flex-shrink-0 p-3'>
+          <div className='w-30 flex-shrink-0 p-3'>
             <Text size='xs' fw={300} c='dark' className='mb-1'>
               Words
             </Text>
@@ -29,7 +29,7 @@ function ProfileSideScrollinfo() {
           </div>
 
           {/* Learned Words */}
-          <div className='w-24 flex-shrink-0 p-3'>
+          <div className='w-30 flex-shrink-0 p-3'>
             <Text size='xs' fw={300} c='dark' className='mb-1'>
               Learned Words
             </Text>
@@ -39,7 +39,7 @@ function ProfileSideScrollinfo() {
           </div>
 
           {/* Not Learned yet */}
-          <div className='w-24 flex-shrink-0 p-3'>
+          <div className='w-30 flex-shrink-0 p-3'>
             <Text size='xs' fw={300} c='dark' className='mb-1'>
               Unknown Words
             </Text>
@@ -49,7 +49,7 @@ function ProfileSideScrollinfo() {
           </div>
 
           {/* Learning */}
-          <div className='w-24 flex-shrink-0 p-3'>
+          <div className='w-30 flex-shrink-0 p-3'>
             <Text size='xs' fw={300} c='dark' className='mb-1'>
               Learning
             </Text>

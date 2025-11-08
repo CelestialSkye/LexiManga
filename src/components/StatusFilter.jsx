@@ -1,12 +1,12 @@
 import { Select } from '@mantine/core';
 
-const StatusFilter = ({ 
-  value, 
-  onChange, 
-  placeholder = "Filter by status",
-  size = "sm",
+const StatusFilter = ({
+  value,
+  onChange,
+  placeholder = 'Filter by status',
+  size = 'sm',
   includeAll = true,
-  ...props 
+  ...props
 }) => {
   const statusOptions = [
     ...(includeAll ? [{ value: 'all', label: 'All Status' }] : []),
@@ -23,9 +23,7 @@ const StatusFilter = ({
       data={statusOptions}
       size={size}
       style={{ minWidth: 150 }}
-        classNames={{
-        input: 'focus:ring-2 focus:ring-violet-500 focus:outline-none',
-      }}
+      className='violet-focus'
       {...props}
     />
   );
