@@ -7,6 +7,9 @@ import { useTrendingManga, useSuggestedManga, useMonthlyManga } from '../service
  */
 const useHomePageLoading = () => {
   // Fetch data from all home page components
+  // Note: These queries are called here to track loading state.
+  // React Query caches results, so when child components call the same queries,
+  // they get the cached data (no additional network requests).
   const { isLoading: trendingLoading } = useTrendingManga(10);
   const { isLoading: suggestedLoading } = useSuggestedManga(
     4,
