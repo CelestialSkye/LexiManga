@@ -118,6 +118,7 @@ export const useUpdateVocabWord = () => {
           mangaId,
           wordId,
           changes,
+          newStatus: newData.status,
           coverImage,
         });
       }

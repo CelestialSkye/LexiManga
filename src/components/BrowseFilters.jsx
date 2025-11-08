@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { TextInput, Select, Button, Collapse, Stack, Paper, Title, Grid } from '@mantine/core';
+import { TextInput, Select, Button, Stack, Paper, Title, Grid } from '@mantine/core';
 import { IconChevronDown } from '@tabler/icons-react';
+import './BrowseFilters.css';
 
 const BrowseFilters = ({ filters, onFilterChange }) => {
   const [filtersOpen, setFiltersOpen] = useState(false);
@@ -40,8 +41,8 @@ const BrowseFilters = ({ filters, onFilterChange }) => {
   ];
 
   return (
-    <div>
-      <Stack gap='md'>
+    <div className='mb-4'>
+      <Stack gap='xs'>
         <Title order={1} size='h2'>
           Browse Manga
         </Title>
@@ -74,7 +75,7 @@ const BrowseFilters = ({ filters, onFilterChange }) => {
           </Button>
         </div>
 
-        <Collapse in={filtersOpen}>
+        <div className={`filters-dropdown ${filtersOpen ? 'open' : 'closed'}`}>
           <Stack gap='md'>
             <Grid>
               <Grid.Col span={{ base: 12, sm: 6, md: 3 }}>
@@ -133,7 +134,7 @@ const BrowseFilters = ({ filters, onFilterChange }) => {
               Clear Filters
             </Button>
           </Stack>
-        </Collapse>
+        </div>
       </Stack>
     </div>
   );

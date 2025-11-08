@@ -53,7 +53,7 @@ export const useSaveMangaStatus = () => {
 
       if (!isNew && previousData) {
         Object.keys(newData).forEach((key) => {
-          // Skip auto-updated fields 
+          // Skip auto-updated fields
           if (!AUTO_UPDATE_FIELDS.includes(key) && previousData[key] !== newData[key]) {
             changes[key] = { from: previousData[key], to: newData[key] };
           }
@@ -76,7 +76,6 @@ export const useSaveMangaStatus = () => {
         mangaTitle: newData.mangaTitle,
         status: newData.status,
         coverImage,
-        data: newData,
       };
 
       if (!isNew && Object.keys(changes).length > 0) {
@@ -174,5 +173,3 @@ const logActivity = async (type, data) => {
     console.error('Error logging activity:', error);
   }
 };
-
-

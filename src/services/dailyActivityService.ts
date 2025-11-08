@@ -4,9 +4,8 @@ import { getAuth } from 'firebase/auth';
 
 export interface DailyActivity {
   readManga: boolean;
-  mangaStartedCount: number;
+  mangaAddedCount: number;
   addedWordsCount: number;
-  learnedWordsCount: number;
   streak: number;
   lastActivityDate: string | null;
 }
@@ -48,9 +47,8 @@ export const getDailyActivities = async (): Promise<DailyActivity> => {
   if (!user) {
     return {
       readManga: false,
-      mangaStartedCount: 0,
+      mangaAddedCount: 0,
       addedWordsCount: 0,
-      learnedWordsCount: 0,
       streak: 0,
       lastActivityDate: null,
     };
@@ -72,30 +70,31 @@ export const getDailyActivities = async (): Promise<DailyActivity> => {
 
     // Sort by timestamp descending and filter activities to only today's activities
     const activities = allActivities
-      .sort((a, b) => b.timestamp - a.timestamp)
       .filter((activity) => {
+        if (!activity.timestamp) return false;
         const activityDate = getStartOfDay(activity.timestamp);
         return activityDate.getTime() === startOfDay.getTime();
+      })
+      .sort((a, b) => {
+        const timeA = a.timestamp?.getTime?.() ?? 0;
+        const timeB = b.timestamp?.getTime?.() ?? 0;
+        return timeB - timeA;
       });
 
     // Count different activity types
     const mangaReadActivities = activities.filter(
       (a) => a.type === 'manga_update' && a.chapterRead
     );
-    const mangaStartedActivities = activities.filter((a) => a.type === 'manga_add');
+    const mangaAddedActivities = activities.filter((a) => a.type === 'manga_add');
     const wordAddedActivities = activities.filter((a) => a.type === 'word_add');
-    const learnedWordsActivities = activities.filter(
-      (a) => a.type === 'word_update' && a.newStatus === 'learned'
-    );
 
     // Calculate streak
     const streak = await calculateStreak(user.uid);
 
     return {
       readManga: mangaReadActivities.length > 0,
-      mangaStartedCount: mangaStartedActivities.length,
+      mangaAddedCount: mangaAddedActivities.length,
       addedWordsCount: wordAddedActivities.length,
-      learnedWordsCount: learnedWordsActivities.length,
       streak,
       lastActivityDate:
         activities.length > 0 ? (activities[0].timestamp?.toISOString() ?? null) : null,
@@ -104,9 +103,8 @@ export const getDailyActivities = async (): Promise<DailyActivity> => {
     console.error('Error fetching daily activities:', error);
     return {
       readManga: false,
-      mangaStartedCount: 0,
+      mangaAddedCount: 0,
       addedWordsCount: 0,
-      learnedWordsCount: 0,
       streak: 0,
       lastActivityDate: null,
     };
@@ -130,7 +128,11 @@ export const calculateStreak = async (userId: string): Promise<number> => {
         ...doc.data(),
         timestamp: doc.data().timestamp?.toDate?.(),
       }))
-      .sort((a, b) => b.timestamp - a.timestamp);
+      .sort((a, b) => {
+        const timeA = a.timestamp?.getTime?.() ?? 0;
+        const timeB = b.timestamp?.getTime?.() ?? 0;
+        return timeB - timeA;
+      });
 
     if (activities.length === 0) {
       return 0;
@@ -195,6 +197,7 @@ export const hadActivityYesterday = async (userId: string): Promise<boolean> => 
 
     // Filter to check for yesterday's activity
     return allActivities.some((activity) => {
+      if (!activity.timestamp) return false;
       const activityDate = getStartOfDay(activity.timestamp);
       return activityDate.getTime() === yesterdayStart.getTime();
     });
@@ -230,6 +233,7 @@ export const getActivityStats = async (
 
     // Filter activities by date range client-side
     const activities = allActivities.filter((activity) => {
+      if (!activity.timestamp) return false;
       const activityTime = activity.timestamp.getTime();
       return activityTime >= startDate.getTime() && activityTime <= endDate.getTime();
     });

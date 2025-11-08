@@ -41,19 +41,20 @@ const GENRE_COLORS = {
 };
 
 const fetchMangaByGenre = async (genre) => {
-  const isDev = import.meta.env.DEV;
-  const baseURL = isDev
-    ? 'http://localhost:5001/vocabularymanga/us-central1'
-    : 'https://us-central1-lexicon-a17e2.cloudfunctions.net';
+  const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3003';
 
-  const response = await fetch(`${baseURL}/getMangaByGenre?genre=${encodeURIComponent(genre)}`);
+  const response = await fetch(
+    `${BACKEND_URL}/api/browse?genre=${encodeURIComponent(genre)}&limit=20`
+  );
 
   if (!response.ok) throw new Error('Failed to fetch manga');
 
   const data = await response.json();
   if (data.error) throw new Error(data.error);
 
-  return data;
+  // Return a random manga from the genre results
+  const randomIndex = Math.floor(Math.random() * data.media.length);
+  return data.media[randomIndex];
 };
 
 const GenreCarousel = () => {
@@ -135,14 +136,9 @@ const GenreTile = ({ genre, onNavigate, isSmallScreen, isMobile }) => {
         {/* Manga   */}
         <div
           onClick={handleMangaClick}
-          className='flex cursor-pointer flex-col overflow-hidden rounded-[16px] transition-transform duration-200 hover:shadow-lg'
+          className='flex cursor-pointer flex-col overflow-hidden rounded-[16px] '
           style={{ backgroundColor: '#f9f9f9' }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.transform = 'translateY(-4px)';
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.transform = 'translateY(0)';
-          }}
+       
         >
           {isLoading ? (
             <div
@@ -243,17 +239,11 @@ const GenreTile = ({ genre, onNavigate, isSmallScreen, isMobile }) => {
           </p>
         </div>
 
-        {/* Manga Card with Image and Description */}
+        {/* Manga */}
         <div
           onClick={handleMangaClick}
-          className='flex cursor-pointer gap-3 overflow-hidden rounded-[16px] transition-transform duration-200 hover:shadow-lg'
-          style={{ backgroundColor: '#f9f9f9', minHeight: '160px' }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.transform = 'translateY(-4px)';
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.transform = 'translateY(0)';
-          }}
+          className='flex cursor-pointer gap-3 overflow-hidden rounded-[16px] '
+        
         >
           {isLoading ? (
             <div
@@ -330,23 +320,18 @@ const GenreTile = ({ genre, onNavigate, isSmallScreen, isMobile }) => {
       {/* Genre  */}
       <div
         onClick={handleGenreClick}
-        className='flex w-32 flex-shrink-0 cursor-pointer flex-col items-center justify-center rounded-[16px] px-3 transition-opacity duration-200 hover:opacity-80'
+        className='flex w-32 flex-shrink-0 cursor-pointer flex-col items-center justify-center rounded-[16px] px-3 '
         style={{ backgroundColor: bgColor, color: '#fff' }}
       >
         <img src={logoWhiteBg} alt='Vocabulary Manga' className='mb-2 h-5 w-5' />
         <p className='text-center text-xs font-semibold'>{genre}</p>
       </div>
 
-      {/* Manga Card on right */}
+      {/* Manga */}
       <div
         onClick={handleMangaClick}
-        className='flex flex-1 cursor-pointer gap-2 overflow-hidden rounded-[16px] transition-transform duration-200 hover:shadow-lg'
-        onMouseEnter={(e) => {
-          e.currentTarget.style.transform = 'translateY(-4px)';
-        }}
-        onMouseLeave={(e) => {
-          e.currentTarget.style.transform = 'translateY(0)';
-        }}
+        className='flex flex-1 cursor-pointer gap-2 overflow-hidden rounded-[16px] transittransformion- '
+       
       >
         {isLoading ? (
           <div
@@ -384,7 +369,7 @@ const GenreTile = ({ genre, onNavigate, isSmallScreen, isMobile }) => {
               <img
                 src={data.coverImage.large}
                 alt={data.title.romaji}
-                className='h-90 w-auto object-cover'
+                className='h-64 w-auto object-cover'
                 loading='lazy'
               />
             </div>

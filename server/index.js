@@ -597,55 +597,142 @@ app.get('/api/suggested', async (req, res) => {
   }
 });
 
-const BROWSE_QUERY = `
-  query ($page: Int, $perPage: Int, $search: String, $genres: [String], $sort: [MediaSort], $statusIn: [MediaStatus], $excludeGenres: [String]) {
-    Page(page: $page, perPage: $perPage) {
-      pageInfo {
-        total
-        currentPage
-        lastPage
-        hasNextPage
-      }
-      media(
-        type: MANGA,
-        search: $search,
-        genre_in: $genres,
-        genre_not_in: $excludeGenres,
-        sort: $sort,
-        status_in: $statusIn
-      ) {
-        id
-        title {
-          romaji
-          english
-        }
-        coverImage {
-          large
-        }
-        bannerImage
-        averageScore
-        genres
-        status
-        chapters
-        description
-        popularity
-        startDate {
-          year
-        }
-        staff(sort: RELEVANCE, perPage: 5) {
-          edges {
-            role
-            node {
-              name {
-                full
-              }
-            }
-          }
-        }
-      }
-    }
-  }
+const MONTHLY_MANGA_QUERY = `
+   query ($perPage: Int) {
+     Page(perPage: $perPage) {
+       media(
+         type: MANGA,
+         sort: [TRENDING_DESC, SCORE_DESC],
+         isAdult: false,
+         status_in: [RELEASING, FINISHED],
+         startDate_greater: 20250101,
+         startDate_lesser: 20251231
+       ) {
+         id
+         title {
+           romaji
+           english
+         }
+         coverImage {
+           large
+         }
+         averageScore
+         popularity
+         description
+         genres
+         startDate {
+           year
+           month
+           day
+         }
+         staff(sort: RELEVANCE, perPage: 3) {
+           edges {
+             role
+             node {
+               name {
+                 full
+               }
+             }
+           }
+         }
+       }
+     }
+   }
 `;
+
+const BROWSE_QUERY = `
+   query ($page: Int, $perPage: Int, $search: String, $genres: [String], $sort: [MediaSort], $statusIn: [MediaStatus], $excludeGenres: [String]) {
+     Page(page: $page, perPage: $perPage) {
+       pageInfo {
+         total
+         currentPage
+         lastPage
+         hasNextPage
+       }
+       media(
+         type: MANGA,
+         search: $search,
+         genre_in: $genres,
+         genre_not_in: $excludeGenres,
+         sort: $sort,
+         status_in: $statusIn
+       ) {
+         id
+         title {
+           romaji
+           english
+         }
+         coverImage {
+           large
+         }
+         bannerImage
+         averageScore
+         genres
+         status
+         chapters
+         description
+         popularity
+         startDate {
+           year
+         }
+         staff(sort: RELEVANCE, perPage: 5) {
+           edges {
+             role
+             node {
+               name {
+                 full
+               }
+             }
+           }
+         }
+       }
+     }
+   }
+`;
+
+app.get('/api/monthly', async (req, res) => {
+  try {
+    const { limit = 15 } = req.query;
+    console.log(`Fetching monthly seasonal manga with limit: ${limit}`);
+
+    const cacheKey = `monthly:${limit}`;
+    const cached = cache.get(cacheKey);
+
+    if (cached) {
+      console.log('Returning cached monthly manga');
+      return res.json({ data: cached, cached: true });
+    }
+
+    const response = await fetch(ANILIST_API, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        query: MONTHLY_MANGA_QUERY,
+        variables: {
+          perPage: parseInt(limit),
+        },
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`AniList API error: ${response.status}`);
+    }
+
+    const data = await response.json();
+
+    if (data.errors) {
+      console.error('AniList errors:', data.errors);
+      throw new Error('AniList API error');
+    }
+
+    const media = data.data.Page.media;
+    cache.set(cacheKey, media, 1800);
+    res.json({ data: media, cached: false });
+  } catch (error) {
+    console.error('Monthly manga error:', error);
+    res.status(500).json({ error: 'Failed to fetch monthly manga' });
+  }
+});
 
 app.get('/api/browse', async (req, res) => {
   try {

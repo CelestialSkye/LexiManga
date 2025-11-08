@@ -1,9 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
+import { Center } from '@mantine/core';
 import { useBrowseManga } from 'src/services/anilistApi';
 import BrowseFilters from '../components/BrowseFilters';
 import BrowseResults from '../components/BrowseResults';
+import LoadingLogo from '../components/LoadingLogo';
 import TopBar from '@components/TopBar';
+import TopBarMobile from '@components/HomePage/TopbarMobile';
 
 const Browse = () => {
   const [searchParams] = useSearchParams();
@@ -18,7 +21,6 @@ const Browse = () => {
 
   const [debouncedFilters, setDebouncedFilters] = useState(filters);
 
-  // Sync URL query parameters to filters on mount and when URL changes
   useEffect(() => {
     setFilters({
       search: searchParams.get('search') || '',
@@ -62,17 +64,35 @@ const Browse = () => {
   };
 
   return (
-    <div className='min-h-screen bg-gray-50 p-4'>
-      <TopBar />
-      <div className='rounded-lg bg-white p-6 shadow-sm'>
-        <BrowseFilters filters={filters} onFilterChange={handleFilterChange} />
-        <BrowseResults
-          data={data}
-          isLoading={isLoading}
-          isError={isError}
-          page={page}
-          onPageChange={handlePageChange}
-        />
+    <div className='!bg-white'>
+      <div className='flex min-h-screen flex-col text-gray-900'>
+        {/* Top Bar */}
+        <header className='w-full'>
+          <TopBar />
+          <TopBarMobile />
+        </header>
+
+        {/* Main Content */}
+        <main className='mx-auto max-w-[95%] flex-1 px-4 py-6 sm:px-6 md:max-w-[85%] md:px-8'>
+          {isLoading ? (
+            <div className='rounded-lg bg-white p-6'>
+              <Center style={{ minHeight: '400px' }}>
+                <LoadingLogo />
+              </Center>
+            </div>
+          ) : (
+            <div className='rounded-lg bg-white'>
+              <BrowseFilters filters={filters} onFilterChange={handleFilterChange} />
+              <BrowseResults
+                data={data}
+                isLoading={isLoading}
+                isError={isError}
+                page={page}
+                onPageChange={handlePageChange}
+              />
+            </div>
+          )}
+        </main>
       </div>
     </div>
   );
