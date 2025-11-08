@@ -3,7 +3,6 @@ const cors = require('cors');
 const NodeCache = require('node-cache');
 const fs = require('fs');
 const path = require('path');
-const nodemailer = require('nodemailer');
 
 const app = express();
 const PORT = process.env.PORT || 3003;
@@ -803,60 +802,6 @@ app.get('/api/browse', async (req, res) => {
   } catch (error) {
     console.error('Browse manga error:', error);
     res.status(500).json({ error: 'Failed to fetch browse manga' });
-  }
-});
-
-// Email endpoint for feedback
-app.post('/api/feedback', async (req, res) => {
-  try {
-    const { email, type, message, userId } = req.body;
-
-    if (!message || !message.trim()) {
-      return res.status(400).json({ error: 'Message is required' });
-    }
-
-    // Try to send email if EMAIL_PASS is configured
-    if (process.env.EMAIL_PASS) {
-      try {
-        const transporter = nodemailer.createTransport({
-          service: 'gmail',
-          auth: {
-            user: process.env.EMAIL_USER || 'derpthulu1@gmail.com',
-            pass: process.env.EMAIL_PASS,
-          },
-        });
-
-        const mailOptions = {
-          from: process.env.EMAIL_USER || 'derpthulu1@gmail.com',
-          to: 'derpthulu1@gmail.com',
-          subject: `Lexicon Feedback - ${type}`,
-          html: `
-            <h2>New Feedback from Lexicon</h2>
-            <p><strong>Type:</strong> ${type}</p>
-            <p><strong>User Email:</strong> ${email}</p>
-            <p><strong>User ID:</strong> ${userId}</p>
-            <p><strong>Message:</strong></p>
-            <p>${message.replace(/\n/g, '<br>')}</p>
-            <hr>
-            <p><small>Sent at: ${new Date().toISOString()}</small></p>
-          `,
-        };
-
-        await transporter.sendMail(mailOptions);
-        console.log('Feedback email sent successfully');
-      } catch (emailError) {
-        console.warn('Failed to send email, but feedback will still be saved:', emailError.message);
-      }
-    } else {
-      console.log(
-        'EMAIL_PASS not configured, email will not be sent (but feedback is saved to Firestore)'
-      );
-    }
-
-    res.json({ success: true, message: 'Feedback received successfully' });
-  } catch (error) {
-    console.error('Feedback error:', error);
-    res.status(500).json({ error: 'Failed to process feedback' });
   }
 });
 

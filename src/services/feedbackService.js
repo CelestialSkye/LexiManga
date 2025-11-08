@@ -3,29 +3,16 @@ import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { useMutation } from '@tanstack/react-query';
 import { notifications } from '@mantine/notifications';
 
-const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3003';
-
 /**
- * Save feedback to Firestore and send email via backend
+ * Save feedback to Firestore
  */
 export const saveFeedback = async (feedbackData) => {
   try {
-    // Save to Firestore for record keeping
     const feedbackRef = collection(db, 'feedbacks');
     const docRef = await addDoc(feedbackRef, {
       ...feedbackData,
       timestamp: serverTimestamp(),
     });
-
-    // Send email via backend
-    await fetch(`${BACKEND_URL}/api/feedback`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(feedbackData),
-    });
-
     return docRef.id;
   } catch (error) {
     console.error('Error saving feedback:', error);
@@ -42,7 +29,7 @@ export const useSendFeedback = () => {
     onSuccess: () => {
       notifications.show({
         title: 'Thank you!',
-        message: 'Your feedback has been sent successfully.',
+        message: 'Your feedback has been saved.',
         color: 'green',
         autoClose: 3000,
       });
@@ -51,7 +38,7 @@ export const useSendFeedback = () => {
       console.error('Feedback submission error:', error);
       notifications.show({
         title: 'Error',
-        message: 'Failed to send feedback. Please try again.',
+        message: 'Failed to save feedback. Please try again.',
         color: 'red',
         autoClose: 3000,
       });
