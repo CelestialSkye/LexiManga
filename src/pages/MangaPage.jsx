@@ -17,6 +17,7 @@ import { useIsFavorited, useToggleFavorite } from '../services/favoriteService';
 import { useAuth } from '../context/AuthContext';
 import { IconHeartFilled } from '@tabler/icons-react';
 import LoadingLogo from '@components/LoadingLogo';
+import useMangaPageLoading from '../hooks/useMangaPageLoading';
 
 const HeartButton = memo(({ isFavorited, isLoading, onClick }) => (
   <div
@@ -52,6 +53,9 @@ const MangaPage = () => {
     manga?.id
   );
   const toggleFavoriteMutation = useToggleFavorite();
+
+  // Aggregate loading states
+  const pageIsLoading = useMangaPageLoading(isLoading, isFavoritedLoading);
 
   //toggle function for favorite
   const handleToggleFavorite = useCallback(async () => {
@@ -96,7 +100,7 @@ const MangaPage = () => {
     { id: 'characters', label: 'Characters' },
   ];
 
-  if (isLoading)
+  if (pageIsLoading)
     return (
       <div className='flex min-h-screen items-center justify-center'>
         <LoadingLogo />
