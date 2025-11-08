@@ -45,7 +45,7 @@ const MangaListModal = () => {
 
   return (
     <>
-      <div className='rounded-[16px] bg-white p-2 pb-4'>
+      <div className='rounded-[16px] bg-white  pb-4'>
         <SearchBar
           className='mb-4'
           value={searchTerm}

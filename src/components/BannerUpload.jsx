@@ -128,6 +128,7 @@ const BannerUpload = () => {
             onClick={handleUpload}
             loading={loading}
             disabled={!selectedFile}
+            radius={12}
             className='w-full px-6 py-3 text-base'
           >
             Upload Banner

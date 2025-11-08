@@ -313,7 +313,7 @@ const SRSGame = ({ manga, words: initialWords }) => {
                 <Button
                   color='violet'
                   size='md'
-                  radius={16}
+                  radius={12}
                   onClick={() => {
                     setSessionActive(true);
                   }}
