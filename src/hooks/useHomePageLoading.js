@@ -1,9 +1,10 @@
-import { useMemo } from 'react';
+import { useMemo, useEffect, useRef, useState } from 'react';
 import { useTrendingManga, useSuggestedManga, useMonthlyManga } from '../services/anilistApi';
 
 /**
  * Aggregates loading states from all critical components on the home page.
  * The page shows the loading screen until all critical data is loaded.
+ * Enforces minimum 300ms display time to prevent flashing.
  */
 const useHomePageLoading = () => {
   // Fetch data from all home page components
@@ -19,11 +20,30 @@ const useHomePageLoading = () => {
   const { isLoading: monthlyLoading } = useMonthlyManga(15);
 
   // Aggregate all loading states
-  const isLoading = useMemo(() => {
+  const queriesLoading = useMemo(() => {
     return trendingLoading || suggestedLoading || monthlyLoading;
   }, [trendingLoading, suggestedLoading, monthlyLoading]);
 
-  return isLoading;
+  // Track when loading started to enforce minimum display time
+  const [displayLoading, setDisplayLoading] = useState(true);
+  const loadingStartedRef = useRef(true);
+
+  useEffect(() => {
+    if (queriesLoading) {
+      // Queries are loading, show loading screen
+      loadingStartedRef.current = true;
+      setDisplayLoading(true);
+    } else if (loadingStartedRef.current) {
+      // Queries are done, but enforce minimum 300ms display time
+      const timer = setTimeout(() => {
+        setDisplayLoading(false);
+        loadingStartedRef.current = false;
+      }, 300);
+      return () => clearTimeout(timer);
+    }
+  }, [queriesLoading]);
+
+  return displayLoading;
 };
 
 export default useHomePageLoading;
