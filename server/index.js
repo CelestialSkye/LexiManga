@@ -815,39 +815,48 @@ app.post('/api/feedback', async (req, res) => {
       return res.status(400).json({ error: 'Message is required' });
     }
 
-    // Configure email transporter (using Gmail SMTP)
-    const transporter = nodemailer.createTransport({
-      service: 'gmail',
-      auth: {
-        user: process.env.EMAIL_USER || 'derpthulu1@gmail.com',
-        pass: process.env.EMAIL_PASS, // Use Gmail App Password
-      },
-    });
+    // Try to send email if EMAIL_PASS is configured
+    if (process.env.EMAIL_PASS) {
+      try {
+        const transporter = nodemailer.createTransport({
+          service: 'gmail',
+          auth: {
+            user: process.env.EMAIL_USER || 'derpthulu1@gmail.com',
+            pass: process.env.EMAIL_PASS,
+          },
+        });
 
-    // Email content
-    const mailOptions = {
-      from: process.env.EMAIL_USER || 'derpthulu1@gmail.com',
-      to: 'derpthulu1@gmail.com',
-      subject: `Lexicon Feedback - ${type}`,
-      html: `
-        <h2>New Feedback from Lexicon</h2>
-        <p><strong>Type:</strong> ${type}</p>
-        <p><strong>User Email:</strong> ${email}</p>
-        <p><strong>User ID:</strong> ${userId}</p>
-        <p><strong>Message:</strong></p>
-        <p>${message.replace(/\n/g, '<br>')}</p>
-        <hr>
-        <p><small>Sent at: ${new Date().toISOString()}</small></p>
-      `,
-    };
+        const mailOptions = {
+          from: process.env.EMAIL_USER || 'derpthulu1@gmail.com',
+          to: 'derpthulu1@gmail.com',
+          subject: `Lexicon Feedback - ${type}`,
+          html: `
+            <h2>New Feedback from Lexicon</h2>
+            <p><strong>Type:</strong> ${type}</p>
+            <p><strong>User Email:</strong> ${email}</p>
+            <p><strong>User ID:</strong> ${userId}</p>
+            <p><strong>Message:</strong></p>
+            <p>${message.replace(/\n/g, '<br>')}</p>
+            <hr>
+            <p><small>Sent at: ${new Date().toISOString()}</small></p>
+          `,
+        };
 
-    // Send email
-    await transporter.sendMail(mailOptions);
+        await transporter.sendMail(mailOptions);
+        console.log('Feedback email sent successfully');
+      } catch (emailError) {
+        console.warn('Failed to send email, but feedback will still be saved:', emailError.message);
+      }
+    } else {
+      console.log(
+        'EMAIL_PASS not configured, email will not be sent (but feedback is saved to Firestore)'
+      );
+    }
 
-    res.json({ success: true, message: 'Feedback sent successfully' });
+    res.json({ success: true, message: 'Feedback received successfully' });
   } catch (error) {
-    console.error('Feedback email error:', error);
-    res.status(500).json({ error: 'Failed to send feedback' });
+    console.error('Feedback error:', error);
+    res.status(500).json({ error: 'Failed to process feedback' });
   }
 });
 
