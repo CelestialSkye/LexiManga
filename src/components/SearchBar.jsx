@@ -9,9 +9,7 @@ const SearchBar = ({ value, onChange, placeholder = 'Search...', size = 'sm', ..
       onChange={(e) => onChange(e.target.value)}
       leftSection={<IconSearch size={16} />}
       size={size}
-      classNames={{
-        input: 'focus:ring-2 focus:ring-violet-500 focus:outline-none',
-      }}
+      className='violet-focus'
       {...props}
     />
   );
