@@ -1,15 +1,7 @@
 const Footer = () => (
-  <div className='pt-6 leading-6 font-medium sm:text-lg sm:leading-7'>
-    <p>
-      Maintained by &nbsp;
-      <a
-        href='https://digitalinspiration.com/'
-        className='text-cyan-600 no-underline hover:text-cyan-700'
-      >
-        Amit Agarwal &rarr;
-      </a>
-    </p>
-  </div>
+  <footer className='border-t border-gray-200 bg-white px-4 py-6 text-center'>
+    <p className='text-sm text-gray-600'>© 2024 Lexicon. Made with care for language learners.</p>
+  </footer>
 );
 
 export default Footer;
