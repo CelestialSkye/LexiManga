@@ -16,6 +16,7 @@ import VocabularyTab from '../features/profile/tabs/VocabularyTab';
 import ProfileTab from '../features/profile/tabs/FavouritesTab';
 import ProfileSideScrollinfo from '@components/ProfileSideScrollInfo';
 import LoadingLogo from '@components/LoadingLogo';
+import Footer from '@components/Footer';
 
 // Error fallback component
 function ErrorFallback({ error, resetErrorBoundary }) {
@@ -205,6 +206,9 @@ const ProfilePage = () => {
           </div>
         </div>
       </div>
+
+      {/* Footer */}
+      <Footer />
     </>
   );
 };

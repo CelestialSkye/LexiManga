@@ -5,6 +5,7 @@ import SuggestionManga from '@components/HomePage/SuggestedManga';
 import MangaByGenre from '@components/HomePage/MangaByGenre';
 import MonthlyManga from '@components/HomePage/MonthlyManga';
 import LoadingLogo from '@components/LoadingLogo';
+import Footer from '@components/Footer';
 import useHomePageLoading from '../hooks/useHomePageLoading';
 
 const Home = () => {
@@ -35,6 +36,9 @@ const Home = () => {
           <SuggestionManga />
           <MangaByGenre />
         </main>
+
+        {/* Footer */}
+        <Footer />
       </div>
     </div>
   );
