@@ -27,7 +27,7 @@ const AddWordModal = ({ manga, opened, closeModal, showMangaSelector = false }) 
   const { data: userManga = [], isLoading: mangaLoading } = useMangaStatuses(user?.uid);
 
   // Transform to Select format
-  const mangaOptions = userManga.map((m) => ({
+  const mangaOptions = (userManga || []).map((m) => ({
     value: m.id,
     label: m.title || m.mangaTitle,
   }));
