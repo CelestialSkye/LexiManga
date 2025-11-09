@@ -7,6 +7,8 @@ import { useNavigate } from 'react-router-dom';
 import { FaStar } from 'react-icons/fa6';
 import TopBarMobile from './TopbarMobile';
 import logo from '../../assets/logo.svg';
+import { CustomTooltip } from '../CustomTooltip';
+import { MangaTooltipContent } from '../MangaTooltipContent';
 
 function getMainCreators(staffEdges) {
   if (!staffEdges?.length) return 'Unknown';
@@ -74,10 +76,12 @@ const Trending = () => {
   // Mobile layout
   if (isMobile) {
     return (
-      <section className='mt-4 w-full overflow-hidden rounded-[16px] bg-black px-6 py-8 '>
+      <section className='mt-4 w-full overflow-hidden rounded-[16px] bg-black px-6 py-8'>
         {/* Text */}
         <div className='mb-6'>
-          <h2 className='mb-2 text-2xl font-bold text-white whitespace-nowrap'>Monthly Manga Picks</h2>
+          <h2 className='mb-2 text-2xl font-bold whitespace-nowrap text-white'>
+            Monthly Manga Picks
+          </h2>
         </div>
 
         {/* Carousel  */}
@@ -100,29 +104,39 @@ const Trending = () => {
           {data?.map((manga) => (
             <Carousel.Slide key={manga.id}>
               <div className='flex flex-col gap-3'>
-                <div
-                  className='relative cursor-pointer overflow-hidden rounded-[16px] shadow-lg'
-                  style={{
-                    width: 'auto',
-                    height: '350px',
-                  }}
-                  onClick={() => navigate(`/manga/${manga.id}`)}
+                <CustomTooltip
+                  label={<MangaTooltipContent manga={manga} />}
+                  position='left'
+                  multiline
+                  w={280}
+                  withArrow
+                  arrowSize={8}
+                  transitionProps={{ transition: 'pop', duration: 250 }}
                 >
-                  <img
-                    src={manga.coverImage?.large}
-                    alt={manga.title?.english || manga.title?.romaji}
-                    className='h-full w-full object-cover'
-                    loading='lazy'
-                  />
-                  {manga.averageScore && (
-                    <div className='absolute top-2 left-2 rounded-md bg-black/70 px-2 py-1 backdrop-blur-sm'>
-                      <p className='flex items-center gap-1 text-xs font-bold text-white'>
-                        <FaStar className='text-violet-400' />{' '}
-                        {(manga.averageScore / 10).toFixed(1)}
-                      </p>
-                    </div>
-                  )}
-                </div>
+                  <div
+                    className='relative cursor-pointer overflow-hidden rounded-[16px] shadow-lg'
+                    style={{
+                      width: 'auto',
+                      height: '350px',
+                    }}
+                    onClick={() => navigate(`/manga/${manga.id}`)}
+                  >
+                    <img
+                      src={manga.coverImage?.large}
+                      alt={manga.title?.english || manga.title?.romaji}
+                      className='h-full w-full object-cover'
+                      loading='lazy'
+                    />
+                    {manga.averageScore && (
+                      <div className='absolute top-2 left-2 rounded-md bg-black/70 px-2 py-1 backdrop-blur-sm'>
+                        <p className='flex items-center gap-1 text-xs font-bold text-white'>
+                          <FaStar className='text-violet-400' />{' '}
+                          {(manga.averageScore / 10).toFixed(1)}
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                </CustomTooltip>
 
                 {/* Info */}
                 <div className='flex flex-col gap-1'>
@@ -141,15 +155,17 @@ const Trending = () => {
 
   // Desktop layout
   return (
-    <section className='mb-4 w-full overflow-hidden rounded-[16px] bg-black px-6 py-8 '>
+    <section className='mb-4 w-full overflow-hidden rounded-[16px] bg-black px-6 py-8'>
       <div className='flex gap-8'>
         {/* text on left */}
-        <div className='w-65 flex-shrink-0 pr-7 pl-7 pt-3'>
+        <div className='w-65 flex-shrink-0 pt-3 pr-7 pl-7'>
           <p className='text-sm'>
             <img src={logo} alt='Vocabulary Manga' className='h-5 w-5' />
           </p>
 
-          <h2 className='pt-5 text-2xl font-bold text-white whitespace-nowrap'>Monthly Manga Picks</h2>
+          <h2 className='pt-5 text-2xl font-bold whitespace-nowrap text-white'>
+            Monthly Manga Picks
+          </h2>
           <p className='mt-40 max-w-sm text-sm leading-relaxed text-gray-400'>
             Stories woven with passionate romance, epic battles, and characters that stay with you
             long after the final page.
@@ -177,29 +193,39 @@ const Trending = () => {
             {data?.map((manga) => (
               <Carousel.Slide key={manga.id}>
                 <div className='flex flex-col gap-3'>
-                  <div
-                    className='relative cursor-pointer overflow-hidden rounded-[16px] shadow-lg'
-                    style={{
-                      width: '190px',
-                      height: '285px',
-                    }}
-                    onClick={() => navigate(`/manga/${manga.id}`)}
+                  <CustomTooltip
+                    label={<MangaTooltipContent manga={manga} />}
+                    position='left'
+                    multiline
+                    w={280}
+                    withArrow
+                    arrowSize={8}
+                    transitionProps={{ transition: 'pop', duration: 250 }}
                   >
-                    <img
-                      src={manga.coverImage?.large}
-                      alt={manga.title?.english || manga.title?.romaji}
-                      className='h-full w-full object-cover'
-                      loading='lazy'
-                    />
-                    {manga.averageScore && (
-                      <div className='absolute top-2 left-2 rounded-md bg-black/70 px-2 py-1 backdrop-blur-sm'>
-                        <p className='flex items-center gap-1 text-xs font-bold text-white'>
-                          <FaStar className='text-violet-400' />{' '}
-                          {(manga.averageScore / 10).toFixed(1)}
-                        </p>
-                      </div>
-                    )}
-                  </div>
+                    <div
+                      className='relative cursor-pointer overflow-hidden rounded-[16px] shadow-lg'
+                      style={{
+                        width: '190px',
+                        height: '285px',
+                      }}
+                      onClick={() => navigate(`/manga/${manga.id}`)}
+                    >
+                      <img
+                        src={manga.coverImage?.large}
+                        alt={manga.title?.english || manga.title?.romaji}
+                        className='h-full w-full object-cover'
+                        loading='lazy'
+                      />
+                      {manga.averageScore && (
+                        <div className='absolute top-2 left-2 rounded-md bg-black/70 px-2 py-1 backdrop-blur-sm'>
+                          <p className='flex items-center gap-1 text-xs font-bold text-white'>
+                            <FaStar className='text-violet-400' />{' '}
+                            {(manga.averageScore / 10).toFixed(1)}
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  </CustomTooltip>
 
                   {/* Info */}
                   <div className='flex flex-col gap-1'>

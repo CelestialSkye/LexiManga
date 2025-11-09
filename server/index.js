@@ -430,6 +430,14 @@ const TRENDING_QUERY = `
           large
         }
         averageScore
+        popularity
+        description
+        genres
+        format
+        chapters
+        volumes
+        status
+        source
         staff(sort: RELEVANCE, perPage: 10) {
           edges {
             role
@@ -599,45 +607,50 @@ app.get('/api/suggested', async (req, res) => {
 
 const MONTHLY_MANGA_QUERY = `
    query ($perPage: Int) {
-     Page(perPage: $perPage) {
-       media(
-         type: MANGA,
-         sort: [TRENDING_DESC, SCORE_DESC],
-         isAdult: false,
-         status_in: [RELEASING, FINISHED],
-         startDate_greater: 20250101,
-         startDate_lesser: 20251231
-       ) {
-         id
-         title {
-           romaji
-           english
-         }
-         coverImage {
-           large
-         }
-         averageScore
-         popularity
-         description
-         genres
-         startDate {
-           year
-           month
-           day
-         }
-         staff(sort: RELEVANCE, perPage: 3) {
-           edges {
-             role
-             node {
-               name {
-                 full
-               }
-             }
-           }
-         }
-       }
-     }
-   }
+      Page(perPage: $perPage) {
+        media(
+          type: MANGA,
+          sort: [TRENDING_DESC, SCORE_DESC],
+          isAdult: false,
+          status_in: [RELEASING, FINISHED],
+          startDate_greater: 20250101,
+          startDate_lesser: 20251231
+        ) {
+          id
+          title {
+            romaji
+            english
+          }
+          coverImage {
+            large
+          }
+          averageScore
+          popularity
+          description
+          genres
+          format
+          chapters
+          volumes
+          status
+          source
+          startDate {
+            year
+            month
+            day
+          }
+          staff(sort: RELEVANCE, perPage: 3) {
+            edges {
+              role
+              node {
+                name {
+                  full
+                }
+              }
+            }
+          }
+        }
+      }
+    }
 `;
 
 const BROWSE_QUERY = `
@@ -649,43 +662,46 @@ const BROWSE_QUERY = `
          lastPage
          hasNextPage
        }
-       media(
-         type: MANGA,
-         search: $search,
-         genre_in: $genres,
-         genre_not_in: $excludeGenres,
-         sort: $sort,
-         status_in: $statusIn
-       ) {
-         id
-         title {
-           romaji
-           english
-         }
-         coverImage {
-           large
-         }
-         bannerImage
-         averageScore
-         genres
-         status
-         chapters
-         description
-         popularity
-         startDate {
-           year
-         }
-         staff(sort: RELEVANCE, perPage: 5) {
-           edges {
-             role
-             node {
-               name {
-                 full
-               }
-             }
-           }
-         }
-       }
+        media(
+          type: MANGA,
+          search: $search,
+          genre_in: $genres,
+          genre_not_in: $excludeGenres,
+          sort: $sort,
+          status_in: $statusIn
+        ) {
+          id
+          title {
+            romaji
+            english
+          }
+          coverImage {
+            large
+          }
+          bannerImage
+          averageScore
+          genres
+          status
+          chapters
+          volumes
+          description
+          popularity
+          format
+          source
+          startDate {
+            year
+          }
+          staff(sort: RELEVANCE, perPage: 5) {
+            edges {
+              role
+              node {
+                name {
+                  full
+                }
+              }
+            }
+          }
+        }
      }
    }
 `;

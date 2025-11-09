@@ -63,7 +63,7 @@ const MangaListModal = () => {
                     <img
                       src={manga.coverImage}
                       alt={manga.title || 'Manga Cover'}
-                      className='mb-2 h-36 w-24 rounded-lg object-cover transition hover:opacity-80'
+                      className='mb-2 h-36 w-24 rounded-[16px] object-cover transition hover:opacity-80'
                     />
                   )}
                 </div>

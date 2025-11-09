@@ -10,9 +10,12 @@ import { useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { openDeleteConfirmation } from './DeleteConfirmationModal';
+import { useNavigate } from 'react-router-dom';
+import { FiArrowUpRight } from 'react-icons/fi';
 
 const MangaStatusModal = ({ manga, opened, closeModal }) => {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { data: existingStatus, isLoading } = useMangaStatus(user?.uid, manga?.id?.toString());
   const saveMutation = useSaveMangaStatus();
@@ -40,14 +43,12 @@ const MangaStatusModal = ({ manga, opened, closeModal }) => {
       return { previousStatus };
     },
     onSuccess: (_, __, context) => {
-      // Invalidate queries to ensure fresh data
       queryClient.invalidateQueries({
         queryKey: ['mangaStatuses', user?.uid],
       });
       closeModal();
     },
     onError: (error, _, context) => {
-      // Rollback the optimistic update if deletion fails
       if (context?.previousStatus) {
         queryClient.setQueryData(
           ['mangaStatus', user?.uid, manga?.id?.toString()],
@@ -102,11 +103,24 @@ const MangaStatusModal = ({ manga, opened, closeModal }) => {
   return (
     <Modal opened={opened} onClose={closeModal} withCloseButton={false} centered>
       <div className='p-4'>
+        <div className='mb-4 flex items-center justify-between'>
+          <Text fw={600} size='lg'>
+            Manga Status
+          </Text>
+          <button
+            onClick={() => navigate(`/manga/${manga?.id}`)}
+            className='rounded-full p-2 transition-all hover:bg-gray-100'
+            title='Go to Manga Page'
+          >
+            <FiArrowUpRight size={20} className='text-violet-600' />
+          </button>
+        </div>
+
         <Text>Status</Text>
         <Select
           value={status}
           onChange={setStatus}
-          className='violet-focus'
+          className='dropdown-smooth-animation violet-focus'
           data={[
             { value: 'reading', label: 'Reading' },
             { value: 'completed', label: 'Completed' },
@@ -115,14 +129,13 @@ const MangaStatusModal = ({ manga, opened, closeModal }) => {
             { value: 'plan-to-read', label: 'Plan to Read' },
           ]}
         />
-        <Text>Progress</Text>
+        <Text className='mt-3'>Progress</Text>
         <NumberInput value={progress} onChange={setProgress} className='violet-focus' />
-        <Text>Score</Text>
-        {/* <NumberInput value={score} onChange={setScore} className='violet-focus' /> */}
+        <Text className='mt-3'>Score</Text>
         <Select
           value={score}
           onChange={setScore}
-          className='violet-focus'
+          className='dropdown-smooth-animation violet-focus'
           placeholder='Select Score'
           data={[
             { value: '1', label: '1 - Terrible' },
@@ -137,7 +150,7 @@ const MangaStatusModal = ({ manga, opened, closeModal }) => {
             { value: '10', label: '10 - Masterpiece' },
           ]}
         />
-        <Text>Notes</Text>
+        <Text className='mt-3'>Notes</Text>
         <TextInput
           value={notes}
           onChange={(e) => setNotes(e.target.value)}
