@@ -17,14 +17,13 @@ const Footer = () => {
   return (
     <>
       <footer className='border-t border-gray-200 bg-white'>
-        <div className='page-container py-8'>
+        <div className='mx-auto max-w-[95%] px-4 py-8 sm:px-6 md:max-w-[85%] md:px-8'>
           <div className='flex items-center justify-between'>
             {/* Left: Logo */}
             <div className='flex items-center gap-3'>
               <img src={logo} alt='Lexicon Logo' className='h-10 w-10' />
               <div>
                 <h3 className='font-bold text-gray-800'>Lexicon</h3>
-                <p className='text-xs text-gray-500'>Learn with Manga</p>
               </div>
             </div>
 
@@ -54,7 +53,7 @@ const Footer = () => {
             </div>
           </div>
 
-          {/* Bottom: Copyright */}
+          {/* Copyright */}
           <div className='mt-6 border-t border-gray-100 pt-6 text-center'>
             <p className='text-xs text-gray-500'>
               © {new Date().getFullYear()} Lexicon. Made with care for language learners.
