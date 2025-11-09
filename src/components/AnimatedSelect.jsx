@@ -101,7 +101,7 @@ const AnimatedSelect = ({
         <div
           ref={buttonRef}
           onClick={() => !disabled && setIsOpen(!isOpen)}
-          className='flex w-full cursor-pointer items-center justify-between rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-left text-gray-900 transition-colors hover:border-gray-400 focus:border-violet-600 focus:outline-none dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:hover:border-gray-500'
+          className='flex w-full cursor-pointer items-center justify-between rounded-md border border-gray-300 bg-white px-3 py-1.5 text-left text-sm text-gray-900 transition-colors hover:border-gray-400 focus:border-violet-600 focus:outline-none dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:hover:border-gray-500'
           role='button'
           tabIndex={0}
           onKeyDown={(e) => {
