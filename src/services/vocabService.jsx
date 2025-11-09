@@ -240,7 +240,7 @@ const logActivity = async (type, data) => {
       Object.entries(data).filter(([key]) => !AUTO_UPDATE_FIELDS.includes(key))
     );
 
-    const result = await addDoc(collection(db, 'activities'), {
+    const result = await addDoc(collection(db, 'users', user.uid, 'activities'), {
       type,
       ...filteredData,
       userId: user.uid,

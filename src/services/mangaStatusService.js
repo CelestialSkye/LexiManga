@@ -161,7 +161,7 @@ const logActivity = async (type, data) => {
 
     console.log('Logging activity:', { type, data, userId: user.uid });
 
-    const result = await addDoc(collection(db, 'activities'), {
+    const result = await addDoc(collection(db, 'users', user.uid, 'activities'), {
       type,
       ...data,
       userId: user.uid,
