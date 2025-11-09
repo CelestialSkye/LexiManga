@@ -17,7 +17,6 @@ import { useIsFavorited, useToggleFavorite } from '../services/favoriteService';
 import { useAuth } from '../context/AuthContext';
 import { IconHeartFilled } from '@tabler/icons-react';
 import LoadingLogo from '@components/LoadingLogo';
-import Footer from '@components/Footer';
 import useMangaPageLoading from '../hooks/useMangaPageLoading';
 
 const HeartButton = memo(({ isFavorited, isLoading, onClick, user }) => (
@@ -408,11 +407,7 @@ const MangaPage = () => {
         manga={manga}
         opened={isStatusModalOpen}
         closeModal={() => setIsStatusModalOpen(false)}
-      />
-
-      {/* Footer */}
-      <Footer />
-    </>
+      /></>
   );
 };
 
