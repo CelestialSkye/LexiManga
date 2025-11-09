@@ -58,9 +58,9 @@ export const getDailyActivities = async (): Promise<DailyActivity> => {
     const startOfDay = getStartOfDay();
     const endOfDay = getEndOfDay();
 
-    const activitiesRef = collection(db, 'activities');
-    // Query only by userId to avoid composite index requirement
-    const userActivitiesQuery = query(activitiesRef, where('userId', '==', user.uid));
+    const activitiesRef = collection(db, 'users', user.uid, 'activities');
+    // Query from user's subcollection
+    const userActivitiesQuery = query(activitiesRef);
 
     const activitiesSnapshot = await getDocs(userActivitiesQuery);
     const allActivities = activitiesSnapshot.docs.map((doc) => ({
@@ -117,10 +117,10 @@ export const getDailyActivities = async (): Promise<DailyActivity> => {
  */
 export const calculateStreak = async (userId: string): Promise<number> => {
   try {
-    const activitiesRef = collection(db, 'activities');
+    const activitiesRef = collection(db, 'users', userId, 'activities');
 
-    // Get all activities for the user
-    const userActivitiesQuery = query(activitiesRef, where('userId', '==', userId));
+    // Get all activities for the user from their subcollection
+    const userActivitiesQuery = query(activitiesRef);
 
     const activitiesSnapshot = await getDocs(userActivitiesQuery);
     const activities = activitiesSnapshot.docs
@@ -186,8 +186,8 @@ export const hadActivityYesterday = async (userId: string): Promise<boolean> => 
   try {
     const yesterdayStart = getYesterdayStart();
 
-    const activitiesRef = collection(db, 'activities');
-    const userActivitiesQuery = query(activitiesRef, where('userId', '==', userId));
+    const activitiesRef = collection(db, 'users', userId, 'activities');
+    const userActivitiesQuery = query(activitiesRef);
 
     const activitiesSnapshot = await getDocs(userActivitiesQuery);
     const allActivities = activitiesSnapshot.docs.map((doc) => ({
@@ -222,8 +222,8 @@ export const getActivityStats = async (
   daysActive: number;
 }> => {
   try {
-    const activitiesRef = collection(db, 'activities');
-    const userActivitiesQuery = query(activitiesRef, where('userId', '==', userId));
+    const activitiesRef = collection(db, 'users', userId, 'activities');
+    const userActivitiesQuery = query(activitiesRef);
 
     const activitiesSnapshot = await getDocs(userActivitiesQuery);
     const allActivities = activitiesSnapshot.docs.map((doc) => ({
