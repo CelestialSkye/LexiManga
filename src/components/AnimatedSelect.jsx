@@ -39,7 +39,6 @@ const AnimatedSelect = ({
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [searchValue, setSearchValue] = useState('');
-  const [dropdownPosition, setDropdownPosition] = useState({ top: 0, left: 0, width: 0 });
   const containerRef = useRef(null);
   const inputRef = useRef(null);
 
@@ -57,15 +56,6 @@ const AnimatedSelect = ({
     };
 
     if (isOpen) {
-      // Calculate dropdown position
-      const rect = containerRef.current?.getBoundingClientRect();
-      if (rect) {
-        setDropdownPosition({
-          top: rect.top + rect.height + 8,
-          left: rect.left,
-          width: rect.width,
-        });
-      }
       document.addEventListener('mousedown', handleClickOutside);
     }
 
@@ -95,7 +85,7 @@ const AnimatedSelect = ({
         </label>
       )}
 
-      <div className='relative'>
+      <div className='relative overflow-visible'>
         <div
           onClick={() => !disabled && setIsOpen(!isOpen)}
           className='flex w-full cursor-pointer items-center justify-between rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-left text-gray-900 transition-colors hover:border-gray-400 focus:border-violet-600 focus:outline-none dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:hover:border-gray-500'
@@ -158,13 +148,7 @@ const AnimatedSelect = ({
               initial='closed'
               animate='open'
               exit='closed'
-              style={{
-                position: 'fixed',
-                top: dropdownPosition.top,
-                left: dropdownPosition.left,
-                width: dropdownPosition.width,
-              }}
-              className='z-[9999] overflow-hidden rounded-lg border border-gray-300 bg-white shadow-lg dark:border-gray-600 dark:bg-gray-800'
+              className='absolute top-full right-0 left-0 z-[9999] mt-1 overflow-hidden rounded-lg border border-gray-300 bg-white shadow-lg dark:border-gray-600 dark:bg-gray-800'
             >
               {searchable && (
                 <div className='border-b border-gray-200 p-2 dark:border-gray-700'>
