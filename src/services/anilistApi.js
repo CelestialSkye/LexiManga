@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 
-const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3003';
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3001';
 const BASE_URL = 'https://graphql.anilist.co';
 
 /**
