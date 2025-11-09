@@ -9,7 +9,6 @@ import TopBar from 'src/components/TopBar';
 import AccountTab from 'src/features/Settings/tabs/AccountTab';
 import LanguageTab from 'src/features/Settings/tabs/LanguageTab';
 import SettingsTab from 'src/features/Settings/tabs/SettingsTab';
-import Footer from '@components/Footer';
 
 const getUserProfile = async (uid) => {
   const ref = doc(db, 'users', uid);
@@ -40,13 +39,13 @@ const Settings = () => {
   if (!profile) return <p className='py-8 text-center'>No profile found</p>;
 
   return (
-    <div className='flex min-h-screen flex-col bg-gray-50 dark:bg-gray-900'>
+    <div className='flex min-h-screen flex-col bg-white'>
       <TopBar />
-      <div className='mx-auto w-full flex-1 px-4 pt-8 pb-8 lg:w-[85%]'>
+      <div className='mx-auto w-full flex-1 px-4 pt-8 pb-8 lg:w-[85%] lg:max-w-7xl'>
         <div className='flex flex-col gap-8 lg:flex-row'>
           {/* Desktop Sidebar Navigation */}
           <div className='hidden flex-shrink-0 lg:flex lg:w-64'>
-            <div className='h-fit w-full overflow-y-auto rounded-[16px] border border-gray-200 bg-white shadow-lg dark:border-gray-700 dark:bg-gray-800'>
+            <div className='h-fit w-full overflow-y-auto rounded-[16px] border border-gray-200 bg-white shadow-lg'>
               <div className='flex w-full flex-col gap-2 p-6'>
                 {tabs.map((tab) => (
                   <button
@@ -55,7 +54,7 @@ const Settings = () => {
                     className={`rounded-lg px-4 py-3 text-left font-medium transition-all duration-200 ${
                       activeTab === tab.id
                         ? 'bg-violet-600 text-white shadow-md'
-                        : 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700'
+                        : 'text-gray-700 hover:bg-gray-100'
                     }`}
                   >
                     {tab.label}
@@ -71,12 +70,12 @@ const Settings = () => {
               {/* Mobile Header with Dropdown */}
               <div className='mb-8 lg:hidden'>
                 <div className='mb-4 flex items-center justify-between'>
-                  <h1 className='text-2xl font-bold text-gray-900 dark:text-white'>Settings</h1>
+                  <h1 className='text-2xl font-bold text-gray-900'>Settings</h1>
                   <button
                     onClick={() => setIsOpen(!isOpen)}
-                    className='rounded-lg p-2 transition-colors hover:bg-gray-200 dark:hover:bg-gray-700'
+                    className='rounded-lg p-2 transition-colors hover:bg-gray-200'
                   >
-                    <FaTableList size={24} className='text-gray-700 dark:text-gray-300' />
+                    <FaTableList size={24} className='text-gray-700' />
                   </button>
                 </div>
 
@@ -86,7 +85,7 @@ const Settings = () => {
                     isOpen ? 'max-h-48 opacity-100' : 'max-h-0 opacity-0'
                   }`}
                 >
-                  <div className='space-y-2 border-t border-gray-200 pt-3 dark:border-gray-700'>
+                  <div className='space-y-2 border-t border-gray-200 pt-3'>
                     {tabs.map((tab) => (
                       <button
                         key={tab.id}
@@ -97,7 +96,7 @@ const Settings = () => {
                         className={`w-full rounded-lg px-4 py-2.5 text-left font-medium transition-all duration-200 ${
                           activeTab === tab.id
                             ? 'bg-violet-600 text-white shadow-md'
-                            : 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700'
+                            : 'text-gray-700 hover:bg-gray-100'
                         }`}
                       >
                         {tab.label}
@@ -116,10 +115,7 @@ const Settings = () => {
             </div>
           </div>
         </div>
-      </div>
-      {/* Footer */}
-      <Footer />
-    </div>
+      </div></div>
   );
 };
 
