@@ -41,7 +41,7 @@ const GENRE_COLORS = {
 };
 
 const fetchMangaByGenre = async (genre) => {
-  const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3003';
+  const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3001';
 
   const response = await fetch(
     `${BACKEND_URL}/api/browse?genre=${encodeURIComponent(genre)}&limit=20`
@@ -77,10 +77,9 @@ const GenreCarousel = () => {
   }, []);
 
   return (
-    <div className='mt-4 rounded-[16px] p-2'>
-      <Text size='lg' fw={600} mb='lg'>
-        Explore by Genre
-      </Text>
+    <div className='mt-6 rounded-[16px] p-2'>
+           <h2 className='mb-4 text-xl font-bold'>Explore by Genre</h2>
+
 
       <Grid gutter='md'>
         {displayGenres.map((genre) => (

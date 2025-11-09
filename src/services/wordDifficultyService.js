@@ -1,5 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3001';
+
 export const useWordDifficulty = (word, language) => {
   return useQuery({
     queryKey: ['wordDifficulty', word, language],
@@ -12,7 +14,7 @@ export const useWordDifficulty = (word, language) => {
 export const getWordDifficulty = async (word, language) => {
   try {
     const response = await fetch(
-      `http://localhost:3003/api/word-difficulty?word=${encodeURIComponent(word)}&language=${encodeURIComponent(language)}`
+      `${BACKEND_URL}/api/word-difficulty?word=${encodeURIComponent(word)}&language=${encodeURIComponent(language)}`
     );
     const result = await response.json();
 

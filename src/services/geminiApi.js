@@ -1,6 +1,8 @@
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3001';
+
 export const translateWithGemini = async (text, sourceLanguage, targetLanguage, userId) => {
   try {
-    const response = await fetch('http://localhost:3003/api/translate', {
+    const response = await fetch(`${BACKEND_URL}/api/translate`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
