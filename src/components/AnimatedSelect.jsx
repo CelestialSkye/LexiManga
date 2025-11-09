@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { TextInput, ScrollArea, Group, Text } from '@mantine/core';
+import { TextInput, Group, Text } from '@mantine/core';
 import { IconChevronDown, IconX } from '@tabler/icons-react';
 import { dropdownCloseVariants } from 'src/utils/animationUtils';
 
@@ -149,14 +149,14 @@ const AnimatedSelect = ({
                 </div>
               )}
 
-              <ScrollArea className='max-h-48'>
+              <div className='max-h-64 overflow-y-auto'>
                 <div className='py-1'>
                   {filteredData.length > 0 ? (
                     filteredData.map((item) => (
                       <button
                         key={item.value}
                         onClick={() => handleSelect(item)}
-                        className={`w-full px-4 py-2.5 text-left text-sm transition-colors ${
+                        className={`w-full px-4 py-2 text-left text-sm transition-colors ${
                           value === item.value
                             ? 'bg-violet-600 text-white'
                             : 'text-gray-900 hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700'
@@ -171,7 +171,7 @@ const AnimatedSelect = ({
                     </div>
                   )}
                 </div>
-              </ScrollArea>
+              </div>
             </motion.div>
           )}
         </AnimatePresence>
