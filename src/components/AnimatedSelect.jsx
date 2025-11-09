@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { TextInput, Group, Text } from '@mantine/core';
 import { IconChevronDown, IconX } from '@tabler/icons-react';
@@ -39,8 +40,10 @@ const AnimatedSelect = ({
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [searchValue, setSearchValue] = useState('');
+  const [dropdownPos, setDropdownPos] = useState({ top: 0, left: 0, width: 0 });
   const containerRef = useRef(null);
   const inputRef = useRef(null);
+  const buttonRef = useRef(null);
 
   const filteredData = searchable
     ? data.filter((item) => item.label.toLowerCase().includes(searchValue.toLowerCase()))
@@ -56,6 +59,15 @@ const AnimatedSelect = ({
     };
 
     if (isOpen) {
+      // Calculate position for portal
+      if (buttonRef.current) {
+        const rect = buttonRef.current.getBoundingClientRect();
+        setDropdownPos({
+          top: rect.top + rect.height + 8,
+          left: rect.left,
+          width: rect.width,
+        });
+      }
       document.addEventListener('mousedown', handleClickOutside);
     }
 
@@ -85,8 +97,9 @@ const AnimatedSelect = ({
         </label>
       )}
 
-      <div className='relative overflow-visible'>
+      <div className='relative'>
         <div
+          ref={buttonRef}
           onClick={() => !disabled && setIsOpen(!isOpen)}
           className='flex w-full cursor-pointer items-center justify-between rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-left text-gray-900 transition-colors hover:border-gray-400 focus:border-violet-600 focus:outline-none dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:hover:border-gray-500'
           role='button'
@@ -140,15 +153,23 @@ const AnimatedSelect = ({
             autoFocus
           />
         )}
+      </div>
 
-        <AnimatePresence mode='wait'>
-          {isOpen && (
+      {isOpen &&
+        createPortal(
+          <AnimatePresence mode='wait'>
             <motion.div
               variants={dropdownVariants}
               initial='closed'
               animate='open'
               exit='closed'
-              className='absolute top-full right-0 left-0 z-[9999] mt-1 overflow-hidden rounded-lg border border-gray-300 bg-white shadow-lg dark:border-gray-600 dark:bg-gray-800'
+              style={{
+                position: 'fixed',
+                top: dropdownPos.top,
+                left: dropdownPos.left,
+                width: dropdownPos.width,
+              }}
+              className='z-[9999] overflow-hidden rounded-lg border border-gray-300 bg-white shadow-lg dark:border-gray-600 dark:bg-gray-800'
             >
               {searchable && (
                 <div className='border-b border-gray-200 p-2 dark:border-gray-700'>
@@ -187,9 +208,9 @@ const AnimatedSelect = ({
                 </div>
               </div>
             </motion.div>
-          )}
-        </AnimatePresence>
-      </div>
+          </AnimatePresence>,
+          document.body
+        )}
     </div>
   );
 };
