@@ -50,7 +50,7 @@ const MobileFAB = () => {
         spotlight.open();
         setIsExpanded(false);
       },
-      show: user,
+      show: true,
     },
     {
       icon: IconBook,
