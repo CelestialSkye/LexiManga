@@ -110,6 +110,7 @@ const MangaStatusModal = ({ manga, opened, closeModal }) => {
           <button
             onClick={() => navigate(`/manga/${manga?.id}`)}
             className='rounded-full p-2 transition-all hover:bg-gray-100'
+            
             title='Go to Manga Page'
           >
             <FiArrowUpRight size={20} className='text-violet-600' />
@@ -127,6 +128,7 @@ const MangaStatusModal = ({ manga, opened, closeModal }) => {
             { value: 'dropped', label: 'Dropped' },
             { value: 'plan-to-read', label: 'Plan to Read' },
           ]}
+          className='violet-focus'
         />
         <Text className='mt-3'>Progress</Text>
         <NumberInput value={progress} onChange={setProgress} className='violet-focus' />
@@ -135,6 +137,7 @@ const MangaStatusModal = ({ manga, opened, closeModal }) => {
           value={score}
           onChange={setScore}
           placeholder='Select Score'
+          className='violet-focus'
           data={[
             { value: '1', label: '1 - Terrible' },
             { value: '2', label: '2 - Poor' },

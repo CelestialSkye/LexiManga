@@ -137,7 +137,7 @@ const ProfilePage = () => {
               <ProfileSideScrollinfo />
             </ErrorBoundary>
           )}
-          {/* left section - fixed position  */}
+          {/* left section  */}
           {isDesktop && (
             <div className='w-48 flex-shrink-0'>
               <div className='sticky top-6 mt-0 rounded-[16px] bg-white p-4 shadow-sm'>
@@ -145,23 +145,23 @@ const ProfilePage = () => {
                 <div className='space-y-2'>
                   <div>
                     <span className='text-xs text-gray-600'>Manga Tracking:</span>
-                    <span className='ml-2 text-xs'>{mangaCount ?? 'N/A'}</span>
+                    <span className='ml-2 text-sm'>{mangaCount ?? 'N/A'}</span>
                   </div>
                   <div>
                     <span className='text-xs text-gray-600'>Words:</span>
-                    <span className='ml-2 text-xs'>{wordCount ?? 'N/A'}</span>
+                    <span className='ml-2 text-sm'>{wordCount ?? 'N/A'}</span>
                   </div>
                   <div>
                     <span className='text-xs text-gray-600'>Learned:</span>
-                    <span className='ml-2 text-xs'>{learnedCount ?? 'N/A'}</span>
+                    <span className='ml-2 text-sm'>{learnedCount ?? 'N/A'}</span>
                   </div>
                   <div>
                     <span className='text-xs text-gray-600'>Unknown:</span>
-                    <span className='ml-2 text-xs'>{unknownCount ?? 'N/A'}</span>
+                    <span className='ml-2 text-sm'>{unknownCount ?? 'N/A'}</span>
                   </div>
                   <div>
                     <span className='text-xs text-gray-600'>Learning:</span>
-                    <span className='ml-2 text-xs'>{learningCount ?? 'N/A'}</span>
+                    <span className='ml-2 text-sm'>{learningCount ?? 'N/A'}</span>
                   </div>
                 </div>
               </div>

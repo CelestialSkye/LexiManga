@@ -47,10 +47,11 @@ const MangaListModal = () => {
     <>
       <div className='rounded-[16px] bg-white  pb-4'>
         <SearchBar
-          className='mb-4'
+          className='mb-4 violet-focus'
           value={searchTerm}
           onChange={setSearchTerm}
           placeholder='Search manga..'
+          
         />
         {filteredManga.length === 0 ? (
           <div className='text-gray-500'>No manga statuses found</div>

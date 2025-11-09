@@ -3,6 +3,9 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { ActionButton } from '../components';
 import HeroBanner from '@components/HeroBanner';
+import HeroBannerMobile from '@components/LandingPage/HeroBanner';
+import NavBar from '@components/LandingPage/NavBar';
+import Benefits from '@components/LandingPage/Benefits';
 
 const LandingPage = () => {
   const navigate = useNavigate();
@@ -11,30 +14,18 @@ const LandingPage = () => {
   const handleGoToWebsite = () => {
     if (user) {
       navigate('/home');
-  
     }
   };
 
   return (
-      <div className="min-h-screen overflow-x-hidden">
-
-          <HeroBanner></HeroBanner>
-          
-          <Text size="3xl" fw={700} className="text-gray-800 mb-8">
-            Vocabulary Manga
-          </Text>
-          
-          <Text size="lg" c="dimmed" className="text-gray-600 mb-8">
-            Learn vocabulary through manga and anime
-          </Text>
-          
-          {/* Main Button */}
-          <div className=''>
-          <ActionButton onClick={handleGoToWebsite}>
-            Go to Website
-          </ActionButton>
-          </div>
-        </div>
+    <div className='overflow-x-hidden'>
+      <div className='mx-auto w-full md:w-[60%]'>
+        <NavBar />
+      </div>
+      <HeroBanner></HeroBanner>
+      <HeroBannerMobile />
+      <Benefits />
+    </div>
   );
 };
 
