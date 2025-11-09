@@ -8,38 +8,45 @@ export default function Benefits() {
   const benefits = [
     {
       id: 1,
-      title: 'Learn Vocabulary',
-      description: 'Discover new words in context while reading manga',
-      icon: '📚',
-      span: 'col-span-1 row-span-1',
+      title: 'Learn From What You Love',
+      subtitle: 'Turn your favorite stories into real, measurable language growth.',
+      description:
+        'Expand your vocabulary naturally by saving and studying words from the manga you are invested in and enjoying.',
     },
     {
       id: 2,
-      title: 'Multiple Languages',
-      description: 'Learn vocabulary in English, Spanish, French, Japanese, and more',
-      icon: '🌍',
-      span: 'col-span-2 row-span-1',
+      title: 'Track Your Dual Journey',
+      subtitle: 'Finally, a simple way to connect reading passion with learning success.',
+      description:
+        "Log the series you're reading, then track your learning journey with notes, scores, and specific reading progress.",
     },
     {
       id: 3,
-      title: 'Spaced Repetition',
-      description: 'Reinforce learning with scientifically-proven spacing algorithms',
-      icon: '🔄',
-      span: 'col-span-1 row-span-2',
+      title: 'Capture Meaningful Words',
+      subtitle: 'Build a powerful, personalized dictionary based only on your interests.',
+      description:
+        'Instantly save new vocabulary right as you encounter it—complete with the panel/sentence context.',
     },
     {
       id: 4,
-      title: 'Track Progress',
-      description: 'Monitor your learning journey with detailed statistics',
-      icon: '📈',
-      span: 'col-span-1 row-span-1',
+      title: 'Get Instant Clarity',
+      subtitle: 'Flexibility at your fingertips: speed up or slow down your learning pace.',
+      description:
+        'Use AI-powered translations for quick understanding, or easily input your own meanings for deeper engagement.',
     },
     {
       id: 5,
-      title: 'Curated Collections',
-      description: 'Explore hand-picked manga and curated word lists',
-      icon: '⭐',
-      span: 'col-span-1 row-span-1',
+      title: 'Smart Review Decks (SRS)',
+      subtitle: 'Master your vocabulary faster with Anki-inspired, spaced repetition.',
+      description:
+        'Your collected vocabulary automatically transforms into reviewable decks, ready for study anytime, anywhere.',
+    },
+    {
+      id: 6,
+      title: 'Never Lose Motivation',
+      subtitle: 'See your efforts pay off: watch your vocabulary count grow week after week.',
+      description:
+        'Visual dashboards track words learned, review history, and your ongoing manga journey.',
     },
   ];
 
@@ -47,7 +54,7 @@ export default function Benefits() {
     return (
       <div className='px-4 py-12'>
         <h2 className='mb-8 text-center text-3xl font-bold text-gray-800'>
-          Why Learn with Lexicon?
+          Why Learn with LexiManga?
         </h2>
         <div className='space-y-4'>
           {benefits.map((benefit) => (
@@ -55,8 +62,8 @@ export default function Benefits() {
               key={benefit.id}
               className='rounded-lg border border-gray-200 bg-white p-6 shadow-sm'
             >
-              <div className='mb-3 text-4xl'>{benefit.icon}</div>
               <h3 className='mb-2 text-lg font-bold text-gray-800'>{benefit.title}</h3>
+              <p className='mb-2 text-sm font-semibold text-purple-600'>{benefit.subtitle}</p>
               <p className='text-gray-600'>{benefit.description}</p>
             </div>
           ))}
@@ -68,18 +75,18 @@ export default function Benefits() {
   return (
     <div className='px-8 py-16'>
       <h2 className='mb-12 text-center text-4xl font-bold text-gray-800'>
-        Why Learn with Lexicon?
+        Why Learn with LexiManga?
       </h2>
 
-      {/* Bento Grid */}
-      <div className='mx-auto grid max-w-5xl grid-cols-3 gap-6'>
+      {/* Consistent 2-column grid */}
+      <div className='mx-auto grid max-w-6xl grid-cols-2 gap-6'>
         {benefits.map((benefit) => (
           <div
             key={benefit.id}
-            className={`${benefit.span} rounded-2xl border border-gray-200 bg-white p-8 shadow-lg transition-shadow duration-300 hover:shadow-xl`}
+            className='rounded-2xl border border-gray-200 bg-white p-8 shadow-lg transition-shadow duration-300 hover:shadow-xl'
           >
-            <div className='mb-4 text-5xl'>{benefit.icon}</div>
-            <h3 className='mb-3 text-xl font-bold text-gray-800'>{benefit.title}</h3>
+            <h3 className='mb-2 text-xl font-bold text-gray-800'>{benefit.title}</h3>
+            <p className='mb-4 text-sm font-semibold text-purple-600'>{benefit.subtitle}</p>
             <p className='leading-relaxed text-gray-600'>{benefit.description}</p>
           </div>
         ))}

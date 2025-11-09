@@ -35,6 +35,7 @@
     ]
   },
   "dependencies": {
+    "@fontsource-variable/inter": "^5.2.8",
     "@google/generative-ai": "^0.24.1",
     "@mantine/carousel": "^8.3.6",
     "@mantine/core": "^8.2.7",
