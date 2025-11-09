@@ -20,13 +20,18 @@ import LoadingLogo from '@components/LoadingLogo';
 import Footer from '@components/Footer';
 import useMangaPageLoading from '../hooks/useMangaPageLoading';
 
-const HeartButton = memo(({ isFavorited, isLoading, onClick }) => (
+const HeartButton = memo(({ isFavorited, isLoading, onClick, user }) => (
   <div
-    onClick={isLoading ? undefined : onClick}
+    onClick={isLoading || !user ? undefined : onClick}
     role='button'
     aria-pressed={isFavorited}
-    style={{ WebkitTapHighlightColor: 'transparent', cursor: 'pointer' }}
-    className='relative inline-flex h-9 w-9 cursor-pointer touch-manipulation items-center justify-center rounded-[8px] bg-violet-500 text-white transition-none outline-none select-none hover:bg-violet-500 focus:outline-none active:bg-violet-500'
+    style={{ WebkitTapHighlightColor: 'transparent', cursor: user ? 'pointer' : 'not-allowed' }}
+    className={`relative inline-flex h-9 w-9 touch-manipulation items-center justify-center rounded-[8px] transition-none outline-none select-none focus:outline-none ${
+      user
+        ? 'cursor-pointer bg-violet-500 text-white hover:bg-violet-500 active:bg-violet-500'
+        : 'cursor-not-allowed bg-gray-300 text-gray-400'
+    }`}
+    title={user ? 'Add to favorites' : 'Sign in to add to favorites'}
   >
     <IconHeartFilled
       size={20}
@@ -154,7 +159,9 @@ const MangaPage = () => {
                   />
                 </div>
                 <div className='text-black'>
-                  <h1 className={`${isMobile ? 'mb-1 text-xs line-clamp-2' : 'text-1xl mb-4 line-clamp-2'} font-bold`}>
+                  <h1
+                    className={`${isMobile ? 'mb-1 line-clamp-2 text-xs' : 'text-1xl mb-4 line-clamp-2'} font-bold`}
+                  >
                     {manga.title?.english || manga.title?.romaji}
                   </h1>
                   {isMobile && (
@@ -163,11 +170,17 @@ const MangaPage = () => {
                         isFavorited={isFavorited}
                         isLoading={toggleFavoriteMutation.isPending}
                         onClick={handleToggleFavorite}
+                        user={user}
                       />
 
                       <button
-                        className='h-9 w-50 cursor-pointer rounded-[8px] bg-violet-500 px-2 py-1 text-sm text-white focus:ring-0 focus:outline-none'
-                        onClick={() => setIsStatusModalOpen(true)}
+                        className={`h-9 w-50 rounded-[8px] px-2 py-1 text-sm transition-colors focus:ring-0 focus:outline-none ${
+                          user
+                            ? 'cursor-pointer bg-violet-500 text-white hover:bg-violet-600'
+                            : 'cursor-not-allowed bg-gray-300 text-gray-400'
+                        }`}
+                        onClick={() => user && setIsStatusModalOpen(true)}
+                        title={user ? 'Add to list' : 'Sign in to add to list'}
                       >
                         Add to List
                       </button>
@@ -189,11 +202,17 @@ const MangaPage = () => {
                   isFavorited={isFavorited}
                   isLoading={toggleFavoriteMutation.isPending}
                   onClick={handleToggleFavorite}
+                  user={user}
                 />
 
                 <button
-                  className='h-9 w-37 rounded-[8px] bg-violet-500 px-2 py-1 text-sm text-white focus:ring-0 focus:outline-none'
-                  onClick={() => setIsStatusModalOpen(true)}
+                  className={`h-9 w-37 rounded-[8px] px-2 py-1 text-sm transition-colors focus:ring-0 focus:outline-none ${
+                    user
+                      ? 'cursor-pointer bg-violet-500 text-white hover:bg-violet-600'
+                      : 'cursor-not-allowed bg-gray-300 text-gray-400'
+                  }`}
+                  onClick={() => user && setIsStatusModalOpen(true)}
+                  title={user ? 'Add to list' : 'Sign in to add to list'}
                 >
                   Add to List
                 </button>
@@ -261,6 +280,54 @@ const MangaPage = () => {
                     <div className='mt-1 text-xs font-bold'>#{manga.favourites || 'N/A'}</div>
                   </div>
 
+                  {/* Format */}
+                  {manga.format && (
+                    <div>
+                      <span className='text-xs font-medium text-gray-600'>Format</span>
+                      <div className='mt-1 text-xs font-bold'>
+                        {manga.format.toLowerCase().replace('_', ' ').charAt(0).toUpperCase() +
+                          manga.format.toLowerCase().replace('_', ' ').slice(1)}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Chapters */}
+                  {manga.chapters && (
+                    <div>
+                      <span className='text-xs font-medium text-gray-600'>Chapters</span>
+                      <div className='mt-1 text-xs font-bold'>{manga.chapters}</div>
+                    </div>
+                  )}
+
+                  {/* Volumes */}
+                  {manga.volumes && (
+                    <div>
+                      <span className='text-xs font-medium text-gray-600'>Volumes</span>
+                      <div className='mt-1 text-xs font-bold'>{manga.volumes}</div>
+                    </div>
+                  )}
+
+                  {/* Source */}
+                  {manga.source && (
+                    <div>
+                      <span className='text-xs font-medium text-gray-600'>Source</span>
+                      <div className='mt-1 text-xs font-bold'>
+                        {manga.source.toLowerCase().replace('_', ' ').charAt(0).toUpperCase() +
+                          manga.source.toLowerCase().replace('_', ' ').slice(1)}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* End Date */}
+                  {manga.endDate?.year && (
+                    <div>
+                      <span className='text-xs font-medium text-gray-600'>Ended</span>
+                      <div className='mt-1 text-xs font-bold'>
+                        {`${manga.endDate.year}-${manga.endDate.month || '01'}-${manga.endDate.day || '01'}`}
+                      </div>
+                    </div>
+                  )}
+
                   {/* Genres */}
                   {manga.genres && manga.genres.length > 0 && (
                     <div>
@@ -279,9 +346,7 @@ const MangaPage = () => {
                   {manga.title?.romaji && (
                     <div>
                       <span className='text-xs font-medium text-gray-600'>Romaji Name</span>
-                      <div className='mt-1 text-xs '>
-                        {manga.title.romaji}
-                      </div>
+                      <div className='mt-1 text-xs'>{manga.title.romaji}</div>
                     </div>
                   )}
 
@@ -289,9 +354,7 @@ const MangaPage = () => {
                   {manga.title?.native && (
                     <div>
                       <span className='text-xs font-medium text-gray-600'>Native Name</span>
-                      <div className='mt-1 text-xs '>
-                        {manga.title.native}
-                      </div>
+                      <div className='mt-1 text-xs'>{manga.title.native}</div>
                     </div>
                   )}
                 </div>

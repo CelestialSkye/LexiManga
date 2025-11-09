@@ -59,12 +59,16 @@ const VocabularyTab = ({ manga }) => {
         filteredCount={filteredWords.length}
         totalCount={words.length}
         rightAction={
-          <button
-            className='h-9 rounded-lg bg-violet-500 px-3 text-sm text-white transition-colors hover:bg-violet-600'
-            onClick={() => setIsAddWordModalOpen(true)}
-          >
-            Add
-          </button>
+          user ? (
+            <button
+              className='h-9 rounded-lg bg-violet-500 px-3 text-sm text-white transition-colors hover:bg-violet-600'
+              onClick={() => setIsAddWordModalOpen(true)}
+            >
+              Add
+            </button>
+          ) : (
+            <div className='text-xs text-gray-500'>Sign in to add words</div>
+          )
         }
       />
 
