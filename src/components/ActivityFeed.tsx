@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useAuth } from '../context/AuthContext';
 import { db } from '../config/firebase';
 import { collection, query, orderBy, onSnapshot, limit } from 'firebase/firestore';
 import { getMangaDetails } from 'src/services/anilistApi';
@@ -25,11 +26,24 @@ const formatTimestamp = (timestamp: Activity['timestamp']): string => {
 };
 
 const ActivityFeed = () => {
+  const { user } = useAuth();
+  const userId = user?.uid;
   const [activities, setActivities] = useState<Activity[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const q = query(collection(db, 'activities'), orderBy('timestamp', 'desc'), limit(20));
+    if (!userId) {
+      setActivities([]);
+      setLoading(false);
+      return;
+    }
+
+    // Query from user's activities subcollection
+    const q = query(
+      collection(db, 'users', userId, 'activities'),
+      orderBy('timestamp', 'desc'),
+      limit(20)
+    );
 
     const unsubscribe = onSnapshot(q, (snapshot) => {
       const fetched: Activity[] = [];
@@ -39,7 +53,7 @@ const ActivityFeed = () => {
     });
 
     return () => unsubscribe();
-  }, []);
+  }, [userId]);
 
   const renderActivityMessage = (activity: Activity) => {
     const { type, mangaTitle, mangaId, word, translation, data = {}, changes = {} } = activity;
