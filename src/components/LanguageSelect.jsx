@@ -1,4 +1,4 @@
-import { Select, Transition } from '@mantine/core';
+import AnimatedSelect from './AnimatedSelect';
 
 const LANGUAGES = [
   { value: 'mandarin', label: 'Mandarin Chinese' },
@@ -18,16 +18,16 @@ const LANGUAGES = [
   { value: 'italian', label: 'Italian' },
 ];
 
-const LanguageSelect = ({ 
-  value, 
-  onChange, 
-  label, 
-  placeholder = "Select a language...",
+const LanguageSelect = ({
+  value,
+  onChange,
+  label,
+  placeholder = 'Select a language...',
   required = false,
-  ...props 
+  ...props
 }) => {
   return (
-    <Select
+    <AnimatedSelect
       label={label}
       placeholder={placeholder}
       value={value}
@@ -36,12 +36,6 @@ const LanguageSelect = ({
       searchable
       clearable
       required={required}
-      styles={{
-        dropdown: {
-          animation: 'popDown 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
-          transformOrigin: 'top',
-        }
-      }}
       {...props}
     />
   );

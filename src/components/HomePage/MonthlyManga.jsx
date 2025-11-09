@@ -74,7 +74,7 @@ const Trending = () => {
   // Mobile layout
   if (isMobile) {
     return (
-      <section className='mt-4 w-full overflow-hidden rounded-[16px] bg-black px-6 py-8 mb-4'>
+      <section className='mt-4 w-full overflow-hidden rounded-[16px] bg-black px-6 py-8 '>
         {/* Text */}
         <div className='mb-6'>
           <h2 className='mb-2 text-2xl font-bold text-white whitespace-nowrap'>Monthly Manga Picks</h2>
@@ -141,16 +141,16 @@ const Trending = () => {
 
   // Desktop layout
   return (
-    <section className='mb-4 w-full overflow-hidden rounded-[16px] bg-black px-6 py-8'>
+    <section className='mb-4 w-full overflow-hidden rounded-[16px] bg-black px-6 py-8 '>
       <div className='flex gap-8'>
         {/* text on left */}
-        <div className='w-65 flex-shrink-0 pr-7 pl-7'>
+        <div className='w-65 flex-shrink-0 pr-7 pl-7 pt-3'>
           <p className='text-sm'>
             <img src={logo} alt='Vocabulary Manga' className='h-5 w-5' />
           </p>
 
           <h2 className='pt-5 text-2xl font-bold text-white whitespace-nowrap'>Monthly Manga Picks</h2>
-          <p className='mt-35 max-w-sm text-sm leading-relaxed text-gray-400'>
+          <p className='mt-40 max-w-sm text-sm leading-relaxed text-gray-400'>
             Stories woven with passionate romance, epic battles, and characters that stay with you
             long after the final page.
           </p>

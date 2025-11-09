@@ -101,10 +101,10 @@ const Trending = () => {
                 <img
                   src={manga.coverImage?.large}
                   alt={manga.title?.english || manga.title?.romaji}
-                  className='h-full w-full object-cover'
+                  className='h-full w-full object-cover cursor-pointer'
                   loading='lazy'
                   onClick={() => navigate(`/manga/${manga.id}`)}
-                />
+                 />
                 {manga.averageScore && (
                   <div className='absolute top-2 left-2 rounded-md bg-black/70 px-2 py-1 backdrop-blur-sm'>
                     <p className='flex items-center gap-1 text-xs font-bold text-white'>

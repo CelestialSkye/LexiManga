@@ -24,6 +24,9 @@ const StatusFilter = ({
       size={size}
       style={{ minWidth: 150 }}
       className='violet-focus'
+      classNames={{
+        dropdown: 'dropdown-smooth-animation',
+      }}
       {...props}
     />
   );

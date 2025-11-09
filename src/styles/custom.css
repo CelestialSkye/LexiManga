@@ -232,19 +232,62 @@ body {
   border-radius: 0 0 24px 24px !important;
 }
 
-/* Language Select Pop Down Animation */
-@keyframes popDown {
+/* Reusable Dropdown Open Animation */
+@keyframes smoothDropdownSlide {
   0% {
     opacity: 0;
-    transform: translateY(-10px) scale(0.95);
-  }
-  50% {
-    opacity: 0.9;
-    transform: translateY(2px) scale(1.02);
+    transform: translateY(-12px) scale(0.98);
   }
   100% {
     opacity: 1;
     transform: translateY(0) scale(1);
+  }
+}
+
+/* Reusable Dropdown Close Animation */
+@keyframes smoothDropdownClose {
+  0% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-12px) scale(0.98);
+  }
+}
+
+/* Apply smooth animation to open dropdowns */
+.dropdown-smooth-animation {
+  animation: smoothDropdownSlide 0.25s cubic-bezier(0.4, 0, 0.2, 1) forwards !important;
+  transform-origin: top center;
+}
+
+/* Apply smooth animation to closing dropdowns */
+.dropdown-smooth-close {
+  animation: smoothDropdownClose 0.12s cubic-bezier(0.4, 0, 0.2, 1) forwards !important;
+  transform-origin: top center;
+}
+
+/* Legacy animations - kept for backward compatibility */
+@keyframes popDown {
+  0% {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.98);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes smoothSlideDown {
+  0% {
+    opacity: 0;
+    transform: translateY(-12px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 
