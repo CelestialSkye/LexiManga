@@ -120,7 +120,6 @@ const MangaStatusModal = ({ manga, opened, closeModal }) => {
         <Select
           value={status}
           onChange={setStatus}
-          className='dropdown-smooth-animation violet-focus'
           data={[
             { value: 'reading', label: 'Reading' },
             { value: 'completed', label: 'Completed' },
@@ -135,7 +134,6 @@ const MangaStatusModal = ({ manga, opened, closeModal }) => {
         <Select
           value={score}
           onChange={setScore}
-          className='dropdown-smooth-animation violet-focus'
           placeholder='Select Score'
           data={[
             { value: '1', label: '1 - Terrible' },
