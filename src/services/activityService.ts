@@ -21,7 +21,7 @@ export const useLogActivity = () => {
         timestamp: new Date(),
       };
 
-      const docRef = await addDoc(collection(db, 'activities'), payload);
+      const docRef = await addDoc(collection(db, 'users', user.uid, 'activities'), payload);
       return { id: docRef.id, ...payload };
     },
   });

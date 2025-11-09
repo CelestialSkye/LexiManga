@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { ErrorBoundary } from 'react-error-boundary';
 import { useAuth } from '../context/AuthContext';
 import { useMediaQuery } from '@mantine/hooks';
@@ -32,8 +33,21 @@ function ErrorFallback({ error, resetErrorBoundary }) {
 }
 
 const ProfilePage = () => {
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('overview');
   const { user, profile } = useAuth();
+
+  // Guard: Redirect to auth if not logged in
+  useEffect(() => {
+    if (!user) {
+      navigate('/auth');
+    }
+  }, [user, navigate]);
+
+  // If not logged in, don't render anything
+  if (!user) {
+    return null;
+  }
   const { wordCount, mangaCount, learnedCount, unknownCount, learningCount } = useProfileStats();
   const { isLoading } = useProfilePageLoading();
 
