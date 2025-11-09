@@ -6,6 +6,8 @@ import { useTrendingManga } from 'src/services/anilistApi';
 import { useNavigate } from 'react-router-dom';
 import { FaStar } from 'react-icons/fa6';
 import TopBarMobile from './TopbarMobile';
+import { CustomTooltip } from '../CustomTooltip';
+import { MangaTooltipContent } from '../MangaTooltipContent';
 
 function getMainCreators(staffEdges) {
   if (!staffEdges?.length) return 'Unknown';
@@ -91,40 +93,50 @@ const Trending = () => {
         {data?.map((manga) => (
           <Carousel.Slide key={manga.id}>
             <div className='flex flex-col items-center text-center'>
-              <div
-                className='relative overflow-hidden rounded-[16px] shadow-md'
-                style={{
-                  width: isMobile ? '245px' : '210px',
-                  height: isMobile ? '345px' : '314px',
-                }}
+              <CustomTooltip
+                label={<MangaTooltipContent manga={manga} />}
+                position='left'
+                multiline
+                w={280}
+                withArrow
+                arrowSize={8}
+                transitionProps={{ transition: 'pop', duration: 250 }}
               >
-                <img
-                  src={manga.coverImage?.large}
-                  alt={manga.title?.english || manga.title?.romaji}
-                  className='h-full w-full object-cover cursor-pointer'
-                  loading='lazy'
-                  onClick={() => navigate(`/manga/${manga.id}`)}
-                 />
-                {manga.averageScore && (
-                  <div className='absolute top-2 left-2 rounded-md bg-black/70 px-2 py-1 backdrop-blur-sm'>
-                    <p className='flex items-center gap-1 text-xs font-bold text-white'>
-                      <FaStar className='text-violet-400' /> {manga.averageScore}
-                    </p>
-                  </div>
-                )}
-                {isMobile && (
-                  <div className='absolute bottom-0 flex h-1/3 w-full items-end bg-gradient-to-t from-black/85 via-black/40 to-transparent px-3 py-3'>
-                    <div className='flex w-full items-end justify-between'>
-                      <p className='line-clamp-2 text-left text-sm font-semibold text-white drop-shadow-md'>
-                        {manga.title?.english || manga.title?.romaji}
-                      </p>
-                      <p className='line-clamp-2 text-xs font-medium text-gray-200 drop-shadow-md'>
-                        {getMainCreators(manga.staff?.edges)}
+                <div
+                  className='relative overflow-hidden rounded-[16px] shadow-md'
+                  style={{
+                    width: isMobile ? '245px' : '210px',
+                    height: isMobile ? '345px' : '314px',
+                  }}
+                >
+                  <img
+                    src={manga.coverImage?.large}
+                    alt={manga.title?.english || manga.title?.romaji}
+                    className='h-full w-full cursor-pointer object-cover'
+                    loading='lazy'
+                    onClick={() => navigate(`/manga/${manga.id}`)}
+                  />
+                  {manga.averageScore && (
+                    <div className='absolute top-2 left-2 rounded-md bg-black/70 px-2 py-1 backdrop-blur-sm'>
+                      <p className='flex items-center gap-1 text-xs font-bold text-white'>
+                        <FaStar className='text-violet-400' /> {manga.averageScore}
                       </p>
                     </div>
-                  </div>
-                )}
-              </div>
+                  )}
+                  {isMobile && (
+                    <div className='absolute bottom-0 flex h-1/3 w-full items-end bg-gradient-to-t from-black/85 via-black/40 to-transparent px-3 py-3'>
+                      <div className='flex w-full items-end justify-between'>
+                        <p className='line-clamp-2 text-left text-sm font-semibold text-white drop-shadow-md'>
+                          {manga.title?.english || manga.title?.romaji}
+                        </p>
+                        <p className='line-clamp-2 text-xs font-medium text-gray-200 drop-shadow-md'>
+                          {getMainCreators(manga.staff?.edges)}
+                        </p>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </CustomTooltip>
               {!isMobile && (
                 <p className='mt-2 line-clamp-2 w-[195px] px-1 text-xs font-medium text-gray-700'>
                   {manga.title?.english || manga.title?.romaji}

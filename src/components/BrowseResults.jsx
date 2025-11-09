@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FaStar } from 'react-icons/fa';
 import { Text, Button, Group, Stack, Center, Badge, Loader, NumberInput } from '@mantine/core';
+import { CustomTooltip } from './CustomTooltip';
+import { MangaTooltipContent } from './MangaTooltipContent';
 
 const BrowseResults = ({ data, isLoading, isError, page, onPageChange }) => {
   const [inputPage, setInputPage] = useState(page);
@@ -37,86 +39,88 @@ const BrowseResults = ({ data, isLoading, isError, page, onPageChange }) => {
 
       <div className='grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5'>
         {data.media.map((manga) => (
-          <div
+          <CustomTooltip
             key={manga.id}
-            onClick={() => navigate(`/manga/${manga.id}`)}
-            className='cursor-pointer overflow-hidden rounded-[16px] border border-gray-200 transition-all hover:scale-105'
-            style={{ borderColor: 'rgba(0, 0, 0, 0.1)' }}
+            label={<MangaTooltipContent manga={manga} />}
+            position='left'
+            multiline
+            w={280}
+            withArrow
+            arrowSize={8}
+            transitionProps={{ transition: 'pop', duration: 250 }}
           >
-            <div className='relative'>
-              <img
-                src={manga.coverImage.large}
-                alt={manga.title.english || manga.title.romaji}
-                className='h-64 w-full object-cover sm:h-72'
-                loading='lazy'
-              />
-              {manga.averageScore && (
-                <Group
-                  gap={4}
-                  p='xs'
-                  style={{
-                    position: 'absolute',
-                    top: 8,
-                    left: 8,
-                    borderRadius: 6,
-                    backgroundColor: 'rgba(0, 0, 0, 0.7)',
-                    backdropFilter: 'blur(4px)',
-                  }}
-                >
-                  <FaStar className='text-xs text-violet-400' />
-                  <Text size='xs' fw={700} c='white'>
-                    {manga.averageScore}
-                  </Text>
-                </Group>
-              )}
-              {manga.status === 'RELEASING' && (
-                <Badge
-                  color='green'
-                  size='sm'
-                  style={{
-                    position: 'absolute',
-                    top: 8,
-                    right: 8,
-                  }}
-                >
-                  Ongoing
-                </Badge>
-              )}
-              {manga.status === 'FINISHED' && (
-                <Badge
-                  color='blue'
-                  size='sm'
-                  style={{
-                    position: 'absolute',
-                    top: 8,
-                    right: 8,
-                  }}
-                >
-                  Finished
-                </Badge>
-              )}
-            </div>
-
-            <Stack gap='xs' p='sm'>
-              <Text size='sm' fw={600} c='dark' lineClamp={2} style={{ minHeight: '2.4em' }}>
-                {manga.title.english || manga.title.romaji}
-              </Text>
-
-              <Group gap={6}>
-                {manga.genres.slice(0, 2).map((genre) => (
-                  <Badge key={genre} color='violet' size='xs'>
-                    {genre}
+            <div
+              onClick={() => navigate(`/manga/${manga.id}`)}
+              className='cursor-pointer overflow-hidden rounded-[16px] border border-gray-200 transition-all hover:scale-105'
+              style={{ borderColor: 'rgba(0, 0, 0, 0.1)' }}
+            >
+              <div className='relative'>
+                <img
+                  src={manga.coverImage.large}
+                  alt={manga.title.english || manga.title.romaji}
+                  className='h-64 w-full object-cover sm:h-72'
+                  loading='lazy'
+                />
+                {manga.averageScore && (
+                  <Group
+                    gap={4}
+                    p='xs'
+                    style={{
+                      position: 'absolute',
+                      top: 8,
+                      left: 8,
+                      borderRadius: 6,
+                      backgroundColor: 'rgba(0, 0, 0, 0.7)',
+                      backdropFilter: 'blur(4px)',
+                    }}
+                  >
+                    <FaStar className='text-xs text-violet-400' />
+                    <Text size='xs' fw={700} c='white'>
+                      {manga.averageScore}
+                    </Text>
+                  </Group>
+                )}
+                {manga.status === 'RELEASING' && (
+                  <Badge
+                    color='green'
+                    size='sm'
+                    style={{
+                      position: 'absolute',
+                      top: 8,
+                      right: 8,
+                    }}
+                  >
+                    Ongoing
                   </Badge>
-                ))}
-              </Group>
+                )}
+                {manga.status === 'FINISHED' && (
+                  <Badge
+                    color='blue'
+                    size='sm'
+                    style={{
+                      position: 'absolute',
+                      top: 8,
+                      right: 8,
+                    }}
+                  >
+                    Finished
+                  </Badge>
+                )}
+              </div>
 
-              {manga.startDate?.year && (
-                <Text size='xs' c='dimmed'>
-                  {manga.startDate.year}
+              <Stack gap='xs' p='sm'>
+                <Text size='sm' fw={600} c='dark' lineClamp={2} style={{ minHeight: '2.4em' }}>
+                  {manga.title.english || manga.title.romaji}
                 </Text>
-              )}
-            </Stack>
-          </div>
+
+                {manga.startDate?.year && (
+                  <Text size='xs' c='dimmed'>
+                    {manga.startDate.year}
+                  </Text>
+                )}
+              </Stack>
+            </div>
+          </CustomTooltip>
         ))}
       </div>
 
