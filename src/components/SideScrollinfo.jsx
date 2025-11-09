@@ -91,15 +91,13 @@ function SideScrollinfo({ manga }) {
               <Text size='xs' fw={300} c='dark' className='mb-1'>
                 Genres
               </Text>
-              <Text size='sm' fw={500} c='dark' className='font-bold'>
-                <div className='flex flex-wrap gap-2'>
-                  {manga.genres.map((genre) => (
-                    <Badge key={genre} color='violet' size='sm'>
-                      {genre}
-                    </Badge>
-                  ))}
-                </div>{' '}
-              </Text>
+              <div className='flex flex-wrap gap-2'>
+                {manga.genres.map((genre) => (
+                  <Badge key={genre} color='violet' size='sm'>
+                    {genre}
+                  </Badge>
+                ))}
+              </div>
             </div>
           )}
 
