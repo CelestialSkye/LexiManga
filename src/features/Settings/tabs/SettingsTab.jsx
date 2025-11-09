@@ -1,61 +1,103 @@
-import TopBar from '@components/TopBar';
-import { useMediaQuery } from '@mantine/hooks';
+import { useState } from 'react';
 import { collection, getDocs } from 'firebase/firestore';
 import { db } from 'src/config/firebase';
-import { useAuth } from "../../../context/AuthContext";
-import { authService } from 'src/services';
+import { useAuth } from '../../../context/AuthContext';
 
 const SettingsTab = () => {
-  const isMobile = useMediaQuery('(max-width: 768px)');
-  const isDesktop = useMediaQuery('(min-width: 769px)');
   const { user } = useAuth();
+  const [isArchiving, setIsArchiving] = useState(false);
+  const [archiveMessage, setArchiveMessage] = useState('');
 
-  const handleArchiveWords = async () => {  
+  const handleArchiveWords = async () => {
     if (!user?.uid) {
-      alert('You must be logged in');
+      setArchiveMessage('Error: You must be logged in');
       return;
     }
 
-    const userId = user.uid;
-    const wordsCollection = collection(db, 'users', userId, 'words');
-    const snapshot = await getDocs(wordsCollection);
+    setIsArchiving(true);
+    setArchiveMessage('');
 
-    if (snapshot.empty) {
-      alert('No words to archive');
-      return;
+    try {
+      const userId = user.uid;
+      const wordsCollection = collection(db, 'users', userId, 'words');
+      const snapshot = await getDocs(wordsCollection);
+
+      if (snapshot.empty) {
+        setArchiveMessage('No words to archive');
+        setIsArchiving(false);
+        return;
+      }
+
+      let textContent = '';
+      snapshot.forEach((doc) => {
+        const data = doc.data();
+        textContent += `Manga Name: ${data.mangaTitle || 'N/A'}  \nWord: ${data.word || 'N/A'}\nMeaning: ${data.translation || 'N/A'}\nExample: ${data.context || 'N/A'}\n---\n`;
+      });
+
+      const blob = new Blob([textContent], { type: 'text/plain' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = 'archived_words.txt';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+
+      setArchiveMessage(`Successfully archived ${snapshot.size} word(s)`);
+    } catch (error) {
+      setArchiveMessage('Error: ' + error.message);
+    } finally {
+      setIsArchiving(false);
     }
-
-    let textContent = '';
-    snapshot.forEach((doc) => {
-      const data = doc.data();
-      textContent += `Manga Name: ${data.mangaTitle || 'N/A'}  \nWord: ${data.word || 'N/A'}\nMeaning: ${data.translation || 'N/A'}\nExample: ${data.context|| 'N/A'}\n---\n`;
-    });
-
-    const blob = new Blob([textContent], { type: 'text/plain' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = 'archived_words.txt';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
   };
 
   return (
-    <div className='space-y-6 rounded-[16px] p-4'>
-      <div className={`${isMobile ? 'absolute top-0 right-0 left-0 z-10' : ''}`}>
-        <TopBar />
+    <div className='space-y-6'>
+      {/* Archive Words Card */}
+      <div className='rounded-[16px] bg-white p-6 shadow-md transition-shadow hover:shadow-lg dark:bg-gray-800'>
+        <h2 className='mb-4 text-xl font-bold text-gray-900 dark:text-white'>Archive Your Words</h2>
+
+        <div className='space-y-4'>
+          <p className='text-gray-600 dark:text-gray-400'>
+            Export all your vocabulary words to a text file for backup or personal use.
+          </p>
+
+          <button
+            onClick={handleArchiveWords}
+            disabled={isArchiving}
+            className={`inline-flex items-center justify-center rounded-lg px-6 py-2.5 font-medium shadow-sm transition-all duration-200 hover:shadow-md ${
+              isArchiving
+                ? 'cursor-not-allowed bg-gray-400 text-white opacity-75'
+                : 'bg-violet-600 text-white hover:bg-violet-700'
+            }`}
+          >
+            {isArchiving ? 'Archiving...' : 'Download Archive'}
+          </button>
+
+          {archiveMessage && (
+            <div
+              className={`mt-4 rounded-lg p-4 ${
+                archiveMessage.includes('Error')
+                  ? 'bg-red-50 text-red-700 dark:bg-red-900/20 dark:text-red-400'
+                  : 'bg-green-50 text-green-700 dark:bg-green-900/20 dark:text-green-400'
+              }`}
+            >
+              <p className='text-sm'>{archiveMessage}</p>
+            </div>
+          )}
+        </div>
       </div>
-      
-      <div className='rounded-[12px] bg-white p-6 shadow-lg dark:bg-gray-800 dark:text-white'>
-        <h2 className='text-lg font-semibold mb-4'>Archive Words</h2>
-        <button
-          onClick={handleArchiveWords}
-          className='px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition'
-        >
-          Archive Words
-        </button>
+
+      {/* Additional Settings Cards */}
+      <div className='rounded-lg bg-white p-6 shadow-md transition-shadow hover:shadow-lg dark:bg-gray-800'>
+        <h2 className='mb-4 text-xl font-bold text-gray-900 dark:text-white'>
+          More Settings Coming Soon
+        </h2>
+
+        <p className='text-gray-600 dark:text-gray-400'>
+          Additional settings and options will be available here in the future (maybe).
+        </p>
       </div>
     </div>
   );

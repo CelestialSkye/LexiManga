@@ -23,7 +23,7 @@ const SuggestionManga = () => {
             <img
               src={manga.coverImage.large}
               alt={manga.title.english || manga.title.romaji}
-              className='h-40 w-28 flex-shrink-0 rounded-[12px] object-cover'
+              className='h-45 w-32 flex-shrink-0 rounded-[12px] object-cover cursor-pointer'
               onClick={() => navigate(`/manga/${manga.id}`)}
             />
 
@@ -31,7 +31,7 @@ const SuggestionManga = () => {
             <div className='flex flex-1 flex-col justify-between'>
               <div>
                 <h3
-                  className='mb-2 line-clamp-2 text-lg font-bold text-gray-800'
+                  className='mb-2 line-clamp-2 text-lg font-bold text-gray-800 cursor-pointer'
                   onClick={() => navigate(`/manga/${manga.id}`)}
                 >
                   {manga.title.english || manga.title.romaji}

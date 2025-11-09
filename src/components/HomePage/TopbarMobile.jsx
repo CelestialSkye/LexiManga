@@ -38,7 +38,7 @@ const TopBarMobile = () => {
   return (
     <>
       <div className='flex w-full items-center justify-center bg-white px-4 py-3 shadow-sm sm:px-6'>
-        <div className='flex w-[95%] items-center justify-between md:w-[85%]'>
+        <div className='flex w-[95%] items-center justify-between md:w-[80%]'>
           {/* Left */}
           <div className='flex items-center'>
             <p className='text-sm'>

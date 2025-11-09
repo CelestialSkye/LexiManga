@@ -1,10 +1,33 @@
 import React, { useState } from 'react';
 import { TextInput, Select, Button, Stack, Paper, Title, Grid } from '@mantine/core';
 import { IconChevronDown } from '@tabler/icons-react';
+import { motion } from 'framer-motion';
 import './BrowseFilters.css';
 
 const BrowseFilters = ({ filters, onFilterChange }) => {
   const [filtersOpen, setFiltersOpen] = useState(false);
+
+  // Dropdown animation variants
+  const dropdownVariants = {
+    open: {
+      opacity: 1,
+      y: 0,
+      scale: 1,
+      transition: {
+        duration: 0.25,
+        ease: [0.4, 0, 0.2, 1],
+      },
+    },
+    closed: {
+      opacity: 0,
+      y: -12,
+      scale: 0.98,
+      transition: {
+        duration: 0.12,
+        ease: [0.4, 0, 0.2, 1],
+      },
+    },
+  };
 
   const genres = [
     'Action',
@@ -88,9 +111,12 @@ const BrowseFilters = ({ filters, onFilterChange }) => {
                   ]}
                   value={filters.genre}
                   onChange={(value) => onFilterChange('genre', value)}
-                  className='violet-focus'
+                  className='violet-focus cursor-pointer'
                   searchable
                   clearable
+                  classNames={{
+                    dropdown: 'dropdown-smooth-animation',
+                  }}
                 />
               </Grid.Col>
 
@@ -102,6 +128,9 @@ const BrowseFilters = ({ filters, onFilterChange }) => {
                   value={filters.sort}
                   className='violet-focus'
                   onChange={(value) => onFilterChange('sort', value)}
+                  classNames={{
+                    dropdown: 'dropdown-smooth-animation',
+                  }}
                 />
               </Grid.Col>
 
@@ -113,6 +142,9 @@ const BrowseFilters = ({ filters, onFilterChange }) => {
                   value={filters.status}
                   className='violet-focus'
                   onChange={(value) => onFilterChange('status', value)}
+                  classNames={{
+                    dropdown: 'dropdown-smooth-animation',
+                  }}
                 />
               </Grid.Col>
 

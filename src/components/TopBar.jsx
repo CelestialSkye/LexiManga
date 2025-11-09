@@ -9,6 +9,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useState, useEffect } from 'react';
 import { IconBell } from '@tabler/icons-react';
 import { getDailyActivities } from '../services/dailyActivityService';
+import { dropdownCloseVariants } from '../utils/animationUtils';
 import logo from '../assets/logo.svg';
 
 const TopBar = () => {
@@ -77,7 +78,7 @@ const TopBar = () => {
   const dropdownBgClass = isDarkTopbar ? 'bg-black/40' : 'bg-white';
   const dropdownTextClass = isDarkTopbar
     ? 'text-white hover:bg-violet-800'
-    : 'text-gray-700 hover:bg-violet-100';
+    : 'text-gray-700 hover:bg-gray-100';
   const dropdownItemClass = isDarkTopbar ? 'text-white' : 'text-gray-700';
 
   return (
@@ -178,13 +179,13 @@ const TopBar = () => {
                           />
                         </button>
 
-                        <AnimatePresence>
+                        <AnimatePresence mode='wait'>
                           {isNotificationsOpen && (
                             <motion.div
-                              initial={{ opacity: 0, y: -10, scale: 0.95 }}
-                              animate={{ opacity: 1, y: 0, scale: 1 }}
-                              exit={{ opacity: 0, y: -10, scale: 0.95 }}
-                              transition={{ duration: 0.2, ease: 'easeOut' }}
+                              variants={dropdownCloseVariants}
+                              initial='closed'
+                              animate='open'
+                              exit='closed'
                               className={`notifications-container pointer-events-auto absolute top-14 right-0 z-[9999] flex min-w-[300px] flex-col gap-0 rounded-lg ${dropdownBgClass} p-0 shadow-lg`}
                             >
                               <div className='space-y-4 p-4'>
@@ -279,13 +280,13 @@ const TopBar = () => {
                           user.email?.charAt(0).toUpperCase()}
                       </Avatar>
 
-                      <AnimatePresence>
+                      <AnimatePresence mode='wait'>
                         {isDropdownOpen && (
                           <motion.div
-                            initial={{ opacity: 0, y: -10, scale: 0.95 }}
-                            animate={{ opacity: 1, y: 0, scale: 1 }}
-                            exit={{ opacity: 0, y: -10, scale: 0.95 }}
-                            transition={{ duration: 0.2, ease: 'easeOut' }}
+                            variants={dropdownCloseVariants}
+                            initial='closed'
+                            animate='open'
+                            exit='closed'
                             className={`dropdown-container absolute top-20 right-28 z-50 flex min-w-[200px] flex-col gap-1 rounded-b-[16px] ${dropdownBgClass} p-0 shadow-lg`}
                           >
                             <div

@@ -302,13 +302,16 @@ const SRSGame = ({ manga, words: initialWords }) => {
                     placeholder='Study all words'
                     data={mangaOptions}
                     value={selectedMangaFilter}
-                         className='violet-focus'
+                    className='violet-focus'
                     onChange={(value) => {
                       setSelectedMangaFilter(value);
                     }}
                     clearable
                     searchable
                     size='sm'
+                    classNames={{
+                      dropdown: 'dropdown-smooth-animation',
+                    }}
                   />
                 </div>
                 <Button
@@ -368,6 +371,9 @@ const SRSGame = ({ manga, words: initialWords }) => {
                   clearable
                   searchable
                   size='sm'
+                  classNames={{
+                    dropdown: 'dropdown-smooth-animation',
+                  }}
                 />
               </div>
               <Button
