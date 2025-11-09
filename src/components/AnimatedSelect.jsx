@@ -39,6 +39,7 @@ const AnimatedSelect = ({
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [searchValue, setSearchValue] = useState('');
+  const [dropdownPosition, setDropdownPosition] = useState({ top: 0, left: 0, width: 0 });
   const containerRef = useRef(null);
   const inputRef = useRef(null);
 
@@ -56,6 +57,15 @@ const AnimatedSelect = ({
     };
 
     if (isOpen) {
+      // Calculate dropdown position
+      const rect = containerRef.current?.getBoundingClientRect();
+      if (rect) {
+        setDropdownPosition({
+          top: rect.top + rect.height + 8,
+          left: rect.left,
+          width: rect.width,
+        });
+      }
       document.addEventListener('mousedown', handleClickOutside);
     }
 
@@ -72,6 +82,7 @@ const AnimatedSelect = ({
 
   const handleClear = (e) => {
     e.stopPropagation();
+    e.preventDefault();
     onChange(null);
   };
 
@@ -85,10 +96,16 @@ const AnimatedSelect = ({
       )}
 
       <div className='relative'>
-        <button
+        <div
           onClick={() => !disabled && setIsOpen(!isOpen)}
-          disabled={disabled}
-          className='flex w-full items-center justify-between rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-left text-gray-900 transition-colors hover:border-gray-400 focus:border-violet-600 focus:outline-none dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:hover:border-gray-500'
+          className='flex w-full cursor-pointer items-center justify-between rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-left text-gray-900 transition-colors hover:border-gray-400 focus:border-violet-600 focus:outline-none dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:hover:border-gray-500'
+          role='button'
+          tabIndex={0}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              !disabled && setIsOpen(!isOpen);
+            }
+          }}
         >
           <span
             className={
@@ -100,12 +117,19 @@ const AnimatedSelect = ({
 
           <Group gap='xs' className='flex-shrink-0'>
             {clearable && selectedLabel && (
-              <button
+              <div
                 onClick={handleClear}
                 className='rounded p-1 transition-colors hover:bg-gray-100 dark:hover:bg-gray-700'
+                role='button'
+                tabIndex={0}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    handleClear(e);
+                  }
+                }}
               >
                 <IconX size={16} className='text-gray-500' />
-              </button>
+              </div>
             )}
             <IconChevronDown
               size={18}
@@ -114,7 +138,7 @@ const AnimatedSelect = ({
               }`}
             />
           </Group>
-        </button>
+        </div>
 
         {searchable && isOpen && (
           <TextInput
@@ -134,7 +158,13 @@ const AnimatedSelect = ({
               initial='closed'
               animate='open'
               exit='closed'
-              className='absolute top-full right-0 left-0 z-50 mt-2 overflow-hidden rounded-lg border border-gray-300 bg-white shadow-lg dark:border-gray-600 dark:bg-gray-800'
+              style={{
+                position: 'fixed',
+                top: dropdownPosition.top,
+                left: dropdownPosition.left,
+                width: dropdownPosition.width,
+              }}
+              className='z-[9999] overflow-hidden rounded-lg border border-gray-300 bg-white shadow-lg dark:border-gray-600 dark:bg-gray-800'
             >
               {searchable && (
                 <div className='border-b border-gray-200 p-2 dark:border-gray-700'>
