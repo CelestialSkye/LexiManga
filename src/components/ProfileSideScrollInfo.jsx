@@ -9,7 +9,7 @@ function ProfileSideScrollinfo() {
       <ScrollArea w='100%' h={80} scrollbarSize={4}>
         <Box w={800} className='flex gap-18'>
           {/* Manga count */}
-          <div className='w-32 flex-shrink-0 p-3'>
+          <div className='w-auto flex-shrink-0 p-3'>
             <Text size='xs' fw={300} c='dark' className='mb-1'>
               Manga Tracking
             </Text>
@@ -19,7 +19,7 @@ function ProfileSideScrollinfo() {
           </div>
 
           {/* Words Count */}
-          <div className='w-30 flex-shrink-0 p-3'>
+          <div className='w-auto flex-shrink-0 p-3'>
             <Text size='xs' fw={300} c='dark' className='mb-1'>
               Words
             </Text>
@@ -29,7 +29,7 @@ function ProfileSideScrollinfo() {
           </div>
 
           {/* Learned Words */}
-          <div className='w-30 flex-shrink-0 p-3'>
+          <div className='w-auto flex-shrink-0 p-3'>
             <Text size='xs' fw={300} c='dark' className='mb-1'>
               Learned Words
             </Text>
@@ -39,7 +39,7 @@ function ProfileSideScrollinfo() {
           </div>
 
           {/* Not Learned yet */}
-          <div className='w-30 flex-shrink-0 p-3'>
+          <div className='w-auto flex-shrink-0 p-3'>
             <Text size='xs' fw={300} c='dark' className='mb-1'>
               Unknown Words
             </Text>
@@ -49,7 +49,7 @@ function ProfileSideScrollinfo() {
           </div>
 
           {/* Learning */}
-          <div className='w-30 flex-shrink-0 p-3'>
+          <div className='w-auto flex-shrink-0 p-3'>
             <Text size='xs' fw={300} c='dark' className='mb-1'>
               Learning
             </Text>

@@ -32,7 +32,7 @@ function SideScrollinfo({ manga }) {
       <ScrollArea w='100%' h={85} scrollbarSize={4}>
         <Box w={800} className='flex gap-6'>
           {/* Release Date  */}
-          <div className='w-32 flex-shrink-0 p-3'>
+          <div className='w-auto flex-shrink-0 p-3'>
             <Text size='xs' fw={300} c='dark' className='mb-1'>
               Released
             </Text>
@@ -46,7 +46,7 @@ function SideScrollinfo({ manga }) {
           </div>
 
           {/* Status  */}
-          <div className='w-28 flex-shrink-0 p-3'>
+          <div className='w-auto flex-shrink-0 p-3'>
             <Text size='xs' fw={300} c='dark' className='mb-1'>
               Status
             </Text>
@@ -56,7 +56,7 @@ function SideScrollinfo({ manga }) {
           </div>
 
           {/* Score  */}
-          <div className='w-24 flex-shrink-0 p-3'>
+          <div className='w-auto flex-shrink-0 p-3'>
             <Text size='xs' fw={300} c='dark' className='mb-1'>
               Score
             </Text>
@@ -66,7 +66,7 @@ function SideScrollinfo({ manga }) {
           </div>
 
           {/* Popularity  */}
-          <div className='w-28 flex-shrink-0 p-3'>
+          <div className='w-auto flex-shrink-0 p-3'>
             <Text size='xs' fw={300} c='dark' className='mb-1'>
               Popularity
             </Text>
@@ -76,7 +76,7 @@ function SideScrollinfo({ manga }) {
           </div>
 
           {/* favorites  */}
-          <div className='w-28 flex-shrink-0 p-3'>
+          <div className='w-auto flex-shrink-0 p-3'>
             <Text size='xs' fw={300} c='dark' className='mb-1'>
               Favourites
             </Text>
@@ -87,7 +87,7 @@ function SideScrollinfo({ manga }) {
 
           {/* Genres  */}
           {manga.genres && manga.genres.length > 0 && (
-            <div className='w-100 flex-shrink-0 p-3'>
+            <div className='w-auto flex-shrink-0 p-3'>
               <Text size='xs' fw={300} c='dark' className='mb-1'>
                 Genres
               </Text>
@@ -102,17 +102,17 @@ function SideScrollinfo({ manga }) {
           )}
 
           {/* romaji  */}
-          <div className='w-40 flex-shrink-0 p-3'>
+          <div className='w-auto flex-shrink-0 p-3'>
             <Text size='xs' fw={300} c='dark' className='mb-1'>
               Romaji Name
             </Text>
-            <Text size='xs' fw={700} c='dark' className='line-clamp-2 font-bold'>
+            <Text size='xs' fw={700} c='dark' className='font-bold whitespace-nowrap'>
               {manga.title?.romaji || 'N/A'}
             </Text>
           </div>
 
           {/* japanese  */}
-          <div className='w-40 flex-shrink-0 p-3'>
+          <div className='w-auto flex-shrink-0 p-3'>
             <Text size='xs' fw={300} c='dark' className='mb-1'>
               Native Name
             </Text>

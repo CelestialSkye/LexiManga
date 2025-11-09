@@ -154,7 +154,7 @@ const MangaPage = () => {
                   />
                 </div>
                 <div className='text-black'>
-                  <h1 className={`${isMobile ? 'mb-1 text-sm' : 'text-1xl mb-4'} font-bold`}>
+                  <h1 className={`${isMobile ? 'mb-1 text-xs line-clamp-2' : 'text-1xl mb-4 line-clamp-2'} font-bold`}>
                     {manga.title?.english || manga.title?.romaji}
                   </h1>
                   {isMobile && (
@@ -279,7 +279,7 @@ const MangaPage = () => {
                   {manga.title?.romaji && (
                     <div>
                       <span className='text-xs font-medium text-gray-600'>Romaji Name</span>
-                      <div className='mt-1 text-xs font-bold font-semibold'>
+                      <div className='mt-1 text-xs '>
                         {manga.title.romaji}
                       </div>
                     </div>
@@ -289,7 +289,7 @@ const MangaPage = () => {
                   {manga.title?.native && (
                     <div>
                       <span className='text-xs font-medium text-gray-600'>Native Name</span>
-                      <div className='mt-1 text-xs font-bold font-semibold'>
+                      <div className='mt-1 text-xs '>
                         {manga.title.native}
                       </div>
                     </div>
