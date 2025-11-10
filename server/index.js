@@ -5,6 +5,8 @@ require('dotenv').config({ path: path.resolve(__dirname, '../.env') });
 const express = require('express');
 const cors = require('cors');
 const NodeCache = require('node-cache');
+const cacheManager = require('./cache-manager');
+const cacheScheduler = require('./cache-scheduler');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -181,12 +183,21 @@ app.get('/api/search', async (req, res) => {
     }
 
     const cacheKey = `search:${search}:${limit}`;
-    const cached = cache.get(cacheKey);
 
+    // Layer 1: Check NodeCache (in-memory)
+    const cached = cache.get(cacheKey);
     if (cached) {
       return res.json({ data: cached, cached: true });
     }
 
+    // Layer 2: Check Firebase cache
+    const fbCached = await cacheManager.getCacheFromFirebase(cacheKey);
+    if (fbCached) {
+      cache.set(cacheKey, fbCached.data, 300); // Warm NodeCache
+      return res.json({ data: fbCached.data, cached: true });
+    }
+
+    // Layer 3: Fetch from AniList
     const response = await fetch(ANILIST_API, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -202,6 +213,8 @@ app.get('/api/search', async (req, res) => {
       throw new Error('AniList API error');
     }
 
+    // Save to both caches
+    await cacheManager.setCacheInFirebase(cacheKey, data.data, 3600);
     cache.set(cacheKey, data.data, 1800);
     res.json({ data: data.data, cached: false });
   } catch (error) {
@@ -218,12 +231,21 @@ app.get('/api/manga/:id', async (req, res) => {
     }
 
     const cacheKey = `manga:${id}`;
-    const cached = cache.get(cacheKey);
 
+    // Layer 1: Check NodeCache
+    const cached = cache.get(cacheKey);
     if (cached) {
       return res.json({ data: cached, cached: true });
     }
 
+    // Layer 2: Check Firebase cache
+    const fbCached = await cacheManager.getCacheFromFirebase(cacheKey);
+    if (fbCached) {
+      cache.set(cacheKey, fbCached.data, 300); // Warm NodeCache
+      return res.json({ data: fbCached.data, cached: true });
+    }
+
+    // Layer 3: Fetch from AniList
     const response = await fetch(ANILIST_API, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -239,6 +261,8 @@ app.get('/api/manga/:id', async (req, res) => {
       throw new Error('AniList API error');
     }
 
+    // Save to both caches
+    await cacheManager.setCacheInFirebase(cacheKey, data.data, 14400);
     cache.set(cacheKey, data.data, 7200);
     res.json({ data: data.data, cached: false });
   } catch (error) {
@@ -406,6 +430,146 @@ const loadFrequencyLists = () => {
 
 const FREQUENCY_LISTS = loadFrequencyLists();
 
+// Initialize cache scheduler with queries
+const TRENDING_QUERY_FOR_SCHEDULER = `
+  query ($perPage: Int) {
+    Page(perPage: $perPage) {
+      media(type: MANGA, sort: TRENDING_DESC) {
+        id
+        title {
+          romaji
+          english
+        }
+        coverImage {
+          large
+        }
+        averageScore
+        popularity
+        description
+        genres
+        format
+        chapters
+        volumes
+        status
+        source
+        staff(sort: RELEVANCE, perPage: 10) {
+          edges {
+            role
+            node {
+              name {
+                full
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+`;
+
+const MONTHLY_MANGA_QUERY_FOR_SCHEDULER = `
+   query ($perPage: Int) {
+      Page(perPage: $perPage) {
+        media(
+          type: MANGA,
+          sort: [TRENDING_DESC, SCORE_DESC],
+          isAdult: false,
+          status_in: [RELEASING, FINISHED],
+          startDate_greater: 20250101,
+          startDate_lesser: 20251231
+        ) {
+          id
+          title {
+            romaji
+            english
+          }
+          coverImage {
+            large
+          }
+          averageScore
+          popularity
+          description
+          genres
+          format
+          chapters
+          volumes
+          status
+          source
+          startDate {
+            year
+            month
+            day
+          }
+          staff(sort: RELEVANCE, perPage: 3) {
+            edges {
+              role
+              node {
+                name {
+                  full
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+`;
+
+const SUGGESTED_QUERY_FOR_SCHEDULER = `
+  query ($perPage: Int, $genres: [String], $excludeGenres: [String]) {
+    Page(perPage: $perPage) {
+      media(
+        type: MANGA, 
+        sort: [POPULARITY_DESC],
+        genre_in: $genres,
+        genre_not_in: $excludeGenres,
+        averageScore_greater: 75,
+        popularity_greater: 3000,
+        popularity_lesser: 50000,
+        status_in: [RELEASING, FINISHED]
+      ) {
+        id
+        title {
+          romaji
+          english
+        }
+        coverImage {
+          large
+        }
+        bannerImage
+        averageScore
+        popularity
+        trending
+        genres
+        description
+        chapters
+        status
+        startDate {
+          year
+        }
+        staff(sort: RELEVANCE, perPage: 5) {
+          edges {
+            role
+            node {
+              name {
+                full
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+`;
+
+cacheScheduler.initializeScheduler(
+  ANILIST_API,
+  TRENDING_QUERY_FOR_SCHEDULER,
+  MONTHLY_MANGA_QUERY_FOR_SCHEDULER,
+  SUGGESTED_QUERY_FOR_SCHEDULER
+);
+cacheScheduler.startScheduler();
+
 app.get('/api/word-difficulty', async (req, res) => {
   try {
     const { word, language } = req.query;
@@ -549,13 +713,24 @@ app.get('/api/trending', async (req, res) => {
     console.log(`Fetching trending manga with limit: ${limit}`);
 
     const cacheKey = `trending:${limit}`;
-    const cached = cache.get(cacheKey);
 
+    // Layer 1: Check NodeCache
+    const cached = cache.get(cacheKey);
     if (cached) {
-      console.log('Returning cached trending manga');
+      console.log('Returning cached trending manga from memory');
       return res.json({ data: cached, cached: true });
     }
 
+    // Layer 2: Check Firebase cache
+    const fbCached = await cacheManager.getCacheFromFirebase(cacheKey);
+    if (fbCached) {
+      console.log('Returning cached trending manga from Firebase');
+      cache.set(cacheKey, fbCached.data, 300); // Warm NodeCache
+      return res.json({ data: fbCached.data, cached: true });
+    }
+
+    // Layer 3: Fetch from AniList
+    console.log('Fetching trending manga from AniList API');
     const response = await fetch(ANILIST_API, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -577,6 +752,9 @@ app.get('/api/trending', async (req, res) => {
     }
 
     const media = data.data.Page.media;
+
+    // Save to both caches
+    await cacheManager.setCacheInFirebase(cacheKey, media, 7200);
     cache.set(cacheKey, media, 1800);
     res.json({ data: media, cached: false });
   } catch (error) {
@@ -596,13 +774,24 @@ app.get('/api/suggested', async (req, res) => {
       : ['Hentai', 'Ecchi'];
 
     const cacheKey = `suggested:${limit}:${genreArray.join(',')}:${excludeGenreArray.join(',')}`;
-    const cached = cache.get(cacheKey);
 
+    // Layer 1: Check NodeCache
+    const cached = cache.get(cacheKey);
     if (cached) {
-      console.log('Returning cached suggested manga');
+      console.log('Returning cached suggested manga from memory');
       return res.json({ data: cached, cached: true });
     }
 
+    // Layer 2: Check Firebase cache
+    const fbCached = await cacheManager.getCacheFromFirebase(cacheKey);
+    if (fbCached) {
+      console.log('Returning cached suggested manga from Firebase');
+      cache.set(cacheKey, fbCached.data, 300); // Warm NodeCache
+      return res.json({ data: fbCached.data, cached: true });
+    }
+
+    // Layer 3: Fetch from AniList
+    console.log('Fetching suggested manga from AniList API');
     const response = await fetch(ANILIST_API, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -640,6 +829,8 @@ app.get('/api/suggested', async (req, res) => {
     const shuffled = topGems.sort(() => Math.random() - 0.5);
     const result = shuffled.slice(0, parseInt(limit));
 
+    // Save to both caches
+    await cacheManager.setCacheInFirebase(cacheKey, result, 7200);
     cache.set(cacheKey, result, 1800);
     res.json({ data: result, cached: false });
   } catch (error) {
@@ -755,13 +946,24 @@ app.get('/api/monthly', async (req, res) => {
     console.log(`Fetching monthly seasonal manga with limit: ${limit}`);
 
     const cacheKey = `monthly:${limit}`;
-    const cached = cache.get(cacheKey);
 
+    // Layer 1: Check NodeCache
+    const cached = cache.get(cacheKey);
     if (cached) {
-      console.log('Returning cached monthly manga');
+      console.log('Returning cached monthly manga from memory');
       return res.json({ data: cached, cached: true });
     }
 
+    // Layer 2: Check Firebase cache
+    const fbCached = await cacheManager.getCacheFromFirebase(cacheKey);
+    if (fbCached) {
+      console.log('Returning cached monthly manga from Firebase');
+      cache.set(cacheKey, fbCached.data, 300); // Warm NodeCache
+      return res.json({ data: fbCached.data, cached: true });
+    }
+
+    // Layer 3: Fetch from AniList
+    console.log('Fetching monthly manga from AniList API');
     const response = await fetch(ANILIST_API, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -785,6 +987,9 @@ app.get('/api/monthly', async (req, res) => {
     }
 
     const media = data.data.Page.media;
+
+    // Save to both caches
+    await cacheManager.setCacheInFirebase(cacheKey, media, 7200);
     cache.set(cacheKey, media, 1800);
     res.json({ data: media, cached: false });
   } catch (error) {
