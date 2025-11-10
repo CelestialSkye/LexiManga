@@ -42,7 +42,7 @@ export default function HowItWorks() {
 
       <div className='grid grid-cols-1 gap-8 md:grid-cols-3 md:gap-10'>
         {steps.map((step) => (
-          <div key={step.id} className='flex flex-col'>
+          <div key={step.id} className='flex flex-col' style={{ minHeight: '600px' }}>
             {/* Images for ID 1 only */}
             {step.id === 1 && step.images && (
               <div
