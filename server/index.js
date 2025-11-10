@@ -568,7 +568,6 @@ cacheScheduler.initializeScheduler(
   MONTHLY_MANGA_QUERY_FOR_SCHEDULER,
   SUGGESTED_QUERY_FOR_SCHEDULER
 );
-cacheScheduler.startScheduler();
 
 app.get('/api/word-difficulty', async (req, res) => {
   try {
@@ -1075,4 +1074,9 @@ app.get('/api/health', (req, res) => {
 
 app.listen(PORT, () => {
   console.log(` Backend running on port ${PORT}`);
+
+  // Start cache scheduler after server is listening (non-blocking)
+  setImmediate(() => {
+    cacheScheduler.startScheduler();
+  });
 });
