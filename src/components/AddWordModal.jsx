@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Modal, Radio, Group, ActionIcon, Stack, Select } from '@mantine/core';
+import { Modal, Radio, Group, ActionIcon, Stack, Select, Textarea } from '@mantine/core';
 import { TextInput, NumberInput, Button, Text } from '@mantine/core';
 import { useAddVocabWord } from '../services/vocabService';
 import { useAuth } from '../context/AuthContext';
@@ -51,8 +51,9 @@ const AddWordModal = ({ manga, opened, closeModal, showMangaSelector = false }) 
         user?.uid
       );
       setTranslation(translatedText);
+      setTranslationError('');
     } catch (error) {
-      setTranslationError(error.message);
+      setTranslationError(error.message || 'Translation failed. Please try again.');
     } finally {
       setIsTranslating(false);
     }
@@ -218,7 +219,7 @@ const AddWordModal = ({ manga, opened, closeModal, showMangaSelector = false }) 
               value={translation}
               onChange={(e) => setTranslation(e.target.value)}
               style={{ flex: 1 }}
-              error={translationError || (!translation.trim() ? 'Translation is required' : '')}
+              error={!translationError && !translation.trim() ? 'Translation is required' : ''}
               className='violet-focus'
             />
             <ActionIcon
@@ -250,10 +251,13 @@ const AddWordModal = ({ manga, opened, closeModal, showMangaSelector = false }) 
 
         <div className='pb-2'>
           <Text>Context</Text>
-          <TextInput
+          <Textarea
             value={context}
             onChange={(e) => setContext(e.target.value)}
             className='violet-focus'
+            placeholder='Enter the sentence or panel context where you found this word'
+            minRows={3}
+            maxRows={6}
           />
         </div>
 

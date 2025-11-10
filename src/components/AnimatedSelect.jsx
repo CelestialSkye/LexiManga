@@ -1,5 +1,4 @@
 import { useState, useRef, useEffect } from 'react';
-import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { TextInput, Group, Text } from '@mantine/core';
 import { IconChevronDown, IconX } from '@tabler/icons-react';
@@ -91,7 +90,7 @@ const AnimatedSelect = ({
   return (
     <div ref={containerRef} className='relative w-full'>
       {label && (
-        <label className='mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300'>
+        <label className='mb-2 block text-sm font-medium text-gray-700'>
           {label}
           {required && <span className='text-red-500'>*</span>}
         </label>
@@ -101,7 +100,7 @@ const AnimatedSelect = ({
         <div
           ref={buttonRef}
           onClick={() => !disabled && setIsOpen(!isOpen)}
-          className='flex w-full cursor-pointer items-center justify-between rounded-md border border-gray-300 bg-white px-3 py-1.5 text-left text-sm text-gray-900 transition-colors hover:border-gray-400 focus:border-violet-600 focus:outline-none dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:hover:border-gray-500'
+          className='flex w-full cursor-pointer items-center justify-between rounded-md border border-gray-300 bg-white px-3 py-1.5 text-left text-sm text-gray-900 transition-colors hover:border-gray-400 focus:border-violet-600 focus:outline-none'
           role='button'
           tabIndex={0}
           onKeyDown={(e) => {
@@ -110,11 +109,7 @@ const AnimatedSelect = ({
             }
           }}
         >
-          <span
-            className={
-              selectedLabel ? 'text-gray-900 dark:text-white' : 'text-gray-500 dark:text-gray-400'
-            }
-          >
+          <span className={selectedLabel ? 'text-gray-900' : 'text-gray-500'}>
             {selectedLabel || placeholder}
           </span>
 
@@ -122,7 +117,7 @@ const AnimatedSelect = ({
             {clearable && selectedLabel && (
               <div
                 onClick={handleClear}
-                className='rounded p-1 transition-colors hover:bg-gray-100 dark:hover:bg-gray-700'
+                className='rounded p-1 transition-colors hover:bg-gray-100'
                 role='button'
                 tabIndex={0}
                 onKeyDown={(e) => {
@@ -155,62 +150,67 @@ const AnimatedSelect = ({
         )}
       </div>
 
-      {isOpen &&
-        createPortal(
-          <AnimatePresence mode='wait'>
-            <motion.div
-              variants={dropdownVariants}
-              initial='closed'
-              animate='open'
-              exit='closed'
-              style={{
-                position: 'fixed',
-                top: dropdownPos.top,
-                left: dropdownPos.left,
-                width: dropdownPos.width,
-              }}
-              className='z-[9999] overflow-hidden rounded-lg border border-gray-300 bg-white shadow-lg dark:border-gray-600 dark:bg-gray-800'
-            >
-              {searchable && (
-                <div className='border-b border-gray-200 p-2 dark:border-gray-700'>
-                  <input
-                    type='text'
-                    placeholder='Search...'
-                    value={searchValue}
-                    onChange={(e) => setSearchValue(e.target.value)}
-                    className='w-full rounded border border-gray-300 px-3 py-2 text-sm outline-none focus:border-violet-600 dark:border-gray-600 dark:bg-gray-700 dark:text-white'
-                    autoFocus
-                  />
-                </div>
-              )}
-
-              <div className='max-h-64 overflow-y-auto'>
-                <div className='py-1'>
-                  {filteredData.length > 0 ? (
-                    filteredData.map((item) => (
-                      <button
-                        key={item.value}
-                        onClick={() => handleSelect(item)}
-                        className={`w-full px-4 py-2 text-left text-sm transition-colors ${
-                          value === item.value
-                            ? 'bg-violet-600 text-white'
-                            : 'text-gray-900 hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700'
-                        }`}
-                      >
-                        {item.label}
-                      </button>
-                    ))
-                  ) : (
-                    <div className='px-4 py-8 text-center text-sm text-gray-500 dark:text-gray-400'>
-                      No results found
-                    </div>
-                  )}
-                </div>
+      {isOpen && (
+        <AnimatePresence mode='wait'>
+          <motion.div
+            variants={dropdownVariants}
+            initial='closed'
+            animate='open'
+            exit='closed'
+            style={{
+              position: 'fixed',
+              top: dropdownPos.top,
+              left: dropdownPos.left,
+              width: dropdownPos.width,
+              pointerEvents: 'auto',
+              zIndex: 9999,
+            }}
+            className='overflow-hidden rounded-lg border border-gray-300 bg-white shadow-lg'
+          >
+            {searchable && (
+              <div className='pointer-events-auto border-b border-gray-200 p-2'>
+                <input
+                  type='text'
+                  placeholder='Search...'
+                  value={searchValue}
+                  onChange={(e) => setSearchValue(e.target.value)}
+                  className='pointer-events-auto w-full rounded border border-gray-300 px-3 py-2 text-sm outline-none focus:border-violet-600'
+                  autoFocus
+                />
               </div>
-            </motion.div>
-          </AnimatePresence>,
-          document.body
-        )}
+            )}
+
+            <div className='max-h-64 overflow-y-auto'>
+              <div className='py-1'>
+                {filteredData.length > 0 ? (
+                  filteredData.map((item) => (
+                    <button
+                      key={item.value}
+                      type='button'
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        handleSelect(item);
+                      }}
+                      className={`pointer-events-auto w-full cursor-pointer px-4 py-2 text-left text-sm transition-colors ${
+                        value === item.value
+                          ? 'bg-violet-600 text-white'
+                          : 'text-gray-900 hover:bg-gray-100'
+                      }`}
+                    >
+                      {item.label}
+                    </button>
+                  ))
+                ) : (
+                  <div className='px-4 py-8 text-center text-sm text-gray-500'>
+                    No results found
+                  </div>
+                )}
+              </div>
+            </div>
+          </motion.div>
+        </AnimatePresence>
+      )}
     </div>
   );
 };

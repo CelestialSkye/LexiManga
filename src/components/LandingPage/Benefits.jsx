@@ -50,44 +50,22 @@ export default function Benefits() {
     },
   ];
 
-  if (isMobile) {
-    return (
-      <div className='px-4 py-12'>
-        <h2 className='mb-8 text-center text-3xl font-bold text-gray-800'>
-          Why Learn with LexiManga?
-        </h2>
-        <div className='space-y-4'>
-          {benefits.map((benefit) => (
-            <div
-              key={benefit.id}
-              className='rounded-lg border border-gray-200 bg-white p-6 shadow-sm'
-            >
-              <h3 className='mb-2 text-lg font-bold text-gray-800'>{benefit.title}</h3>
-              <p className='mb-2 text-sm font-semibold text-purple-600'>{benefit.subtitle}</p>
-              <p className='text-gray-600'>{benefit.description}</p>
-            </div>
-          ))}
-        </div>
-      </div>
-    );
-  }
-
   return (
-    <div className='px-8 py-16'>
-      <h2 className='mb-12 text-center text-4xl font-bold text-gray-800'>
+    <div className='mx-auto max-w-[95%] px-4 py-6 sm:px-6 md:max-w-[85%] md:px-8 md:py-16'>
+      <h2 className='mb-8 text-center text-3xl font-bold text-gray-800 md:mb-12 md:text-4xl'>
         Why Learn with LexiManga?
       </h2>
 
-      {/* Consistent 2-column grid */}
-      <div className='mx-auto grid max-w-6xl grid-cols-2 gap-6'>
+      {/* Responsive grid: 1 column on mobile, 2 columns on desktop */}
+      <div className='grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-6'>
         {benefits.map((benefit) => (
           <div
             key={benefit.id}
-            className='rounded-2xl border border-gray-200 bg-white p-8 shadow-lg transition-shadow duration-300 hover:shadow-xl'
+            className='rounded-lg border border-gray-200 bg-white p-6 shadow-sm transition-shadow duration-300 md:rounded-2xl md:p-8 md:shadow-lg md:hover:shadow-xl'
           >
-            <h3 className='mb-2 text-xl font-bold text-gray-800'>{benefit.title}</h3>
-            <p className='mb-4 text-sm font-semibold text-purple-600'>{benefit.subtitle}</p>
-            <p className='leading-relaxed text-gray-600'>{benefit.description}</p>
+            <h3 className='mb-2 text-lg font-bold text-gray-800 md:text-xl'>{benefit.title}</h3>
+            <p className='mb-2 text-sm font-semibold text-purple-600 md:mb-4'>{benefit.subtitle}</p>
+            <p className='text-gray-600 md:leading-relaxed'>{benefit.description}</p>
           </div>
         ))}
       </div>

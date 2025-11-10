@@ -64,44 +64,38 @@ const AccountTab = () => {
     });
   };
 
-  if (isLoading)
-    return <p className='py-8 text-center text-gray-600 dark:text-gray-400'>Loading...</p>;
-  if (!profile)
-    return <p className='py-8 text-center text-gray-600 dark:text-gray-400'>No profile found</p>;
+  if (isLoading) return <p className='py-8 text-center text-gray-600'>Loading...</p>;
+  if (!profile) return <p className='py-8 text-center text-gray-600'>No profile found</p>;
 
   return (
     <div className='space-y-6'>
       {/* Account Information Section */}
-      <div className='rounded-[16px] bg-white p-6 shadow-md transition-shadow hover:shadow-lg dark:bg-gray-800'>
-        <h2 className='mb-6 text-xl font-bold text-gray-900 dark:text-white'>
-          Account Information
-        </h2>
+      <div className='rounded-[16px] bg-white p-6 shadow-md transition-shadow hover:shadow-lg'>
+        <h2 className='mb-6 text-xl font-bold text-gray-900'>Account Information</h2>
 
         <div className='space-y-6'>
           <div>
-            <p className='mb-2 text-sm font-semibold tracking-wide text-gray-600 uppercase dark:text-gray-400'>
+            <p className='mb-2 text-sm font-semibold tracking-wide text-gray-600 uppercase'>
               Nickname
             </p>
-            <p className='text-lg font-medium text-gray-900 dark:text-white'>{profile.nickname}</p>
+            <p className='text-lg font-medium text-gray-900'>{profile.nickname}</p>
           </div>
 
-          <div className='border-t border-gray-200 pt-6 dark:border-gray-700'>
-            <p className='mb-2 text-sm font-semibold tracking-wide text-gray-600 uppercase dark:text-gray-400'>
+          <div className='border-t border-gray-200 pt-6'>
+            <p className='mb-2 text-sm font-semibold tracking-wide text-gray-600 uppercase'>
               Email
             </p>
-            <p className='text-lg font-medium text-gray-900 dark:text-white'>{profile.email}</p>
+            <p className='text-lg font-medium text-gray-900'>{profile.email}</p>
           </div>
         </div>
       </div>
 
       {/* Change Password Section */}
-      <div className='rounded-[16px] bg-white p-6 shadow-md transition-shadow hover:shadow-lg dark:bg-gray-800'>
-        <h2 className='mb-4 text-xl font-bold text-gray-900 dark:text-white'>Security</h2>
+      <div className='rounded-[16px] bg-white p-6 shadow-md transition-shadow hover:shadow-lg'>
+        <h2 className='mb-4 text-xl font-bold text-gray-900'>Security</h2>
 
         <div className='space-y-4'>
-          <p className='text-gray-600 dark:text-gray-400'>
-            Secure your account by changing your password regularly.
-          </p>
+          <p className='text-gray-600'>Secure your account by changing your password regularly.</p>
 
           <button
             onClick={handlePasswordReset}
@@ -112,7 +106,7 @@ const AccountTab = () => {
 
           {message && (
             <div
-              className={`mt-4 rounded-lg p-4 ${message.includes('Error') ? 'bg-red-50 text-red-700 dark:bg-red-900/20 dark:text-red-400' : 'bg-green-50 text-green-700 dark:bg-green-900/20 dark:text-green-400'}`}
+              className={`mt-4 rounded-lg p-4 ${message.includes('Error') ? 'bg-red-50 text-red-700' : 'bg-green-50 text-green-700'}`}
             >
               <p className='text-sm'>{message}</p>
             </div>
@@ -121,11 +115,11 @@ const AccountTab = () => {
       </div>
 
       {/* Delete Account Section */}
-      <div className='rounded-[16px] border-l-4 border-red-500 bg-white p-6 shadow-md transition-shadow hover:shadow-lg dark:bg-gray-800'>
-        <h2 className='mb-4 text-xl font-bold text-gray-900 dark:text-white'>Danger Zone</h2>
+      <div className='rounded-[16px] border-l-4 border-red-500 bg-white p-6 shadow-md transition-shadow hover:shadow-lg'>
+        <h2 className='mb-4 text-xl font-bold text-gray-900'>Danger Zone</h2>
 
         <div className='space-y-4'>
-          <p className='text-gray-600 dark:text-gray-400'>
+          <p className='text-gray-600'>
             Once you delete your account, there is no going back. Please be certain.
           </p>
 

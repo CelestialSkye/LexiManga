@@ -16,32 +16,56 @@ export const translateWithGemini = async (text, sourceLanguage, targetLanguage, 
     });
 
     if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+
+      // Handle rate limit from our server (user's translation quota - 20 per hour)
       if (response.status === 429) {
-        const errorData = await response.json();
         const minutesLeft = Math.ceil((errorData.resetTime - Date.now()) / 60000);
 
         if (minutesLeft > 60) {
           throw new Error(
-            `You've reached your translation limit for this hour. Please try again in ${Math.ceil(minutesLeft / 60)} hours.`
+            `⏳ Rate Limited: You've reached your translation limit (20 per hour). Please try again in ${Math.ceil(minutesLeft / 60)} hour(s).`
           );
         } else if (minutesLeft > 1) {
           throw new Error(
-            `You've reached your translation limit for this hour. Please try again in ${minutesLeft} minutes.`
+            `⏳ Rate Limited: You've reached your translation limit (20 per hour). Please try again in ${minutesLeft} minute(s).`
           );
         } else {
           throw new Error(
-            `You've reached your translation limit for this hour. Please try again in a few minutes.`
+            `⏳ Rate Limited: You've reached your translation limit (20 per hour). Please try again in a moment.`
           );
         }
       }
-      throw new Error(`Translation failed: ${response.status}`);
+
+      // Handle service quota exceeded (503)
+      if (response.status === 503 && errorData.type === 'QUOTA_EXCEEDED') {
+        throw new Error('Translation limit reached. Please try again later.');
+      }
+
+      // Handle configuration errors (500 with CONFIG_ERROR)
+      if (response.status === 500 && errorData.type === 'CONFIG_ERROR') {
+        throw new Error(
+          '⚙️ Configuration Error: Translation service is not properly configured. Please contact support.'
+        );
+      }
+
+      // Handle model errors (500 with MODEL_ERROR)
+      if (response.status === 500 && errorData.type === 'MODEL_ERROR') {
+        throw new Error(
+          '🚫 Service Unavailable: Translation service is temporarily unavailable. Please try again later.'
+        );
+      }
+
+      // Generic error handling
+      const errorMessage = errorData.details || errorData.error || 'Unknown error';
+      throw new Error(`❌ Translation failed: ${errorMessage.substring(0, 120)}`);
     }
 
     const data = await response.json();
     return data.translation;
   } catch (error) {
-    console.error('Translation error:', error);
-    return `[Translation: ${text} (${sourceLanguage} → ${targetLanguage})]`;
+    // Don't log here, let the component handle it
+    throw error; // Re-throw to let the component handle it
   }
 };
 

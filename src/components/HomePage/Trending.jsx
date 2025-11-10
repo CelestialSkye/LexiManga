@@ -73,7 +73,8 @@ const Trending = () => {
   }
 
   return (
-    <section className='w-full rounded-2xl py-2'>
+    <section className='w-full rounded-2xl py-2 pt-4'>
+      <h2 className='mb-4 text-xl font-bold'>Trending Manga</h2>
       <Carousel
         slideSize={isMobile ? '20%' : '18%'}
         height='auto'

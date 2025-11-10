@@ -127,7 +127,7 @@ const TopBar = () => {
                 >
                   <img src={logo} alt='Vocabulary Manga' className='h-10 w-10' />
                   <span
-                    className={`pl-2 text-lg font-bold ${isDarkTopbar ? 'text-white' : 'text-black'}`}
+                    className={`pl-2 text-lg font-medium ${isDarkTopbar ? 'text-white' : 'text-black'}`}
                     onClick={(e) => {
                       e.stopPropagation();
                       navigate('/home');
@@ -136,7 +136,7 @@ const TopBar = () => {
                     Home
                   </span>
                   <span
-                    className={`pl-2 text-lg font-bold ${isDarkTopbar ? 'text-white' : 'text-black'}`}
+                    className={`pl-2 text-lg font-medium ${isDarkTopbar ? 'text-white' : 'text-black'}`}
                     onClick={(e) => {
                       e.stopPropagation();
                       navigate('/browse');
@@ -145,7 +145,7 @@ const TopBar = () => {
                     Browse
                   </span>
                   <span
-                    className={`pl-2 text-lg font-bold ${isDarkTopbar ? 'text-white' : 'text-black'}`}
+                    className={`pl-2 text-lg font-medium ${isDarkTopbar ? 'text-white' : 'text-black'}`}
                     onClick={(e) => {
                       e.stopPropagation();
                       navigate('/profile');
