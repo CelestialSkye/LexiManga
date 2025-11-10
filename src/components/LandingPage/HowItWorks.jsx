@@ -49,7 +49,7 @@ export default function HowItWorks() {
                 className='relative mb-6 flex w-full justify-center'
                 style={{
                   gap: isMobile ? '2%' : '-8%',
-                  aspectRatio: isMobile ? '16/9' : '10/6', // 👈 keeps equal height
+                  minHeight: isMobile ? '200px' : '280px',
                 }}
               >
                 <img
@@ -88,7 +88,7 @@ export default function HowItWorks() {
                 className='relative mb-6 flex w-full justify-center'
                 style={{
                   gap: isMobile ? '2%' : '-8%',
-                  aspectRatio: isMobile ? '16/9' : '10/6', // 👈 keeps equal height
+                  minHeight: isMobile ? '200px' : '280px',
                 }}
               >
                 <img
@@ -127,7 +127,7 @@ export default function HowItWorks() {
                 className='relative mb-6 flex w-full justify-center'
                 style={{
                   gap: isMobile ? '2%' : '-8%',
-                  aspectRatio: isMobile ? '16/9' : '10/6', // 👈 keeps equal height
+                  minHeight: isMobile ? '200px' : '280px',
                 }}
               >
                 <img
