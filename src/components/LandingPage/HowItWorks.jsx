@@ -4,6 +4,8 @@ import screenshot2 from '../../assets/landing/screenshot2.png';
 import screenshot3 from '../../assets/landing/screenshot3.png';
 import screenshot4 from '../../assets/landing/screenshot4.png';
 import screenshot5 from '../../assets/landing/screenshot5.png';
+import screenshot6 from '../../assets/landing/screenshot6.png';
+import screenshot7 from '../../assets/landing/screenshot7.png';
 
 export default function HowItWorks() {
   const isMobile = useMediaQuery('(max-width: 768px)');
@@ -28,6 +30,7 @@ export default function HowItWorks() {
       title: 'Review & Retain',
       description:
         'Your vocabulary automatically becomes a smart review deck. Use our Spaced Repetition System to schedule optimal reviews and lock in the knowledge for long-term mastery.',
+      images: [screenshot6, screenshot7],
     },
   ];
 
@@ -105,6 +108,45 @@ export default function HowItWorks() {
                 <img
                   src={step.images[1]}
                   alt='Screenshot 5'
+                  className={`${
+                    isMobile ? 'w-[48%]' : 'w-[45%]'
+                  } h-full rounded-[16px] border border-gray-200 object-contain shadow-lg transition-transform duration-300`}
+                  style={{
+                    transform: isMobile ? 'translateX(3%)' : 'translateX(6%) rotate(2deg)',
+                    zIndex: 5,
+                    maskImage: 'linear-gradient(to top, rgba(0,0,0,0) 0%, rgba(0,0,0,1) 30%)',
+                    WebkitMaskImage: 'linear-gradient(to top, rgba(0,0,0,0) 0%, rgba(0,0,0,1) 30%)',
+                  }}
+                />
+              </div>
+            )}
+
+            {/* Images for ID 3 only */}
+            {step.id === 3 && step.images && (
+              <div
+                className='relative mb-6 flex w-full justify-center'
+                style={{
+                  gap: isMobile ? '2%' : '-8%',
+                  aspectRatio: isMobile ? '16/9' : '10/6', // 👈 keeps equal height
+                }}
+              >
+                <img
+                  src={step.images[0]}
+                  alt='Screenshot 6'
+                  className={`${
+                    isMobile ? 'w-[48%]' : 'w-[45%]'
+                  } h-full rounded-[16px] border border-gray-200 object-contain shadow-lg transition-transform duration-300`}
+                  style={{
+                    transform: isMobile ? 'translateX(-3%)' : 'translateX(-6%) rotate(-2deg)',
+                    zIndex: 10,
+                    maskImage: 'linear-gradient(to top, rgba(0,0,0,0) 0%, rgba(0,0,0,1) 30%)',
+                    WebkitMaskImage: 'linear-gradient(to top, rgba(0,0,0,0) 0%, rgba(0,0,0,1) 30%)',
+                  }}
+                />
+
+                <img
+                  src={step.images[1]}
+                  alt='Screenshot 7'
                   className={`${
                     isMobile ? 'w-[48%]' : 'w-[45%]'
                   } h-full rounded-[16px] border border-gray-200 object-contain shadow-lg transition-transform duration-300`}
