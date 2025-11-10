@@ -1,11 +1,13 @@
+const path = require('path');
+const fs = require('fs');
+require('dotenv').config({ path: path.resolve(__dirname, '../.env') });
+
 const express = require('express');
 const cors = require('cors');
 const NodeCache = require('node-cache');
-const fs = require('fs');
-const path = require('path');
 
 const app = express();
-const PORT = process.env.PORT || 3003;
+const PORT = process.env.PORT || 3001;
 
 app.use(cors());
 app.use(express.json());
@@ -278,7 +280,13 @@ app.post('/api/translate', async (req, res) => {
     }
 
     const { GoogleGenerativeAI } = require('@google/generative-ai');
-    const genAI = new GoogleGenerativeAI('AIzaSyBpYJMy-wV0FP5pO_ndrVApITWIqTAZ9yc');
+    const geminiApiKey = process.env.GEMINI_API_KEY;
+
+    if (!geminiApiKey) {
+      return res.status(500).json({ error: 'Gemini API key not configured' });
+    }
+
+    const genAI = new GoogleGenerativeAI(geminiApiKey);
     const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash-exp' });
 
     const prompt = `Translate the following ${sourceLang} text to ${targetLang}. Only return the translation, nothing else: "${text}"`;
@@ -300,8 +308,43 @@ app.post('/api/translate', async (req, res) => {
       resetTime: rateLimit.resetTime,
     });
   } catch (error) {
-    console.error('Translation error:', error);
-    res.status(500).json({ error: 'Translation failed' });
+    console.error('Translation error:', error.message || error);
+
+    const errorMessage = error.message || 'Unknown error';
+
+    // Detect quota exceeded errors
+    if (errorMessage.includes('429') || errorMessage.includes('Quota exceeded')) {
+      return res.status(503).json({
+        error: 'Service quota exceeded',
+        details: 'The translation service quota has been exceeded. Please try again later.',
+        type: 'QUOTA_EXCEEDED',
+      });
+    }
+
+    // Detect API configuration errors
+    if (errorMessage.includes('not configured') || errorMessage.includes('API key')) {
+      return res.status(500).json({
+        error: 'Service configuration error',
+        details: 'Translation service is not properly configured.',
+        type: 'CONFIG_ERROR',
+      });
+    }
+
+    // Detect model not found errors
+    if (errorMessage.includes('404') || errorMessage.includes('not found')) {
+      return res.status(500).json({
+        error: 'Service unavailable',
+        details: 'Translation model is not available. Please try again later.',
+        type: 'MODEL_ERROR',
+      });
+    }
+
+    // Generic error
+    res.status(500).json({
+      error: 'Translation failed',
+      details: errorMessage.substring(0, 200),
+      type: 'UNKNOWN_ERROR',
+    });
   }
 });
 

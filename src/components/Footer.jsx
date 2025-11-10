@@ -10,8 +10,6 @@ const Footer = () => {
   const links = [
     { label: 'Feedback', href: '#', action: () => setFeedbackModalOpen(true) },
     { label: 'GitHub', href: 'https://github.com', icon: IconBrandGithub },
-    { label: 'Contact', href: 'mailto:contact@lexicon.app', icon: IconMail },
-    { label: 'Twitter', href: 'https://twitter.com', icon: IconBrandTwitter },
   ];
 
   return (

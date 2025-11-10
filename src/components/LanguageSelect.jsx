@@ -1,7 +1,6 @@
 import AnimatedSelect from './AnimatedSelect';
 
 const LANGUAGES = [
-  { value: 'mandarin', label: 'Mandarin Chinese' },
   { value: 'spanish', label: 'Spanish' },
   { value: 'english', label: 'English' },
   { value: 'hindi', label: 'Hindi' },

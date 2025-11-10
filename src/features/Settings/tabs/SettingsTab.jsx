@@ -55,11 +55,11 @@ const SettingsTab = () => {
   return (
     <div className='space-y-6'>
       {/* Archive Words Card */}
-      <div className='rounded-[16px] bg-white p-6 shadow-md transition-shadow hover:shadow-lg dark:bg-gray-800'>
-        <h2 className='mb-4 text-xl font-bold text-gray-900 dark:text-white'>Archive Your Words</h2>
+      <div className='rounded-[16px] bg-white p-6 shadow-md transition-shadow hover:shadow-lg'>
+        <h2 className='mb-4 text-xl font-bold text-gray-900'>Archive Your Words</h2>
 
         <div className='space-y-4'>
-          <p className='text-gray-600 dark:text-gray-400'>
+          <p className='text-gray-600'>
             Export all your vocabulary words to a text file for backup or personal use.
           </p>
 
@@ -79,8 +79,8 @@ const SettingsTab = () => {
             <div
               className={`mt-4 rounded-lg p-4 ${
                 archiveMessage.includes('Error')
-                  ? 'bg-red-50 text-red-700 dark:bg-red-900/20 dark:text-red-400'
-                  : 'bg-green-50 text-green-700 dark:bg-green-900/20 dark:text-green-400'
+                  ? 'bg-red-50 text-red-700'
+                  : 'bg-green-50 text-green-700'
               }`}
             >
               <p className='text-sm'>{archiveMessage}</p>
@@ -90,12 +90,10 @@ const SettingsTab = () => {
       </div>
 
       {/* Additional Settings Cards */}
-      <div className='rounded-lg bg-white p-6 shadow-md transition-shadow hover:shadow-lg dark:bg-gray-800'>
-        <h2 className='mb-4 text-xl font-bold text-gray-900 dark:text-white'>
-          More Settings Coming Soon
-        </h2>
+      <div className='rounded-lg bg-white p-6 shadow-md transition-shadow hover:shadow-lg'>
+        <h2 className='mb-4 text-xl font-bold text-gray-900'>More Settings Coming Soon</h2>
 
-        <p className='text-gray-600 dark:text-gray-400'>
+        <p className='text-gray-600'>
           Additional settings and options will be available here in the future (maybe).
         </p>
       </div>

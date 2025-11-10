@@ -85,6 +85,70 @@ function SideScrollinfo({ manga }) {
             </Text>
           </div>
 
+          {/* Format */}
+          {manga.format && (
+            <div className='w-auto flex-shrink-0 p-3'>
+              <Text size='xs' fw={300} c='dark' className='mb-1'>
+                Format
+              </Text>
+              <Text size='sm' fw={500} c='dark' className='font-bold whitespace-nowrap'>
+                {manga.format.toLowerCase().replace('_', ' ').charAt(0).toUpperCase() +
+                  manga.format.toLowerCase().replace('_', ' ').slice(1)}
+              </Text>
+            </div>
+          )}
+
+          {/* Chapters */}
+          {manga.chapters && (
+            <div className='w-auto flex-shrink-0 p-3'>
+              <Text size='xs' fw={300} c='dark' className='mb-1'>
+                Chapters
+              </Text>
+              <Text size='sm' fw={500} c='dark' className='font-bold'>
+                {manga.chapters}
+              </Text>
+            </div>
+          )}
+
+          {/* Volumes */}
+          {manga.volumes && (
+            <div className='w-auto flex-shrink-0 p-3'>
+              <Text size='xs' fw={300} c='dark' className='mb-1'>
+                Volumes
+              </Text>
+              <Text size='sm' fw={500} c='dark' className='font-bold'>
+                {manga.volumes}
+              </Text>
+            </div>
+          )}
+
+          {/* Source */}
+          {manga.source && (
+            <div className='w-auto flex-shrink-0 p-3'>
+              <Text size='xs' fw={300} c='dark' className='mb-1'>
+                Source
+              </Text>
+              <Text size='sm' fw={500} c='dark' className='font-bold whitespace-nowrap'>
+                {manga.source.toLowerCase().replace('_', ' ').charAt(0).toUpperCase() +
+                  manga.source.toLowerCase().replace('_', ' ').slice(1)}
+              </Text>
+            </div>
+          )}
+
+          {/* End Date */}
+          {manga.endDate?.year && (
+            <div className='w-auto flex-shrink-0 p-3'>
+              <Text size='xs' fw={300} c='dark' className='mb-1'>
+                Ended
+              </Text>
+              <Text size='sm' fw={500} c='dark' className='font-bold'>
+                {formatDate(
+                  `${manga.endDate.year}-${manga.endDate.month || '01'}-${manga.endDate.day || '01'}`
+                )}
+              </Text>
+            </div>
+          )}
+
           {/* Genres  */}
           {manga.genres && manga.genres.length > 0 && (
             <div className='w-auto flex-shrink-0 p-3'>

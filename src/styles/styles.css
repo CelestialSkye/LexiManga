@@ -1,4 +1,8 @@
 @layer base {
+  body,
+  html {
+    font-family: 'Inter Variable', sans-serif;
+  }
   h1 {
     @apply text-2xl;
   }

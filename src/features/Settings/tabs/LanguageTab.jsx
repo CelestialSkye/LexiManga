@@ -38,24 +38,22 @@ const LanguageTab = () => {
   return (
     <div className='space-y-6'>
       {/* Language Selection Card */}
-      <div className='rounded-[16px] bg-white p-6 shadow-md transition-shadow hover:shadow-lg dark:bg-gray-800'>
-        <h2 className='mb-6 text-xl font-bold text-gray-900 dark:text-white'>
-          Change Target Language
-        </h2>
+      <div className='rounded-[16px] bg-white p-6 shadow-md transition-shadow hover:shadow-lg'>
+        <h2 className='mb-6 text-xl font-bold text-gray-900'>Change Target Language</h2>
 
         <div className='space-y-5'>
           <div>
             <label
               htmlFor='languageSelect'
-              className='mb-3 block text-sm font-semibold text-gray-700 dark:text-gray-300'
+              className='mb-3 block text-sm font-semibold text-gray-700'
             >
               Select Your Target Language
             </label>
             <LanguageSelect value={language} onChange={handleLanguageChange} required />
           </div>
 
-          <div className='rounded-lg border border-violet-200 bg-violet-50 p-4 dark:border-violet-800 dark:bg-violet-900/20'>
-            <p className='text-sm text-blue-900 dark:text-blue-300'>
+          <div className='rounded-lg border border-violet-200 bg-violet-50 p-4'>
+            <p className='text-sm text-blue-900'>
               <span className='font-semibold'>Note:</span> Changing your target language will reset
               all your current vocabulary words. This action cannot be undone.
             </p>
@@ -78,8 +76,8 @@ const LanguageTab = () => {
             <div
               className={`rounded-lg p-4 ${
                 message.includes('Error')
-                  ? 'border border-red-200 bg-red-50 text-red-700 dark:border-red-800 dark:bg-red-900/20 dark:text-red-400'
-                  : 'border border-green-200 bg-green-50 text-green-700 dark:border-green-800 dark:bg-green-900/20 dark:text-green-400'
+                  ? 'border border-red-200 bg-red-50 text-red-700'
+                  : 'border border-green-200 bg-green-50 text-green-700'
               }`}
             >
               <p className='text-sm'>{message}</p>
@@ -89,11 +87,9 @@ const LanguageTab = () => {
       </div>
 
       {/* Info Card */}
-      <div className='rounded-[16px] bg-white p-6 shadow-md transition-shadow hover:shadow-lg dark:bg-gray-800'>
-        <h3 className='mb-3 text-lg font-semibold text-gray-900 dark:text-white'>
-          Supported Languages
-        </h3>
-        <p className='text-sm text-gray-600 dark:text-gray-400'>
+      <div className='rounded-[16px] bg-white p-6 shadow-md transition-shadow hover:shadow-lg'>
+        <h3 className='mb-3 text-lg font-semibold text-gray-900'>Supported Languages</h3>
+        <p className='text-sm text-gray-600'>
           We support a wide variety of languages including Japanese, Korean, Spanish, French,
           German, Italian, Portuguese, Russian, Turkish, Hindi, Bengali, Arabic, and many more.
         </p>
