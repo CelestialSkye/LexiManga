@@ -176,11 +176,15 @@ function startScheduler() {
     4 * 60 * 60 * 1000
   );
 
-  // Initial refresh on startup (async, don't block)
-  console.log('📦 Running initial cache refresh...');
-  refreshTrendingManga(10);
-  refreshMonthlyManga(15);
-  refreshSuggestedManga(4);
+  // Initial refresh on startup (non-blocking, async)
+  console.log('📦 Running initial cache refresh in background...');
+
+  // Don't await - let it run asynchronously
+  Promise.all([refreshTrendingManga(10), refreshMonthlyManga(15), refreshSuggestedManga(4)]).catch(
+    (err) => {
+      console.error('❌ Initial cache refresh error:', err.message);
+    }
+  );
 
   console.log('✅ Cache scheduler started successfully');
 }
