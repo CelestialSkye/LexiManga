@@ -311,6 +311,7 @@ const SRSGame = ({ manga, words: initialWords }) => {
                     size='sm'
                     classNames={{
                       dropdown: 'dropdown-smooth-animation',
+                      input: 'violet-focus',
                     }}
                   />
                 </div>
@@ -373,6 +374,7 @@ const SRSGame = ({ manga, words: initialWords }) => {
                   size='sm'
                   classNames={{
                     dropdown: 'dropdown-smooth-animation',
+                    input: 'violet-focus',
                   }}
                 />
               </div>
@@ -394,7 +396,7 @@ const SRSGame = ({ manga, words: initialWords }) => {
 
           <div className='text-center'>
             <Text size='md' fw={700}>
-              SRS Review
+              Review
             </Text>
             <Progress value={(currentCardIndex / totalCards) * 100} size='sm' mt='sm' />
             <Text size='xs' c='dimmed' mt='xs'>
@@ -424,9 +426,14 @@ const SRSGame = ({ manga, words: initialWords }) => {
                     {currentCard.wordData.translation}
                   </Text>
                   {currentCard.wordData.context && (
-                    <Badge size='sm' variant='light' mt='sm'>
+                    <Text
+                      size='sm'
+                      c='dimmed'
+                      mt='md'
+                      style={{ wordBreak: 'break-word', whiteSpace: 'pre-wrap' }}
+                    >
                       {currentCard.wordData.context}
-                    </Badge>
+                    </Text>
                   )}
                 </div>
               )}
