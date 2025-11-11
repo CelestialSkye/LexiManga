@@ -1,4 +1,4 @@
-import { Group, Text, Avatar, Skeleton } from '@mantine/core';
+import { Group, Text, Avatar } from '@mantine/core';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import ActionButton from './ActionButton';
@@ -235,22 +235,22 @@ const TopBar = () => {
                                     >
                                       Words Added Today
                                     </p>
-                                    <div style={{ height: '32px', marginTop: '8px' }}>
-                                      {loading ? (
-                                        <Skeleton height={32} width='100%' />
-                                      ) : (
-                                        <p
-                                          style={{
-                                            fontSize: '20px',
-                                            fontWeight: 'bold',
-                                            color: isDarkTopbar ? '#a78bfa' : '#7c3aed',
-                                            margin: 0,
-                                          }}
-                                        >
-                                          {dailyActivities?.addedWordsCount || 0}
-                                        </p>
-                                      )}
-                                    </div>
+                                    <p
+                                      style={{
+                                        fontSize: '20px',
+                                        fontWeight: 'bold',
+                                        color: isDarkTopbar ? '#a78bfa' : '#7c3aed',
+                                        margin: 0,
+                                        marginTop: '8px',
+                                        opacity: loading ? 0.5 : 1,
+                                        transition: 'opacity 0.2s ease',
+                                        height: '32px',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                      }}
+                                    >
+                                      {dailyActivities?.addedWordsCount || 0}
+                                    </p>
                                   </div>
 
                                   {/* Manga Added Today */}
@@ -274,22 +274,22 @@ const TopBar = () => {
                                     >
                                       Manga Added Today
                                     </p>
-                                    <div style={{ height: '32px', marginTop: '8px' }}>
-                                      {loading ? (
-                                        <Skeleton height={32} width='100%' />
-                                      ) : (
-                                        <p
-                                          style={{
-                                            fontSize: '20px',
-                                            fontWeight: 'bold',
-                                            color: isDarkTopbar ? '#a78bfa' : '#7c3aed',
-                                            margin: 0,
-                                          }}
-                                        >
-                                          {dailyActivities?.mangaAddedCount || 0}
-                                        </p>
-                                      )}
-                                    </div>
+                                    <p
+                                      style={{
+                                        fontSize: '20px',
+                                        fontWeight: 'bold',
+                                        color: isDarkTopbar ? '#a78bfa' : '#7c3aed',
+                                        margin: 0,
+                                        marginTop: '8px',
+                                        opacity: loading ? 0.5 : 1,
+                                        transition: 'opacity 0.2s ease',
+                                        height: '32px',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                      }}
+                                    >
+                                      {dailyActivities?.mangaAddedCount || 0}
+                                    </p>
                                   </div>
 
                                   {/* Learning Streak */}
@@ -313,22 +313,22 @@ const TopBar = () => {
                                     >
                                       Learning Streak
                                     </p>
-                                    <div style={{ height: '32px', marginTop: '8px' }}>
-                                      {loading ? (
-                                        <Skeleton height={32} width='100%' />
-                                      ) : (
-                                        <p
-                                          style={{
-                                            fontSize: '20px',
-                                            fontWeight: 'bold',
-                                            color: isDarkTopbar ? '#a78bfa' : '#7c3aed',
-                                            margin: 0,
-                                          }}
-                                        >
-                                          {dailyActivities?.streak || 0}
-                                        </p>
-                                      )}
-                                    </div>
+                                    <p
+                                      style={{
+                                        fontSize: '20px',
+                                        fontWeight: 'bold',
+                                        color: isDarkTopbar ? '#a78bfa' : '#7c3aed',
+                                        margin: 0,
+                                        marginTop: '8px',
+                                        opacity: loading ? 0.5 : 1,
+                                        transition: 'opacity 0.2s ease',
+                                        height: '32px',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                      }}
+                                    >
+                                      {dailyActivities?.streak || 0}
+                                    </p>
                                   </div>
                                 </div>
                               </div>
