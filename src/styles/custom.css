@@ -193,14 +193,60 @@ body {
 /* Violet focus for inputs */
 .violet-focus input:focus {
   border-color: #8b5cf6 !important;
-  box-shadow: 0 0 0 1px #8b5cf6 !important;
+  box-shadow: inset 0 0 0 0.5px #8b5cf6 !important;
   outline: none !important;
 }
 
 .violet-focus input:focus-visible {
   border-color: #8b5cf6 !important;
-  box-shadow: 0 0 0 1px #8b5cf6 !important;
+  box-shadow: inset 0 0 0 0.5px #8b5cf6 !important;
   outline: none !important;
+}
+
+.violet-focus input:focus-visible {
+  border-color: #8b5cf6 !important;
+  box-shadow:
+    0 0 0 3px rgba(139, 92, 246, 0.2),
+    0 0 0 1px #8b5cf6 !important;
+  outline: none !important;
+}
+
+/* Override Mantine CSS variables for focus colors */
+:root {
+  --input-focus-color: #8b5cf6 !important;
+  --input-focus-border-color: #8b5cf6 !important;
+  --input-bd-focus: #8b5cf6 !important;
+  --mantine-color-blue-5: #8b5cf6 !important;
+  --mantine-color-blue-filled: #8b5cf6 !important;
+  --mantine-primary-color-filled: #8b5cf6 !important;
+  --mantine-primary-color: #8b5cf6 !important;
+}
+
+/* Force violet focus on ALL Mantine input fields */
+input:focus,
+input:focus-visible,
+[class*='mantine'][class*='Input'] input:focus,
+[class*='mantine'][class*='Input'] input:focus-visible,
+.mantine-PasswordInput-input:focus,
+.mantine-PasswordInput-input:focus-visible,
+.mantine-TextInput-input:focus,
+.mantine-TextInput-input:focus-visible {
+  border-color: #8b5cf6 !important;
+  box-shadow: 0 0 0 2px #8b5cf6 !important;
+  outline: none !important;
+}
+
+/* Target input elements directly with high specificity */
+input[type='text']:focus,
+input[type='email']:focus,
+input[type='password']:focus,
+input[type='number']:focus,
+textarea:focus,
+select:focus {
+  border-color: #8b5cf6 !important;
+  box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.3) !important;
+  outline: 2px solid #8b5cf6 !important;
+  outline-offset: 0 !important;
 }
 
 /* Violet focus for radio buttons */
@@ -294,4 +340,16 @@ body {
 /* Cursor pointer */
 button {
   cursor: pointer;
+}
+
+/* Hide reCAPTCHA badge by default on all pages */
+.grecaptcha-badge {
+  visibility: hidden !important;
+  display: none !important;
+}
+
+/* Show reCAPTCHA badge on Auth page - fix positioning */
+.grecaptcha-badge[style*='visibility: visible'] {
+  right: 10px !important;
+  bottom: 10px !important;
 }

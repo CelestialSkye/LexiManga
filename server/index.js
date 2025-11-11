@@ -5,6 +5,7 @@ require('dotenv').config({ path: path.resolve(__dirname, '../.env') });
 const express = require('express');
 const cors = require('cors');
 const NodeCache = require('node-cache');
+const axios = require('axios');
 const cacheManager = require('./cache-manager');
 const cacheScheduler = require('./cache-scheduler');
 
@@ -16,7 +17,42 @@ app.use(express.json());
 
 const cache = new NodeCache({ stdTTL: 3600 });
 const translationCache = new NodeCache({ stdTTL: 86400 });
+const ipRateLimits = new NodeCache({ stdTTL: 3600 }); // 1 hour for IP-based rate limiting
 const rateLimits = new Map();
+
+// Function to verify reCAPTCHA token
+const verifyRecaptcha = async (token) => {
+  try {
+    const response = await axios.post('https://www.google.com/recaptcha/api/siteverify', null, {
+      params: {
+        secret: process.env.VITE_RECAPTCHA_SECRET_KEY,
+        response: token,
+      },
+    });
+
+    const { success, score, error_codes } = response.data;
+
+    // reCAPTCHA v3 returns a score between 0 and 1
+    // 1.0 is very likely a legitimate interaction, 0.0 is very likely a bot
+    return success && score > 0.3; // Accept if score is above 0.3 (more lenient for testing)
+  } catch (error) {
+    console.error('reCAPTCHA verification error:', error.message);
+    return false;
+  }
+};
+
+// Function to check IP-based rate limit for registrations
+const checkIPRateLimit = (ip, limit = 5) => {
+  const key = `reg:${ip}`;
+  const current = ipRateLimits.get(key) || 0;
+
+  if (current >= limit) {
+    return false;
+  }
+
+  ipRateLimits.set(key, current + 1);
+  return true;
+};
 
 const checkRateLimit = (userId, limit = 20) => {
   const now = Date.now();
@@ -1065,6 +1101,49 @@ app.get('/api/browse', async (req, res) => {
   } catch (error) {
     console.error('Browse manga error:', error);
     res.status(500).json({ error: 'Failed to fetch browse manga' });
+  }
+});
+
+// Authentication endpoint for registration with reCAPTCHA and IP rate limiting
+app.post('/api/auth/register', async (req, res) => {
+  try {
+    const { email, recaptchaToken } = req.body;
+
+    // Get client IP
+    const clientIp = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
+
+    // Check IP-based rate limit (max 5 registrations per hour per IP)
+    if (!checkIPRateLimit(clientIp)) {
+      return res.status(429).json({
+        message: 'Too many registration attempts from this IP. Please try again later.',
+      });
+    }
+
+    // Verify reCAPTCHA token
+    if (!recaptchaToken) {
+      return res.status(400).json({
+        message: 'reCAPTCHA token is required',
+      });
+    }
+
+    const isValidCaptcha = await verifyRecaptcha(recaptchaToken);
+    if (!isValidCaptcha) {
+      return res.status(400).json({
+        message: 'reCAPTCHA verification failed. Please try again.',
+      });
+    }
+
+    // If all checks pass, return success
+    // The actual Firebase registration happens on the client side
+    res.json({
+      success: true,
+      message: 'reCAPTCHA verification passed. You can proceed with registration.',
+    });
+  } catch (error) {
+    console.error('Registration error:', error);
+    res.status(500).json({
+      message: 'Registration verification failed. Please try again.',
+    });
   }
 });
 

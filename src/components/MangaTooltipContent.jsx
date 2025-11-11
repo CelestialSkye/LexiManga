@@ -1,10 +1,10 @@
-import { FaStar } from 'react-icons/fa6';
+import { FaStar, FaBook } from 'react-icons/fa6';
 
 /**
  * Reusable tooltip content component for manga info
- * Displays score, description, genres, format, status, chapters, volumes, source, and popularity
+ * Displays score, description, genres, format, status, chapters, volumes, source, popularity, and word count
  */
-export function MangaTooltipContent({ manga }) {
+export function MangaTooltipContent({ manga, wordCount = 0, isLoadingWords = false }) {
   return (
     <div className='flex flex-col gap-2'>
       {/* Score */}
@@ -14,6 +14,22 @@ export function MangaTooltipContent({ manga }) {
           <span className='text-xs font-bold text-white'>
             {(manga.averageScore / 10).toFixed(1)}
           </span>
+        </div>
+      )}
+
+      {/* Word Count */}
+      {!isLoadingWords && (
+        <div className='flex items-center gap-1'>
+          <FaBook className='text-blue-400' />
+          <span className='text-xs font-bold text-white'>
+            {wordCount} word{wordCount !== 1 ? 's' : ''} saved
+          </span>
+        </div>
+      )}
+      {isLoadingWords && (
+        <div className='flex items-center gap-1'>
+          <FaBook className='text-blue-400' />
+          <span className='text-xs font-bold text-gray-300'>Loading...</span>
         </div>
       )}
 

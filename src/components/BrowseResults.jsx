@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { FaStar } from 'react-icons/fa';
 import { Text, Button, Group, Stack, Center, Badge, Loader, NumberInput } from '@mantine/core';
 import { CustomTooltip } from './CustomTooltip';
-import { MangaTooltipContent } from './MangaTooltipContent';
+import { MangaTooltipWithWordCount } from './MangaWithWordCount';
 
 const BrowseResults = ({ data, isLoading, isError, page, onPageChange }) => {
   const [inputPage, setInputPage] = useState(page);
@@ -41,7 +41,7 @@ const BrowseResults = ({ data, isLoading, isError, page, onPageChange }) => {
         {data.media.map((manga) => (
           <CustomTooltip
             key={manga.id}
-            label={<MangaTooltipContent manga={manga} />}
+            label={<MangaTooltipWithWordCount manga={manga} />}
             position='left'
             multiline
             w={280}

@@ -1,53 +1,43 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useMediaQuery } from '@mantine/hooks';
 import { motion, AnimatePresence } from 'framer-motion';
+import { IconMenu2 } from '@tabler/icons-react';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../../context/AuthContext';
 import { HERO_BANNER_CONFIG } from '../../constants/heroBannerConfig';
+import { dropdownCloseVariants } from '../../utils/animationUtils';
 import logo from '../../assets/logo.svg';
 
 export default function NavBar() {
   const isMobile = useMediaQuery(`(max-width: ${HERO_BANNER_CONFIG.breakpoints.mobile}px)`);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const containerRef = useRef(null);
+  const navigate = useNavigate();
+  const { user } = useAuth();
 
   // Responsive widths
   const containerWidth = isMobile ? '95%' : '85%';
 
-  const menuVariants = {
-    hidden: {
-      opacity: 0,
-      y: -10,
-    },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: {
-        duration: 0.2,
-      },
-    },
-    exit: {
-      opacity: 0,
-      y: -10,
-      transition: {
-        duration: 0.15,
-      },
-    },
-  };
+  // Close menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (containerRef.current && !containerRef.current.contains(event.target)) {
+        setIsMenuOpen(false);
+      }
+    };
 
-  const menuItemVariants = {
-    hidden: { opacity: 0, x: -10 },
-    visible: (i) => ({
-      opacity: 1,
-      x: 0,
-      transition: {
-        delay: i * 0.05,
-      },
-    }),
-  };
+    if (isMenuOpen) {
+      document.addEventListener('click', handleClickOutside);
+      return () => document.removeEventListener('click', handleClickOutside);
+    }
+  }, [isMenuOpen]);
 
   // Mobile version
   if (isMobile) {
     return (
       <nav
-        className='mx-auto flex items-center justify-between py-4'
+        ref={containerRef}
+        className='relative mx-auto flex items-center justify-between py-4'
         style={{ width: containerWidth }}
       >
         {/* Left - Logo */}
@@ -58,49 +48,39 @@ export default function NavBar() {
         {/* Right - Menu Button */}
         <button
           onClick={() => setIsMenuOpen(!isMenuOpen)}
-          className='relative flex h-10 w-10 flex-col items-center justify-center focus:outline-none'
+          className='flex h-10 w-10 items-center justify-center rounded-lg transition-all hover:bg-gray-100'
         >
-          <motion.div
-            animate={isMenuOpen ? { rotate: 45 } : { rotate: 0 }}
-            className='absolute h-0.5 w-6 bg-gray-800 transition-all'
-          />
-          <motion.div
-            animate={isMenuOpen ? { opacity: 0 } : { opacity: 1 }}
-            className='h-0.5 w-6 bg-gray-800'
-          />
-          <motion.div
-            animate={isMenuOpen ? { rotate: -45 } : { rotate: 0 }}
-            className='absolute h-0.5 w-6 bg-gray-800 transition-all'
-          />
+          <IconMenu2 size={24} stroke={2.5} className='text-gray-800' />
         </button>
 
         {/* Dropdown Menu */}
         <AnimatePresence>
           {isMenuOpen && (
             <motion.div
-              variants={menuVariants}
-              initial='hidden'
-              animate='visible'
-              exit='exit'
-              className='absolute top-16 right-0 z-50 w-48 rounded-lg border border-gray-200 bg-white shadow-lg'
-              style={{ width: containerWidth }}
+              variants={dropdownCloseVariants}
+              initial='closed'
+              animate='open'
+              exit='closed'
+              className='absolute top-14 right-0 z-50 flex min-w-[200px] flex-col gap-1 rounded-lg bg-white p-0 shadow-lg'
             >
-              <div className='py-2'>
-                {['Home', 'About', 'Features', 'Contact'].map((item, i) => (
-                  <motion.a
-                    key={item}
-                    custom={i}
-                    variants={menuItemVariants}
-                    initial='hidden'
-                    animate='visible'
-                    href={`#${item.toLowerCase()}`}
-                    className='block px-4 py-2 text-gray-800 transition-colors hover:bg-purple-100 hover:text-purple-600'
-                    onClick={() => setIsMenuOpen(false)}
-                  >
-                    {item}
-                  </motion.a>
-                ))}
-              </div>
+              <button
+                className='w-full rounded px-4 py-2 text-left text-sm font-medium text-gray-700 transition-colors hover:bg-gray-100'
+                onClick={() => {
+                  navigate('/auth');
+                  setIsMenuOpen(false);
+                }}
+              >
+                Sign In / Sign Up
+              </button>
+              <button
+                className='w-full rounded px-4 py-2 text-left text-sm font-medium text-gray-700 transition-colors hover:bg-gray-100'
+                onClick={() => {
+                  navigate('/home');
+                  setIsMenuOpen(false);
+                }}
+              >
+                Home
+              </button>
             </motion.div>
           )}
         </AnimatePresence>
@@ -111,7 +91,7 @@ export default function NavBar() {
   // Desktop version - Floating transparent
   return (
     <nav
-      className='absolute left-1/2 -translate-x-1/2 z-40 rounded-full border border-gray-300 bg-white/80 shadow-sm backdrop-blur-sm'
+      className='absolute left-1/2 z-40 -translate-x-1/2 rounded-full border border-gray-300 bg-white/80 shadow-sm backdrop-blur-sm'
       style={{
         width: '55%',
         paddingTop: '1rem',

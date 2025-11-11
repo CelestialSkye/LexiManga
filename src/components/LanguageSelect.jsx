@@ -1,4 +1,4 @@
-import AnimatedSelect from './AnimatedSelect';
+import { Select } from '@mantine/core';
 
 const LANGUAGES = [
   { value: 'spanish', label: 'Spanish' },
@@ -26,7 +26,7 @@ const LanguageSelect = ({
   ...props
 }) => {
   return (
-    <AnimatedSelect
+    <Select
       label={label}
       placeholder={placeholder}
       value={value}
