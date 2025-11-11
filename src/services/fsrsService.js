@@ -1,4 +1,4 @@
-import { FSRS, createEmptyCard, Rating } from 'ts-fsrs';
+import { createEmptyCard, FSRS, Rating } from 'ts-fsrs';
 
 const fsrs = new FSRS();
 

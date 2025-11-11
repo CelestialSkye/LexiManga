@@ -1,6 +1,7 @@
+import { doc, getDoc, updateDoc } from 'firebase/firestore';
+import { deleteObject, getDownloadURL, ref, uploadBytes } from 'firebase/storage';
+
 import { storage } from '../config/firebase';
-import { ref, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage';
-import { doc, updateDoc, getDoc } from 'firebase/firestore';
 import { db } from '../config/firebase';
 
 const AVATAR_FOLDER = 'avatars';

@@ -1,10 +1,11 @@
-import { useState } from 'react';
 import { Group, Text } from '@mantine/core';
-import { IconBrandGithub, IconMail, IconBrandTwitter } from '@tabler/icons-react';
-import { useAuth } from '../context/AuthContext';
+import { IconBrandGithub, IconBrandTwitter, IconMail } from '@tabler/icons-react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import FeedbackModal from './FeedbackModal';
+
 import logo from '../assets/logo.svg';
+import { useAuth } from '../context/AuthContext';
+import FeedbackModal from './FeedbackModal';
 
 const Footer = () => {
   const [feedbackModalOpen, setFeedbackModalOpen] = useState(false);

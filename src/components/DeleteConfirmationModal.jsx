@@ -1,11 +1,12 @@
-import { modals } from '@mantine/modals';
 import { Text } from '@mantine/core';
+import { modals } from '@mantine/modals';
 
 export const openDeleteConfirmation = (itemName, itemType = 'item', onConfirm) => {
   modals.openConfirmModal({
     children: (
-      <Text size="sm">
-        Are you sure you want to delete the {itemType} <strong>"{itemName}"</strong>? This action cannot be undone.
+      <Text size='sm'>
+        Are you sure you want to delete the {itemType} <strong>"{itemName}"</strong>? This action
+        cannot be undone.
       </Text>
     ),
     labels: { confirm: 'Delete', cancel: 'Cancel' },

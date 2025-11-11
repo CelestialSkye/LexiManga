@@ -1,5 +1,6 @@
-import React from 'react';
 import { useMediaQuery } from '@mantine/hooks';
+import React from 'react';
+
 import { HERO_BANNER_CONFIG } from '../../constants/heroBannerConfig';
 
 export default function Benefits() {

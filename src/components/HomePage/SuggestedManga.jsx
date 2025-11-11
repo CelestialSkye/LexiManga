@@ -1,7 +1,7 @@
 import React from 'react';
-import { useSuggestedManga } from 'src/services/anilistApi';
-import { useNavigate } from 'react-router-dom';
 import { FaStar } from 'react-icons/fa6';
+import { useNavigate } from 'react-router-dom';
+import { useSuggestedManga } from 'src/services/anilistApi';
 
 const SuggestionManga = () => {
   const navigate = useNavigate();
@@ -14,7 +14,7 @@ const SuggestionManga = () => {
   if (isLoading) return <div className='p-4'>Loading...</div>;
 
   return (
-    <div className='mt-4 p-2 rounded-[16px] '>
+    <div className='mt-4 rounded-[16px] p-2'>
       <h2 className='mb-4 text-xl font-bold'>Suggested for You</h2>
       <div className='space-y-4'>
         {suggestions?.map((manga) => (
@@ -23,7 +23,7 @@ const SuggestionManga = () => {
             <img
               src={manga.coverImage.large}
               alt={manga.title.english || manga.title.romaji}
-              className='h-45 w-32 flex-shrink-0 rounded-[12px] object-cover cursor-pointer'
+              className='h-45 w-32 flex-shrink-0 cursor-pointer rounded-[12px] object-cover'
               onClick={() => navigate(`/manga/${manga.id}`)}
             />
 
@@ -31,7 +31,7 @@ const SuggestionManga = () => {
             <div className='flex flex-1 flex-col justify-between'>
               <div>
                 <h3
-                  className='mb-2 line-clamp-2 text-lg font-bold text-gray-800 cursor-pointer'
+                  className='mb-2 line-clamp-2 cursor-pointer text-lg font-bold text-gray-800'
                   onClick={() => navigate(`/manga/${manga.id}`)}
                 >
                   {manga.title.english || manga.title.romaji}

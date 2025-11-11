@@ -1,4 +1,4 @@
-import { FaStar, FaBook } from 'react-icons/fa6';
+import { FaBook, FaStar } from 'react-icons/fa6';
 
 /**
  * Reusable tooltip content component for manga info

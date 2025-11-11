@@ -1,17 +1,18 @@
-import { useState, useEffect, useCallback } from 'react';
 import { useMediaQuery } from '@mantine/hooks';
-import { 
-  getResponsiveImageSize, 
-  getResponsiveTextSize, 
-  getAllImagePositions,
-  shouldShowHeroBanner 
-} from '../utils/heroBannerUtils';
+import { useCallback, useEffect, useState } from 'react';
+
 import { HERO_BANNER_CONFIG } from '../constants/heroBannerConfig';
+import {
+  getAllImagePositions,
+  getResponsiveImageSize,
+  getResponsiveTextSize,
+  shouldShowHeroBanner,
+} from '../utils/heroBannerUtils';
 
 export const useHeroBanner = () => {
   const isMobile = useMediaQuery('(max-width: 767px)');
   const isDesktop = useMediaQuery('(min-width: 768px)');
-  
+
   const [imageSize, setImageSize] = useState(() => getResponsiveImageSize());
   const [textSize, setTextSize] = useState(() => getResponsiveTextSize());
   const [imagePositions, setImagePositions] = useState(() => getAllImagePositions());
@@ -51,11 +52,12 @@ export const useHeroBanner = () => {
     if (!isVisible) return;
 
     // Set a timeout to mark animations as complete
-    const totalAnimationTime = 
-      (imagePositions.length * animationConfig.staggerDelay) + 
-      animationConfig.overshootDelay + 
-      animationConfig.textDelay + 
-      (HERO_BANNER_CONFIG.text.title.line1.length + HERO_BANNER_CONFIG.text.title.line2.length) * animationConfig.wordDelay +
+    const totalAnimationTime =
+      imagePositions.length * animationConfig.staggerDelay +
+      animationConfig.overshootDelay +
+      animationConfig.textDelay +
+      (HERO_BANNER_CONFIG.text.title.line1.length + HERO_BANNER_CONFIG.text.title.line2.length) *
+        animationConfig.wordDelay +
       animationConfig.paragraphDelay;
 
     setTimeout(() => {
@@ -82,13 +84,13 @@ export const useHeroBanner = () => {
     isVisible,
     isMobile,
     isDesktop,
-    
+
     // Animation state
     animationsComplete,
     animationConfig,
-    
+
     // Actions
     triggerAnimations,
-    updateResponsiveValues
+    updateResponsiveValues,
   };
 };

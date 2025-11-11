@@ -1,7 +1,6 @@
 import { Tooltip } from '@mantine/core';
 import PropTypes from 'prop-types';
 
-
 export function CustomTooltip({
   label,
   children,

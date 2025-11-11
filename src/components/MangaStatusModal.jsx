@@ -1,17 +1,18 @@
-import { useState } from 'react';
 import { Modal } from '@mantine/core';
-import { TextInput, NumberInput, Select, Button, Group, Text, Divider } from '@mantine/core';
+import { Button, Divider, Group, NumberInput, Select, Text, TextInput } from '@mantine/core';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useState } from 'react';
+import { useEffect } from 'react';
+import { FiArrowUpRight } from 'react-icons/fi';
+import { useNavigate } from 'react-router-dom';
+
+import { useAuth } from '../context/AuthContext';
 import {
+  deleteMangaStatus,
   useMangaStatus,
   useSaveMangaStatus,
-  deleteMangaStatus,
 } from '../services/mangaStatusService.js';
-import { useEffect } from 'react';
-import { useAuth } from '../context/AuthContext';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { openDeleteConfirmation } from './DeleteConfirmationModal';
-import { useNavigate } from 'react-router-dom';
-import { FiArrowUpRight } from 'react-icons/fi';
 
 const MangaStatusModal = ({ manga, opened, closeModal }) => {
   const { user } = useAuth();
@@ -110,7 +111,6 @@ const MangaStatusModal = ({ manga, opened, closeModal }) => {
           <button
             onClick={() => navigate(`/manga/${manga?.id}`)}
             className='rounded-full p-2 transition-all hover:bg-gray-100'
-            
             title='Go to Manga Page'
           >
             <FiArrowUpRight size={20} className='text-violet-600' />

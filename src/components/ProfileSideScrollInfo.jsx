@@ -1,4 +1,5 @@
-import { ScrollArea, Box, Text } from '@mantine/core';
+import { Box, ScrollArea, Text } from '@mantine/core';
+
 import { useProfileStats } from '../hooks/useProfileStats';
 
 function ProfileSideScrollinfo() {

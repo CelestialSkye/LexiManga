@@ -21,6 +21,7 @@ const ActionButton = ({
   animationDuration = 0.15,
   disabled = false,
   loading = false,
+  buttonRounded = false,
   ...props
 }) => {
   return (
@@ -28,21 +29,19 @@ const ActionButton = ({
       whileHover={{ scale: hoverScale }}
       whileTap={{ scale: tapScale }}
       transition={{ duration: animationDuration }}
-      className="inline-block"
+      className='inline-block'
     >
       <Button
         variant={variant}
         color={color}
         size={size}
-        radius={12}
+        radius='xl'
         leftSection={
           icon && (
-            <div className={`flex items-center  justify-center ${iconContainerSize}`}>
-              {icon}
-            </div>
+            <div className={`flex items-center justify-center ${iconContainerSize}`}>{icon}</div>
           )
         }
-        className={`${buttonPadding} ${buttonShadow} ${buttonHoverShadow} ${buttonTransition} ${className} `}
+        className={`${buttonPadding} ${buttonShadow} ${buttonHoverShadow} ${buttonTransition} ${className} !bg-violet-600`}
         onClick={onClick}
         disabled={disabled}
         loading={loading}

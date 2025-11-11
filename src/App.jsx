@@ -1,18 +1,19 @@
-import { useEffect } from 'react';
 import { MantineProvider } from '@mantine/core';
 import { ModalsProvider } from '@mantine/modals';
-import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
+import { useEffect } from 'react';
 import { GoogleReCaptchaProvider } from 'react-google-recaptcha-v3';
-import { AuthProvider } from './context/AuthContext';
+import { BrowserRouter, Route, Routes, useLocation } from 'react-router-dom';
+
 import Footer from './components/Footer';
-import LandingPage from './pages/LandingPage';
-import Home from './pages/Home';
-import Dashboard from './pages/Dashboard';
-import MangaPage from './pages/MangaPage';
+import { AuthProvider } from './context/AuthContext';
 import Auth from './pages/Auth';
+import Browse from './pages/Browse';
+import Dashboard from './pages/Dashboard';
+import Home from './pages/Home';
+import LandingPage from './pages/LandingPage';
+import MangaPage from './pages/MangaPage';
 import ProfilePage from './pages/ProfilePage';
 import SettingsPage from './pages/SettingsPage';
-import Browse from './pages/Browse';
 
 const AppContent = () => {
   const location = useLocation();

@@ -1,22 +1,23 @@
-import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { ErrorBoundary } from 'react-error-boundary';
-import { useAuth } from '../context/AuthContext';
+import LoadingLogo from '@components/LoadingLogo';
+import ProfileSideScrollinfo from '@components/ProfileSideScrollInfo';
 import { useMediaQuery } from '@mantine/hooks';
-import { useProfileStats } from '../hooks/useProfileStats';
-import { useProfilePageLoading } from '../hooks/useProfilePageLoading';
-import TopBar from '../components/TopBar';
+import { useEffect, useState } from 'react';
+import { ErrorBoundary } from 'react-error-boundary';
+import { useNavigate } from 'react-router-dom';
+
 import AvatarUpload from '../components/AvatarUpload';
 import BannerUpload from '../components/BannerUpload';
 import ScrollButtons from '../components/ScrollButtons';
-import OverviewTab from '../features/profile/tabs/OverviewTab';
+import TopBar from '../components/TopBar';
+import { useAuth } from '../context/AuthContext';
 import ActivityTab from '../features/profile/tabs/ActivityTab';
+import ProfileTab from '../features/profile/tabs/FavouritesTab';
+import OverviewTab from '../features/profile/tabs/OverviewTab';
 import ScoresTab from '../features/profile/tabs/ScoresTab';
 import StudyTab from '../features/profile/tabs/StudyTab';
 import VocabularyTab from '../features/profile/tabs/VocabularyTab';
-import ProfileTab from '../features/profile/tabs/FavouritesTab';
-import ProfileSideScrollinfo from '@components/ProfileSideScrollInfo';
-import LoadingLogo from '@components/LoadingLogo';
+import { useProfilePageLoading } from '../hooks/useProfilePageLoading';
+import { useProfileStats } from '../hooks/useProfileStats';
 import { capitalizeFirstLetter } from '../utils/formatUtils';
 
 // Error fallback component
@@ -36,6 +37,10 @@ const ProfilePage = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('overview');
   const { user, profile } = useAuth();
+  const { wordCount, mangaCount, learnedCount, unknownCount, learningCount } = useProfileStats();
+  const { isLoading } = useProfilePageLoading();
+  const isMobile = useMediaQuery('(max-width: 768px)');
+  const isDesktop = useMediaQuery('(min-width: 769px)');
 
   // Guard: Redirect to auth if not logged in
   useEffect(() => {
@@ -48,11 +53,6 @@ const ProfilePage = () => {
   if (!user) {
     return null;
   }
-  const { wordCount, mangaCount, learnedCount, unknownCount, learningCount } = useProfileStats();
-  const { isLoading } = useProfilePageLoading();
-
-  const isMobile = useMediaQuery('(max-width: 768px)');
-  const isDesktop = useMediaQuery('(min-width: 769px)');
 
   // Show loading screen while data is being fetched
   if (isLoading) {
@@ -131,7 +131,7 @@ const ProfilePage = () => {
         </div>
 
         {/* Tab Navigation */}
-        <div className='mt-18  md:mt-18'>
+        <div className='mt-18 md:mt-18'>
           {isDesktop ? (
             <div className='mr-[calc((100vw-min(80vw,1200px))/2)] ml-[calc((100vw-min(80vw,1200px))/2+192px)] pl-4'>
               <ScrollButtons items={tabs} activeItem={activeTab} onItemClick={setActiveTab} />

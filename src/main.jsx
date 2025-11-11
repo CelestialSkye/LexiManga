@@ -6,10 +6,9 @@ import '@mantine/core/styles.css';
 import * as Sentry from '@sentry/react';
 import { BrowserTracing } from '@sentry/tracing';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { onCLS, onFCP, onINP, onLCP, onTTFB } from 'web-vitals';
-
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
+import { onCLS, onFCP, onINP, onLCP, onTTFB } from 'web-vitals';
 
 import App from './App';
 import { AuthProvider } from './context/AuthContext';

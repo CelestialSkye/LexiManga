@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
-import { authService } from '../services';
+
 import { useAuth } from '../context/AuthContext';
+import { authService } from '../services';
 
 export const useProfileStats = () => {
   const { user } = useAuth();
@@ -16,8 +17,7 @@ export const useProfileStats = () => {
         try {
           const words = await authService.getUserWordCount(user.uid);
           setWordCount(words);
-        } catch (error) {
-        }
+        } catch (error) {}
       };
       fetchStats();
     }
@@ -29,8 +29,7 @@ export const useProfileStats = () => {
         try {
           const manga = await authService.getUserMangaCount(user.uid);
           setMangaCount(manga);
-        } catch (error) {
-        }
+        } catch (error) {}
       };
       fetchStats();
     }
@@ -42,8 +41,7 @@ export const useProfileStats = () => {
         try {
           const learned = await authService.getUserLearnedWords(user.uid);
           setLearnedCount(learned);
-        } catch (error) {
-        }
+        } catch (error) {}
       };
       fetchStats();
     }
@@ -55,8 +53,7 @@ export const useProfileStats = () => {
         try {
           const unknown = await authService.getUserUnknownWords(user.uid);
           setUnknownCount(unknown);
-        } catch (error) {
-        }
+        } catch (error) {}
       };
       fetchStats();
     }
@@ -68,8 +65,7 @@ export const useProfileStats = () => {
         try {
           const learning = await authService.getUserLearningWords(user.uid);
           setLearningCount(learning);
-        } catch (error) {
-        }
+        } catch (error) {}
       };
       fetchStats();
     }

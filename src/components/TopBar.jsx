@@ -1,18 +1,19 @@
-import { Group, Text, Avatar } from '@mantine/core';
-import { useNavigate, useLocation } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
-import ActionButton from './ActionButton';
-import SpotlightSearch from './SpotlightSearch';
+import { Avatar, Group, Text } from '@mantine/core';
 import { useMediaQuery } from '@mantine/hooks';
-import MobileFAB from './MobileFAB';
-import { motion, AnimatePresence } from 'framer-motion';
-import { useState, useEffect } from 'react';
 import { IconBell } from '@tabler/icons-react';
+import { AnimatePresence, motion } from 'framer-motion';
+import { useEffect, useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
+
+import defaultAvatar from '../assets/defaultAvatar.jpg';
+import logo from '../assets/logo.svg';
+import { useAuth } from '../context/AuthContext';
 import { getDailyActivities } from '../services/dailyActivityService';
 import { dropdownCloseVariants } from '../utils/animationUtils';
 import { capitalizeFirstLetter } from '../utils/formatUtils';
-import logo from '../assets/logo.svg';
-import defaultAvatar from '../assets/defaultAvatar.jpg';
+import ActionButton from './ActionButton';
+import MobileFAB from './MobileFAB';
+import SpotlightSearch from './SpotlightSearch';
 
 const TopBar = () => {
   const navigate = useNavigate();
@@ -190,7 +191,7 @@ const TopBar = () => {
                               exit='closed'
                               className='notifications-container pointer-events-auto absolute top-14 right-0 z-50 flex min-w-[300px] flex-col gap-0 overflow-hidden rounded-[16px] shadow-lg'
                               style={{
-                                marginTop:'7px',
+                                marginTop: '7px',
                                 backgroundColor: isDarkTopbar ? 'rgba(0, 0, 0, 0.4)' : '#ffffff',
                                 willChange: 'transform, opacity',
                               }}

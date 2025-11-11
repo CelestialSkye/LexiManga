@@ -1,12 +1,13 @@
-import React, { useState, useEffect } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import TopBarMobile from '@components/HomePage/TopbarMobile';
+import TopBar from '@components/TopBar';
 import { Center } from '@mantine/core';
+import React, { useEffect, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { useBrowseManga } from 'src/services/anilistApi';
+
 import BrowseFilters from '../components/BrowseFilters';
 import BrowseResults from '../components/BrowseResults';
 import LoadingLogo from '../components/LoadingLogo';
-import TopBar from '@components/TopBar';
-import TopBarMobile from '@components/HomePage/TopbarMobile';
 
 const Browse = () => {
   const [searchParams] = useSearchParams();
@@ -92,7 +93,8 @@ const Browse = () => {
               />
             </div>
           )}
-        </main></div>
+        </main>
+      </div>
     </div>
   );
 };

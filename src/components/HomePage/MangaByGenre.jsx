@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from 'react';
-import { useQuery } from '@tanstack/react-query';
-import { Grid, Paper, Text, Image, Stack, Badge, Group } from '@mantine/core';
-import { useNavigate } from 'react-router-dom';
-import { FaStar } from 'react-icons/fa6';
+import { Badge, Grid, Group, Image, Paper, Stack, Text } from '@mantine/core';
 import { useMediaQuery } from '@mantine/hooks';
+import { useQuery } from '@tanstack/react-query';
+import React, { useEffect, useState } from 'react';
+import { FaStar } from 'react-icons/fa6';
+import { useNavigate } from 'react-router-dom';
+
 import logoWhiteBg from '../../assets/logo2.svg';
 
 const ANILIST_GENRES = [
@@ -78,8 +79,7 @@ const GenreCarousel = () => {
 
   return (
     <div className='mt-6 rounded-[16px] p-2'>
-           <h2 className='mb-4 text-xl font-bold'>Explore by Genre</h2>
-
+      <h2 className='mb-4 text-xl font-bold'>Explore by Genre</h2>
 
       <Grid gutter='md'>
         {displayGenres.map((genre) => (
@@ -135,9 +135,8 @@ const GenreTile = ({ genre, onNavigate, isSmallScreen, isMobile }) => {
         {/* Manga   */}
         <div
           onClick={handleMangaClick}
-          className='flex cursor-pointer flex-col overflow-hidden rounded-[16px] '
+          className='flex cursor-pointer flex-col overflow-hidden rounded-[16px]'
           style={{ backgroundColor: '#f9f9f9' }}
-       
         >
           {isLoading ? (
             <div
@@ -241,8 +240,7 @@ const GenreTile = ({ genre, onNavigate, isSmallScreen, isMobile }) => {
         {/* Manga */}
         <div
           onClick={handleMangaClick}
-          className='flex cursor-pointer gap-3 overflow-hidden rounded-[16px] '
-        
+          className='flex cursor-pointer gap-3 overflow-hidden rounded-[16px]'
         >
           {isLoading ? (
             <div
@@ -319,7 +317,7 @@ const GenreTile = ({ genre, onNavigate, isSmallScreen, isMobile }) => {
       {/* Genre  */}
       <div
         onClick={handleGenreClick}
-        className='flex w-32 flex-shrink-0 cursor-pointer flex-col items-center justify-center rounded-[16px] px-3 '
+        className='flex w-32 flex-shrink-0 cursor-pointer flex-col items-center justify-center rounded-[16px] px-3'
         style={{ backgroundColor: bgColor, color: '#fff' }}
       >
         <img src={logoWhiteBg} alt='Vocabulary Manga' className='mb-2 h-5 w-5' />
@@ -329,8 +327,7 @@ const GenreTile = ({ genre, onNavigate, isSmallScreen, isMobile }) => {
       {/* Manga */}
       <div
         onClick={handleMangaClick}
-        className='flex flex-1 cursor-pointer gap-2 overflow-hidden rounded-[16px] transittransformion- '
-       
+        className='transittransformion- flex flex-1 cursor-pointer gap-2 overflow-hidden rounded-[16px]'
       >
         {isLoading ? (
           <div

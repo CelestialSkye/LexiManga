@@ -1,5 +1,5 @@
-import { useAuth } from 'src/context/AuthContext';
 import FavouritesModal from '@components/FavouritesModal';
+import { useAuth } from 'src/context/AuthContext';
 
 const FavouritesTab = () => {
   const { user } = useAuth();

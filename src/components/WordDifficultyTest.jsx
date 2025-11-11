@@ -1,5 +1,6 @@
+import { Badge, Button, Card, Group, Select, Text, TextInput } from '@mantine/core';
 import { useState } from 'react';
-import { TextInput, Select, Button, Text, Group, Card, Badge } from '@mantine/core';
+
 import { useWordDifficulty } from '../services/wordDifficultyService';
 
 const WordDifficultyTest = () => {
@@ -17,27 +18,33 @@ const WordDifficultyTest = () => {
 
   const getDifficultyColor = (level) => {
     switch (level) {
-      case 'Easy': return 'green';
-      case 'Medium': return 'yellow';
-      case 'Hard': return 'red';
-      default: return 'gray';
+      case 'Easy':
+        return 'green';
+      case 'Medium':
+        return 'yellow';
+      case 'Hard':
+        return 'red';
+      default:
+        return 'gray';
     }
   };
 
   return (
-    <div className="p-6 max-w-2xl mx-auto">
-      <Card shadow="sm" padding="lg" radius="md" withBorder>
-        <Text size="xl" fw={700} mb="md">Word Difficulty Tester</Text>
-        
-        <Group mb="md">
+    <div className='mx-auto max-w-2xl p-6'>
+      <Card shadow='sm' padding='lg' radius='md' withBorder>
+        <Text size='xl' fw={700} mb='md'>
+          Word Difficulty Tester
+        </Text>
+
+        <Group mb='md'>
           <TextInput
-            placeholder="Enter a word..."
+            placeholder='Enter a word...'
             value={word}
             onChange={(e) => setWord(e.target.value)}
             style={{ flex: 1 }}
           />
           <Select
-            placeholder="Select language"
+            placeholder='Select language'
             value={language}
             onChange={setLanguage}
             data={[
@@ -65,38 +72,34 @@ const WordDifficultyTest = () => {
         </Group>
 
         {testWord && (
-          <Card shadow="sm" padding="md" radius="md" withBorder>
-            <Text size="lg" fw={600} mb="sm">
+          <Card shadow='sm' padding='md' radius='md' withBorder>
+            <Text size='lg' fw={600} mb='sm'>
               Testing: "{testWord}" in {testLanguage}
             </Text>
-            
-            {isLoading && (
-              <Text c="dimmed">Loading difficulty analysis...</Text>
-            )}
-            
-            {error && (
-              <Text c="red">Error: {error.message}</Text>
-            )}
-            
+
+            {isLoading && <Text c='dimmed'>Loading difficulty analysis...</Text>}
+
+            {error && <Text c='red'>Error: {error.message}</Text>}
+
             {difficulty && (
               <div>
-                <Group mb="sm">
+                <Group mb='sm'>
                   <Text fw={500}>Difficulty:</Text>
-                  <Badge color={getDifficultyColor(difficulty.level)} size="lg">
+                  <Badge color={getDifficultyColor(difficulty.level)} size='lg'>
                     {difficulty.level}
                   </Badge>
                 </Group>
-                
-                <Group mb="sm">
+
+                <Group mb='sm'>
                   <Text fw={500}>Score:</Text>
-                  <Badge variant="outline" color="blue">
+                  <Badge variant='outline' color='blue'>
                     {difficulty.score}/3
                   </Badge>
                 </Group>
-                
+
                 <Group>
                   <Text fw={500}>Source:</Text>
-                  <Badge variant="light" color="gray">
+                  <Badge variant='light' color='gray'>
                     {difficulty.source}
                   </Badge>
                 </Group>
@@ -104,8 +107,6 @@ const WordDifficultyTest = () => {
             )}
           </Card>
         )}
-
-        
       </Card>
     </div>
   );

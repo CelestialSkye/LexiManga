@@ -1,11 +1,11 @@
-import { useQuery } from '@tanstack/react-query';
-import { db } from 'src/config/firebase';
-import { doc, getDoc } from 'firebase/firestore';
-import { useAuth } from 'src/context/AuthContext';
-import { FaTableList } from 'react-icons/fa6';
-import { useState } from 'react';
 import { useMediaQuery } from '@mantine/hooks';
+import { useQuery } from '@tanstack/react-query';
+import { doc, getDoc } from 'firebase/firestore';
+import { useState } from 'react';
+import { FaTableList } from 'react-icons/fa6';
 import TopBar from 'src/components/TopBar';
+import { db } from 'src/config/firebase';
+import { useAuth } from 'src/context/AuthContext';
 import AccountTab from 'src/features/Settings/tabs/AccountTab';
 import LanguageTab from 'src/features/Settings/tabs/LanguageTab';
 import SettingsTab from 'src/features/Settings/tabs/SettingsTab';
@@ -115,7 +115,8 @@ const Settings = () => {
             </div>
           </div>
         </div>
-      </div></div>
+      </div>
+    </div>
   );
 };
 

@@ -1,10 +1,11 @@
-import TopBar from '../components/TopBar';
-import Trending from '../components/HomePage/Trending';
-import TopBarMobile from '@components/HomePage/TopbarMobile';
-import SuggestionManga from '@components/HomePage/SuggestedManga';
 import MangaByGenre from '@components/HomePage/MangaByGenre';
 import MonthlyManga from '@components/HomePage/MonthlyManga';
+import SuggestionManga from '@components/HomePage/SuggestedManga';
+import TopBarMobile from '@components/HomePage/TopbarMobile';
 import LoadingLogo from '@components/LoadingLogo';
+
+import Trending from '../components/HomePage/Trending';
+import TopBar from '../components/TopBar';
 import useHomePageLoading from '../hooks/useHomePageLoading';
 
 const Home = () => {
@@ -33,7 +34,8 @@ const Home = () => {
           <Trending />
           <SuggestionManga />
           <MangaByGenre />
-        </main></div>
+        </main>
+      </div>
     </div>
   );
 };

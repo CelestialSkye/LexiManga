@@ -1,5 +1,6 @@
-import { useMemo, useEffect, useRef, useState } from 'react';
-import { useTrendingManga, useSuggestedManga, useMonthlyManga } from '../services/anilistApi';
+import { useEffect, useMemo, useRef, useState } from 'react';
+
+import { useMonthlyManga, useSuggestedManga, useTrendingManga } from '../services/anilistApi';
 
 /**
  * Aggregates loading states from all critical components on the home page.

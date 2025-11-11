@@ -1,10 +1,10 @@
-import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { db } from 'src/config/firebase';
-import { doc, getDoc, deleteDoc, collection, getDocs, writeBatch } from 'firebase/firestore';
-import { useAuth } from 'src/context/AuthContext';
-import { getAuth, sendPasswordResetEmail, deleteUser } from 'firebase/auth';
+import { deleteUser, getAuth, sendPasswordResetEmail } from 'firebase/auth';
+import { collection, deleteDoc, doc, getDoc, getDocs, writeBatch } from 'firebase/firestore';
+import { useState } from 'react';
 import { openDeleteConfirmation } from 'src/components/DeleteConfirmationModal';
+import { db } from 'src/config/firebase';
+import { useAuth } from 'src/context/AuthContext';
 
 const AccountTab = () => {
   const { user } = useAuth();

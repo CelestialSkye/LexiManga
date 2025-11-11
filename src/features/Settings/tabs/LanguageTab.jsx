@@ -1,7 +1,7 @@
-import { useState } from 'react';
 import LanguageSelect from '@components/LanguageSelect';
-import { authService } from 'src/services';
+import { useState } from 'react';
 import { useAuth } from 'src/context/AuthContext';
+import { authService } from 'src/services';
 
 const LanguageTab = () => {
   const { user } = useAuth();

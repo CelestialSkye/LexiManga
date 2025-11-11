@@ -1,8 +1,9 @@
-import { useState, useRef } from 'react';
-import { useAuth } from '../context/AuthContext';
-import { Modal, Alert } from '@mantine/core';
-import ActionButton from './ActionButton';
+import { Alert, Modal } from '@mantine/core';
+import { useRef, useState } from 'react';
+
 import defaultAvatar from '../assets/defaultAvatar.jpg';
+import { useAuth } from '../context/AuthContext';
+import ActionButton from './ActionButton';
 
 const AvatarUpload = () => {
   const { profile, updateAvatar } = useAuth();

@@ -1,8 +1,9 @@
 import DOMPurify from 'dompurify';
-import ReadTab from './ReadTab';
-import VocabularyTab from './VocabularyTab';
-import StaffTab from './StaffTab';
+
 import CharactersTab from './CharactersTab';
+import ReadTab from './ReadTab';
+import StaffTab from './StaffTab';
+import VocabularyTab from './VocabularyTab';
 
 const OverviewTab = ({ manga }) => {
   // Sanitize HTML to prevent XSS attacks

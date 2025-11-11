@@ -1,13 +1,14 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { useMediaQuery } from '@mantine/hooks';
-import { motion, AnimatePresence } from 'framer-motion';
-import { IconMenu2 } from '@tabler/icons-react';
-import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../../context/AuthContext';
-import { HERO_BANNER_CONFIG } from '../../constants/heroBannerConfig';
-import { dropdownCloseVariants } from '../../utils/animationUtils';
-import logo from '../../assets/logo.svg';
 import ActionButton from '@components/ActionButton';
+import { useMediaQuery } from '@mantine/hooks';
+import { IconMenu2 } from '@tabler/icons-react';
+import { AnimatePresence, motion } from 'framer-motion';
+import React, { useEffect, useRef, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+
+import logo from '../../assets/logo.svg';
+import { HERO_BANNER_CONFIG } from '../../constants/heroBannerConfig';
+import { useAuth } from '../../context/AuthContext';
+import { dropdownCloseVariants } from '../../utils/animationUtils';
 
 export default function NavBar() {
   const isMobile = useMediaQuery(`(max-width: ${HERO_BANNER_CONFIG.breakpoints.mobile}px)`);

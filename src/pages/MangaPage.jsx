@@ -1,23 +1,24 @@
-import { useState, useEffect, useCallback, memo, useRef } from 'react';
+import LoadingLogo from '@components/LoadingLogo';
+import { Badge, Group } from '@mantine/core';
+import { useMediaQuery } from '@mantine/hooks';
+import { IconHeartFilled } from '@tabler/icons-react';
+import { memo, useCallback, useEffect, useRef, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { useMangaDetails } from '../services/anilistApi';
+
+import MangaStatusModal from '../components/MangaStatusModal';
 import ScrollButtons from '../components/ScrollButtons';
 import SideScrollinfo from '../components/SideScrollinfo';
+import TopBar from '../components/TopBar';
+import { useAuth } from '../context/AuthContext';
+import CharactersTab from '../features/manga/tabs/CharactersTab';
 import OverviewTab from '../features/manga/tabs/OverviewTab';
 import ReadTab from '../features/manga/tabs/ReadTab';
-import VocabularyTab from '../features/manga/tabs/VocabularyTab';
-import StudyTab from '../features/manga/tabs/StudyTab';
 import StaffTab from '../features/manga/tabs/StaffTab';
-import CharactersTab from '../features/manga/tabs/CharactersTab';
-import TopBar from '../components/TopBar';
-import { useMediaQuery } from '@mantine/hooks';
-import { Badge, Group } from '@mantine/core';
-import MangaStatusModal from '../components/MangaStatusModal';
-import { useIsFavorited, useToggleFavorite } from '../services/favoriteService';
-import { useAuth } from '../context/AuthContext';
-import { IconHeartFilled } from '@tabler/icons-react';
-import LoadingLogo from '@components/LoadingLogo';
+import StudyTab from '../features/manga/tabs/StudyTab';
+import VocabularyTab from '../features/manga/tabs/VocabularyTab';
 import useMangaPageLoading from '../hooks/useMangaPageLoading';
+import { useMangaDetails } from '../services/anilistApi';
+import { useIsFavorited, useToggleFavorite } from '../services/favoriteService';
 
 const HeartButton = memo(({ isFavorited, isLoading, onClick, user }) => (
   <div
@@ -124,7 +125,7 @@ const MangaPage = () => {
           <div className={`${isDesktop ? 'absolute top-0 right-0 left-0 z-10' : ''}`}>
             <TopBar />
           </div>
-     
+
           <div
             className={`relative mb-6 ${isMobile ? 'h-52' : 'h-96'} w-full`}
             style={{
@@ -188,7 +189,7 @@ const MangaPage = () => {
         </div>
 
         {/* Tab Navigation */}
-        <div className='mt-22  md:mt-22'>
+        <div className='mt-22 md:mt-22'>
           {isDesktop ? (
             <div className='flex items-center'>
               {/* Buttons directly under cover image */}

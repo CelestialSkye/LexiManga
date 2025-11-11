@@ -4,7 +4,7 @@ const cookieParser = require('cookie-parser');
 /**
  * CSRF Protection Middleware
  * Protects against Cross-Site Request Forgery attacks
- * 
+ *
  * Usage:
  * 1. Apply cookieParser middleware BEFORE csrf middleware
  * 2. GET /api/csrf-token to get a token
@@ -19,7 +19,7 @@ const csrfProtection = csurf({
     secure: process.env.NODE_ENV === 'production', // HTTPS only in production
     sameSite: 'strict', // Prevent cross-site cookie sending
     maxAge: 3600000, // 1 hour
-  }
+  },
 });
 
 /**
@@ -51,7 +51,7 @@ const csrfErrorHandler = (err, req, res, next) => {
 
 /**
  * Skip CSRF for specific endpoints
- * Use for endpoints that don't need protection (e.g., public health checks)
+ * Use for endpoints that don't need protection (e.g., public health checks, auth endpoints)
  */
 const skipCsrf = [
   /^\/api\/health/,
@@ -61,10 +61,12 @@ const skipCsrf = [
   /^\/api\/monthly/,
   /^\/api\/browse/,
   /^\/api\/suggested/,
+  /^\/api\/auth\/register/, // Protected by reCAPTCHA instead
+  /^\/api\/csrf-token/,
 ];
 
 const shouldSkipCsrf = (req) => {
-  return skipCsrf.some(pattern => pattern.test(req.path));
+  return skipCsrf.some((pattern) => pattern.test(req.path));
 };
 
 const csrfMiddleware = (req, res, next) => {
@@ -72,7 +74,7 @@ const csrfMiddleware = (req, res, next) => {
   if (req.method === 'GET' || shouldSkipCsrf(req)) {
     return next();
   }
-  
+
   // Apply CSRF protection to POST, PUT, DELETE
   csrfProtection(req, res, next);
 };

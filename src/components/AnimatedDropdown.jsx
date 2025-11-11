@@ -1,6 +1,6 @@
-import { Menu, Button, Badge } from '@mantine/core';
-import { motion } from 'framer-motion';
+import { Badge, Button, Menu } from '@mantine/core';
 import { IconChevronDown } from '@tabler/icons-react';
+import { motion } from 'framer-motion';
 
 const AnimatedDropdown = ({
   // Button props
@@ -11,32 +11,32 @@ const AnimatedDropdown = ({
   buttonClassName = '',
   buttonWidth = 'auto',
   buttonHeight = 'auto',
-  
+
   // Menu props
   menuWidth = 280,
   menuPosition = 'bottom-start',
   menuShadow = 'md',
-  
+
   // Animation props
   hoverScale = 1.02,
   tapScale = 0.98,
   animationDuration = 0.15,
   itemAnimationDelay = 0.05,
-  
+
   // Data
   items = [],
   selectedItem = null,
   onItemSelect = () => {},
-  
+
   // Styling
   itemClassName = '',
   badgeShow = true,
   descriptionShow = true,
-  
+
   // Custom render functions
   renderButton = null,
   renderItem = null,
-  
+
   // Additional props
   className = '',
   disabled = false,
@@ -45,10 +45,34 @@ const AnimatedDropdown = ({
 }) => {
   // Default items if none provided
   const defaultItems = [
-    { icon: 'IconUser', label: 'Profile', color: 'blue', description: 'View your profile', value: 'profile' },
-    { icon: 'IconSettings', label: 'Settings', color: 'gray', description: 'App preferences', value: 'settings' },
-    { icon: 'IconHeart', label: 'Favorites', color: 'pink', description: 'Saved items', value: 'favorites' },
-    { icon: 'IconBook', label: 'Vocabulary', color: 'green', description: 'Study words', value: 'vocabulary' },
+    {
+      icon: 'IconUser',
+      label: 'Profile',
+      color: 'blue',
+      description: 'View your profile',
+      value: 'profile',
+    },
+    {
+      icon: 'IconSettings',
+      label: 'Settings',
+      color: 'gray',
+      description: 'App preferences',
+      value: 'settings',
+    },
+    {
+      icon: 'IconHeart',
+      label: 'Favorites',
+      color: 'pink',
+      description: 'Saved items',
+      value: 'favorites',
+    },
+    {
+      icon: 'IconBook',
+      label: 'Vocabulary',
+      color: 'green',
+      description: 'Study words',
+      value: 'vocabulary',
+    },
     { icon: 'IconLogout', label: 'Logout', color: 'red', description: 'Sign out', value: 'logout' },
   ];
 
@@ -69,17 +93,12 @@ const AnimatedDropdown = ({
       maxWidth: buttonWidth !== 'auto' ? buttonWidth : undefined,
       minHeight: buttonHeight !== 'auto' ? buttonHeight : undefined,
       maxHeight: buttonHeight !== 'auto' ? buttonHeight : undefined,
-    }
+    },
   };
 
   return (
     <div className={className} {...props}>
-      <Menu 
-        shadow={menuShadow} 
-        width={menuWidth} 
-        position={menuPosition}
-        disabled={disabled}
-      >
+      <Menu shadow={menuShadow} width={menuWidth} position={menuPosition} disabled={disabled}>
         <Menu.Target>
           {renderButton ? (
             renderButton()
@@ -89,19 +108,16 @@ const AnimatedDropdown = ({
               whileTap={{ scale: tapScale }}
               transition={{ duration: animationDuration }}
             >
-              <Button 
-                variant={buttonVariant} 
+              <Button
+                variant={buttonVariant}
                 color={buttonColor}
                 size={buttonSize}
                 rightSection={
-                  <motion.div
-                    animate={{ rotate: 0 }}
-                    transition={{ duration: 0.2 }}
-                  >
+                  <motion.div animate={{ rotate: 0 }} transition={{ duration: 0.2 }}>
                     <IconChevronDown size={16} />
                   </motion.div>
                 }
-                className={`px-6 py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 ${buttonClassName}`}
+                className={`rounded-xl px-6 py-3 shadow-lg transition-all duration-200 hover:shadow-xl ${buttonClassName}`}
                 styles={buttonStyles}
                 disabled={disabled}
                 loading={loading}
@@ -118,10 +134,10 @@ const AnimatedDropdown = ({
               key={item.value || item.label}
               initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ 
+              transition={{
                 duration: 0.2,
                 delay: index * itemAnimationDelay,
-                ease: "easeOut"
+                ease: 'easeOut',
               }}
             >
               {renderItem ? (
@@ -130,27 +146,20 @@ const AnimatedDropdown = ({
                 <Menu.Item
                   icon={item.icon ? <item.icon size={18} /> : undefined}
                   color={item.color}
-                  className={`py-4 px-5 hover:bg-gray-50 transition-all duration-150 rounded-xl mx-2 my-1 ${itemClassName}`}
+                  className={`mx-2 my-1 rounded-xl px-5 py-4 transition-all duration-150 hover:bg-gray-50 ${itemClassName}`}
                   onClick={() => handleItemClick(item)}
                 >
-                  <div className="flex flex-col">
-                    <div className="flex items-center justify-between">
-                      <span className="font-medium text-gray-800">{item.label}</span>
+                  <div className='flex flex-col'>
+                    <div className='flex items-center justify-between'>
+                      <span className='font-medium text-gray-800'>{item.label}</span>
                       {badgeShow && (
-                        <Badge 
-                          color={item.color} 
-                          variant="light" 
-                          size="sm"
-                          className="rounded-lg"
-                        >
+                        <Badge color={item.color} variant='light' size='sm' className='rounded-lg'>
                           {item.color}
                         </Badge>
                       )}
                     </div>
                     {descriptionShow && item.description && (
-                      <span className="text-sm text-gray-500 mt-1">
-                        {item.description}
-                      </span>
+                      <span className='mt-1 text-sm text-gray-500'>{item.description}</span>
                     )}
                   </div>
                 </Menu.Item>

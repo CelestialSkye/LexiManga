@@ -1,8 +1,8 @@
+import { SearchBar } from '@components/index';
+import MangaStatusModal from '@components/MangaStatusModal';
 import React, { useState } from 'react';
 import { useAuth } from 'src/context/AuthContext';
 import { useMangaStatuses } from 'src/services/useMangaStatuses';
-import MangaStatusModal from '@components/MangaStatusModal';
-import { SearchBar } from '@components/index';
 
 const MangaListModal = () => {
   const { user } = useAuth();
@@ -45,13 +45,12 @@ const MangaListModal = () => {
 
   return (
     <>
-      <div className='rounded-[16px] bg-white  pb-4'>
+      <div className='rounded-[16px] bg-white pb-4'>
         <SearchBar
-          className='mb-4 violet-focus'
+          className='violet-focus mb-4'
           value={searchTerm}
           onChange={setSearchTerm}
           placeholder='Search manga..'
-          
         />
         {filteredManga.length === 0 ? (
           <div className='text-gray-500'>No manga statuses found</div>

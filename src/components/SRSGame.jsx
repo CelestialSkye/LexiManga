@@ -1,8 +1,9 @@
-import { useState, useEffect, useRef, useMemo } from 'react';
-import { Card, Text, Button, Group, Badge, Progress, Stack, Select } from '@mantine/core';
-import { useAuth } from '../context/AuthContext';
+import { Badge, Button, Card, Group, Progress, Select, Stack, Text } from '@mantine/core';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { createEmptyCard, FSRS, Rating } from 'ts-fsrs';
-import { useVocabWordsByManga, useUpdateVocabWord, useVocabWords } from '../services/vocabService';
+
+import { useAuth } from '../context/AuthContext';
+import { useUpdateVocabWord, useVocabWords, useVocabWordsByManga } from '../services/vocabService';
 
 const SRSGame = ({ manga, words: initialWords }) => {
   const { user } = useAuth();

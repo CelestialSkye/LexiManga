@@ -1,7 +1,8 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { db } from '../config/firebase';
-import { doc, getDoc, setDoc, deleteDoc, getDocs, collection, addDoc } from 'firebase/firestore';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { getAuth } from 'firebase/auth';
+import { addDoc, collection, deleteDoc, doc, getDoc, getDocs, setDoc } from 'firebase/firestore';
+
+import { db } from '../config/firebase';
 
 export const useIsFavorited = (uid, mangaId) => {
   return useQuery({
