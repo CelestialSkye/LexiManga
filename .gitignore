@@ -45,6 +45,9 @@ TEST_LOCAL.md
 server/package-lock.json
 
 # Local environment files
+.env
+.env.local
+server/.env
 server/.env.local
 
 # Server middleware (optional - can exclude if keeping private)
