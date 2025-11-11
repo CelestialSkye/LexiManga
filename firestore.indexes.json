@@ -1,4 +1,48 @@
 {
-  "indexes": [],
-  "fieldOverrides": []
+  "indexes": [
+    {
+      "collectionGroup": "dailyActivities",
+      "queryScope": "Collection",
+      "fields": [
+        { "fieldPath": "date", "order": "DESCENDING" },
+        { "fieldPath": "createdAt", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "favorites",
+      "queryScope": "Collection",
+      "fields": [{ "fieldPath": "createdAt", "order": "DESCENDING" }]
+    },
+    {
+      "collectionGroup": "mangaStatus",
+      "queryScope": "Collection",
+      "fields": [
+        { "fieldPath": "status", "order": "ASCENDING" },
+        { "fieldPath": "updatedAt", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "rateLimits",
+      "queryScope": "Collection",
+      "fields": [{ "fieldPath": "resetTime", "order": "ASCENDING" }]
+    }
+  ],
+  "fieldOverrides": [
+    {
+      "collectionGroup": "dailyActivities",
+      "fieldPath": "date",
+      "indexes": [
+        { "order": "ASCENDING", "queryScope": "Collection" },
+        { "order": "DESCENDING", "queryScope": "Collection" }
+      ]
+    },
+    {
+      "collectionGroup": "favorites",
+      "fieldPath": "createdAt",
+      "indexes": [
+        { "order": "ASCENDING", "queryScope": "Collection" },
+        { "order": "DESCENDING", "queryScope": "Collection" }
+      ]
+    }
+  ]
 }

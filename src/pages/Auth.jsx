@@ -9,6 +9,11 @@ import { useMediaQuery } from '@mantine/hooks';
 import { useGoogleReCaptcha } from 'react-google-recaptcha-v3';
 import { modals } from '@mantine/modals';
 import { getFirebaseErrorMessage, extractErrorCode } from '../utils/errorMessages';
+import {
+  validatePasswordStrength,
+  getPasswordStrengthColor,
+  getPasswordStrengthLabel,
+} from '../utils/passwordValidator';
 import logo from '../assets/logo.svg';
 import image3 from '../assets/landing/image3.jpg';
 
@@ -26,6 +31,11 @@ const Auth = () => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState('login');
+  const [passwordValidation, setPasswordValidation] = useState({
+    isValid: false,
+    errors: [],
+    strength: 'weak',
+  });
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -49,6 +59,16 @@ const Auth = () => {
     e.preventDefault();
     setLoading(true);
     setError('');
+
+    // Validate password strength before attempting registration
+    const validation = validatePasswordStrength(password);
+    setPasswordValidation(validation);
+
+    if (!validation.isValid) {
+      setLoading(false);
+      setError(validation.errors[0] || 'Password does not meet requirements');
+      return;
+    }
 
     try {
       if (!executeRecaptcha) {
@@ -338,7 +358,13 @@ const Auth = () => {
                   <PasswordInput
                     placeholder='Your password'
                     value={password}
-                    onChange={(e) => setPassword(e.target.value)}
+                    onChange={(e) => {
+                      setPassword(e.target.value);
+                      // Update password validation in real-time
+                      if (activeTab === 'register') {
+                        setPasswordValidation(validatePasswordStrength(e.target.value));
+                      }
+                    }}
                     required
                     variant='default'
                     size='md'
@@ -355,6 +381,54 @@ const Auth = () => {
                       },
                     })}
                   />
+
+                  {/* Password Strength Indicator (only show in register tab) */}
+                  {activeTab === 'register' && password && (
+                    <div className='mt-3 space-y-2'>
+                      {/* Strength Bar */}
+                      <div className='h-2 w-full overflow-hidden rounded-full bg-gray-200'>
+                        <div
+                          style={{
+                            width: `${(passwordValidation.score / 6) * 100}%`,
+                            backgroundColor: getPasswordStrengthColor(passwordValidation.strength),
+                            transition: 'width 0.3s ease',
+                          }}
+                          className='h-full'
+                        />
+                      </div>
+
+                      {/* Strength Label */}
+                      <div className='flex justify-between text-xs'>
+                        <span className='text-gray-600'>Strength:</span>
+                        <span
+                          style={{ color: getPasswordStrengthColor(passwordValidation.strength) }}
+                          className='font-medium'
+                        >
+                          {getPasswordStrengthLabel(passwordValidation.strength)}
+                        </span>
+                      </div>
+
+                      {/* Validation Errors */}
+                      {passwordValidation.errors.length > 0 && (
+                        <div className='space-y-1 rounded bg-red-50 p-2'>
+                          {passwordValidation.errors.map((error, idx) => (
+                            <p key={idx} className='text-xs text-red-600'>
+                              ✗ {error}
+                            </p>
+                          ))}
+                        </div>
+                      )}
+
+                      {/* Requirements Met */}
+                      {passwordValidation.isValid && (
+                        <div className='rounded bg-green-50 p-2'>
+                          <p className='text-xs font-medium text-green-600'>
+                            ✓ Password meets all requirements
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </div>
 
                 <div>
@@ -402,12 +476,18 @@ const Auth = () => {
             )}
 
             {/* Back to Landing */}
-            <div className='mt-8 flex justify-center gap-2'>
+            <div className='mt-8 flex flex-col gap-4'>
+              <button
+                onClick={() => navigate('/home')}
+                className='rounded-lg bg-violet-600 px-6 py-2 text-sm font-medium text-white transition-colors hover:bg-violet-700'
+              >
+                ← Go to Home Page
+              </button>
               <button
                 onClick={() => navigate('/')}
-                className='text-sm font-medium text-gray-600 transition-colors hover:text-gray-800'
+                className='rounded-lg border border-gray-300 px-6 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-100'
               >
-                ← Back to Landing
+                Back to Landing →
               </button>
             </div>
           </div>
