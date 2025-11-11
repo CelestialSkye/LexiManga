@@ -163,7 +163,7 @@ const TopBar = () => {
                   {user ? (
                     <Group gap='sm'>
                       <SpotlightSearch placeholder='Search...' />
-                      <div className='notifications-container relative z-[9999]'>
+                      <div className='notifications-wrapper relative z-[9999]'>
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
