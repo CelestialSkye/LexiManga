@@ -200,7 +200,9 @@ const TopBar = () => {
                                 {/* Stats Cards */}
                                 <div className='space-y-3'>
                                   {/* Words Added Today */}
-                                  <div className='rounded-lg bg-violet-50 p-4'>
+                                  <div
+                                    className={`rounded-lg p-4 ${isDarkTopbar ? 'border border-violet-400/20 bg-violet-900/20' : 'bg-violet-50'}`}
+                                  >
                                     <p
                                       className={`text-sm ${isDarkTopbar ? 'text-gray-300' : 'text-gray-600'}`}
                                     >
@@ -220,7 +222,9 @@ const TopBar = () => {
                                   </div>
 
                                   {/* Manga Added Today */}
-                                  <div className='rounded-lg bg-violet-50 p-4'>
+                                  <div
+                                    className={`rounded-lg p-4 ${isDarkTopbar ? 'border border-violet-400/20 bg-violet-900/20' : 'bg-violet-50'}`}
+                                  >
                                     <p
                                       className={`text-sm ${isDarkTopbar ? 'text-gray-300' : 'text-gray-600'}`}
                                     >
@@ -240,7 +244,9 @@ const TopBar = () => {
                                   </div>
 
                                   {/* Learning Streak */}
-                                  <div className='rounded-lg bg-violet-50 p-4'>
+                                  <div
+                                    className={`rounded-lg p-4 ${isDarkTopbar ? 'border border-violet-400/20 bg-violet-900/20' : 'bg-violet-50'}`}
+                                  >
                                     <p
                                       className={`text-sm ${isDarkTopbar ? 'text-gray-300' : 'text-gray-600'}`}
                                     >
