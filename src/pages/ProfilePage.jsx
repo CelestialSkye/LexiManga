@@ -17,6 +17,7 @@ import VocabularyTab from '../features/profile/tabs/VocabularyTab';
 import ProfileTab from '../features/profile/tabs/FavouritesTab';
 import ProfileSideScrollinfo from '@components/ProfileSideScrollInfo';
 import LoadingLogo from '@components/LoadingLogo';
+import { capitalizeFirstLetter } from '../utils/formatUtils';
 
 // Error fallback component
 function ErrorFallback({ error, resetErrorBoundary }) {
@@ -74,7 +75,7 @@ const ProfilePage = () => {
 
   // Placeholder profile data
   const profileData = {
-    name: profile?.nickname || user?.email || 'User',
+    name: capitalizeFirstLetter(profile?.nickname || user?.email || 'User'),
     email: user?.email || 'user@example.com',
     memberSince: '2024-01-01',
     nativeLang: 'English',

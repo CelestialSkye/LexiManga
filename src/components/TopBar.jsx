@@ -10,6 +10,7 @@ import { useState, useEffect } from 'react';
 import { IconBell } from '@tabler/icons-react';
 import { getDailyActivities } from '../services/dailyActivityService';
 import { dropdownCloseVariants } from '../utils/animationUtils';
+import { capitalizeFirstLetter } from '../utils/formatUtils';
 import logo from '../assets/logo.svg';
 
 const TopBar = () => {
@@ -186,8 +187,9 @@ const TopBar = () => {
                               initial='closed'
                               animate='open'
                               exit='closed'
-                              className='notifications-container pointer-events-auto absolute top-14 right-0 z-50 flex min-w-[300px] flex-col gap-0 overflow-hidden rounded-lg shadow-lg'
+                              className='notifications-container pointer-events-auto absolute top-14 right-0 z-50 flex min-w-[300px] flex-col gap-0 overflow-hidden rounded-[16px] shadow-lg'
                               style={{
+                                marginTop:'7px',
                                 backgroundColor: isDarkTopbar ? 'rgba(0, 0, 0, 0.4)' : '#ffffff',
                                 willChange: 'transform, opacity',
                               }}
@@ -365,7 +367,7 @@ const TopBar = () => {
                               size='sm'
                               className={`w-full rounded px-4 py-2 text-left text-sm transition-colors ${dropdownItemClass}`}
                             >
-                              {profile?.nickname || user.email}
+                              {capitalizeFirstLetter(profile?.nickname || user.email)}
                             </div>
                             <button
                               className={`w-full rounded px-4 py-2 text-left text-sm transition-colors ${dropdownTextClass}`}
