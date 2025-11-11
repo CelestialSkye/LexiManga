@@ -1,10 +1,9 @@
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { db } from 'src/config/firebase';
-import { doc, getDoc } from 'firebase/firestore';
+import { doc, getDoc, deleteDoc, collection, getDocs, writeBatch } from 'firebase/firestore';
 import { useAuth } from 'src/context/AuthContext';
 import { getAuth, sendPasswordResetEmail, deleteUser } from 'firebase/auth';
-import { deleteDoc } from 'firebase/firestore';
 import { openDeleteConfirmation } from 'src/components/DeleteConfirmationModal';
 
 const AccountTab = () => {
@@ -42,23 +41,57 @@ const AccountTab = () => {
     }
   };
 
+  /**
+   * Delete all user data for GDPR compliance
+   * Removes: user document, favorites, daily activities, manga statuses, etc.
+   */
+  const deleteAllUserData = async (userId) => {
+    const batch = writeBatch(db);
+
+    // Collections to delete
+    const collectionsToDelete = ['favorites', 'dailyActivities', 'mangaStatuses', 'wordLists'];
+
+    // Delete subcollections within each collection
+    for (const collectionName of collectionsToDelete) {
+      const userCollectionRef = collection(db, collectionName, userId, 'items');
+      const snapshot = await getDocs(userCollectionRef);
+
+      snapshot.forEach((doc) => {
+        batch.delete(doc.ref);
+      });
+    }
+
+    // Delete main collection documents for this user
+    for (const collectionName of collectionsToDelete) {
+      const docRef = doc(db, collectionName, userId);
+      batch.delete(docRef);
+    }
+
+    // Delete user document
+    batch.delete(doc(db, 'users', userId));
+
+    // Commit batch delete
+    await batch.commit();
+  };
+
   const handleDeleteAccount = () => {
     openDeleteConfirmation(profile?.nickname || user?.email, 'account', async () => {
       try {
-        // Delete Firestore user document
-        await deleteDoc(doc(db, 'users', uid));
+        setMessage('Deleting account and all associated data...');
+
+        // Delete all Firestore data (GDPR compliance)
+        await deleteAllUserData(uid);
 
         // Delete Firebase Auth user
         await deleteUser(auth.currentUser);
 
-        setMessage('Your account has been permanently deleted.');
+        setMessage('Your account and all associated data have been permanently deleted.');
 
         // Redirect after a short delay to show the message
         setTimeout(() => {
           window.location.href = '/home';
         }, 1500);
       } catch (error) {
-        console.error('Delete account error:', error);
         setMessage(`Error deleting account: ${error.message || 'Unknown error occurred'}`);
       }
     });
