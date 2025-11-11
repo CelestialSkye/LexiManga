@@ -24,16 +24,22 @@ try {
     if (!serviceAccountJson) {
       throw new Error(
         'FIREBASE_SERVICE_ACCOUNT_JSON environment variable not set. ' +
-        'Set it in your Render dashboard or environment.'
+          'Set it in your Render dashboard or environment.'
       );
     }
-    
-    const serviceAccount = JSON.parse(serviceAccountJson);
-    admin.initializeApp({
-      credential: admin.credential.cert(serviceAccount),
-      projectId: process.env.VITE_FIREBASE_PROJECT_ID,
-    });
-    console.log('✅ Firebase Admin SDK initialized (production)');
+
+    try {
+      const serviceAccount = JSON.parse(serviceAccountJson);
+      admin.initializeApp({
+        credential: admin.credential.cert(serviceAccount),
+        projectId: process.env.VITE_FIREBASE_PROJECT_ID,
+      });
+      console.log('✅ Firebase Admin SDK initialized (production)');
+    } catch (parseError) {
+      console.error('JSON Parse Error Details:', parseError.message);
+      console.error('First 100 chars of JSON:', serviceAccountJson.substring(0, 100));
+      throw parseError;
+    }
   }
 } catch (error) {
   console.error('❌ Firebase Admin initialization failed:', error.message);
