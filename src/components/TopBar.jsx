@@ -359,7 +359,7 @@ const TopBar = () => {
                             initial='closed'
                             animate='open'
                             exit='closed'
-                            className={`dropdown-container absolute top-20 right-28 z-50 flex min-w-[200px] flex-col gap-1 rounded-b-[16px] ${dropdownBgClass} p-0 shadow-lg`}
+                            className={`dropdown-container absolute top-20 right-28 z-50 flex min-w-[200px] flex-col gap-1 rounded-[16px] ${dropdownBgClass} p-0 shadow-lg`}
                           >
                             <div
                               size='sm'
