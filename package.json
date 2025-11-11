@@ -19,7 +19,9 @@
     "dev": "vite",
     "inline": "INLINE=true vite build",
     "preview": "vite preview",
-    "start": "vite"
+    "start": "vite",
+    "lint": "eslint src --ext .js,.jsx,.ts,.tsx",
+    "type-check": "tsc --noEmit"
   },
   "browserslist": {
     "production": [
