@@ -13,6 +13,8 @@ import { createRoot } from 'react-dom/client';
 
 import App from './App';
 import { AuthProvider } from './context/AuthContext';
+import { startHealthMonitoring } from './services/healthService';
+import { startPerformanceMonitoring } from './services/performanceService';
 
 // Initialize Sentry for error tracking
 if (import.meta.env.VITE_SENTRY_DSN) {
@@ -43,6 +45,17 @@ if (import.meta.env.VITE_SENTRY_DSN) {
   onTTFB((metric) => {
     Sentry.captureMessage(`Web Vitals TTFB: ${metric.value}`, 'info');
   });
+
+  // Start health and performance monitoring
+  startHealthMonitoring((health) => {
+    if (health.status !== 'healthy') {
+      Sentry.captureMessage('Health check failed', 'warning', {
+        extra: health,
+      });
+    }
+  });
+
+  startPerformanceMonitoring();
 }
 
 const queryClient = new QueryClient({
