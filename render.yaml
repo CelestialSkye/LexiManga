@@ -1,24 +1,38 @@
 services:
   # Backend API Server
   - type: web
-    name: vocabulary-manga-backend
+    name: leximanga-backend
     env: node
-    plan: free  # or paid plan
-    buildCommand: cd server && npm install
+    plan: free
+    buildCommand: cd server && npm install && npm run build
     startCommand: cd server && npm start
     envVars:
       - key: NODE_ENV
         value: production
       - key: PORT
         value: 10000
+      # IMPORTANT: Set these via Render Dashboard, NOT in this file:
+      # - GEMINI_API_KEY (Your new key: AIzaSyCtGIIIFwHFXxoGpfaK_oNSwx0JMdY7XTM)
+      # - VITE_RECAPTCHA_SECRET_KEY (Your new key: 6LddjAksAAAAANhQjxGIeD-rsZ94vWLYndpy11YE)
+      # - FIREBASE_SERVICE_ACCOUNT_JSON (Your Firebase service account JSON as string)
+      # - VITE_FIREBASE_PROJECT_ID (vocabularymanga)
 
   # Frontend Static Site
   - type: web
-    name: vocabulary-manga-frontend
+    name: leximanga-frontend
     env: static
     plan: free
     buildCommand: npm install && npm run build
     staticPublishPath: ./dist
     envVars:
       - key: VITE_BACKEND_URL
-        value: https://vocabulary-manga-backend.onrender.com
+        value: https://leximanga-backend.onrender.com
+      # Frontend only needs PUBLIC keys (already in .env):
+      # - VITE_FIREBASE_API_KEY
+      # - VITE_FIREBASE_AUTH_DOMAIN
+      # - VITE_FIREBASE_PROJECT_ID
+      # - VITE_FIREBASE_STORAGE_BUCKET
+      # - VITE_FIREBASE_MESSAGING_SENDER_ID
+      # - VITE_FIREBASE_APP_ID
+      # - VITE_FIREBASE_MEASUREMENT_ID
+      # - VITE_RECAPTCHA_SITE_KEY (public key, safe to expose)

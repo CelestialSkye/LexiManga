@@ -1,10 +1,10 @@
 import { storage } from '../config/firebase';
 import { ref, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage';
-import { doc, updateDoc } from 'firebase/firestore';
+import { doc, updateDoc, getDoc } from 'firebase/firestore';
 import { db } from '../config/firebase';
 
 const AVATAR_FOLDER = 'avatars';
-const MAX_FILE_SIZE = 5 * 1024 * 1024; 
+const MAX_FILE_SIZE = 5 * 1024 * 1024;
 const ALLOWED_FILE_TYPES = ['image/jpeg', 'image/png'];
 
 export const avatarService = {
@@ -13,12 +13,12 @@ export const avatarService = {
       throw new Error('No file provided');
     }
     if (file.size > MAX_FILE_SIZE) {
-        throw new Error('File size exceeds 5MB');
+      throw new Error('File size exceeds 5MB');
     }
     if (!ALLOWED_FILE_TYPES.includes(file.type)) {
-        throw new Error('Invalid file type');
+      throw new Error('Invalid file type');
     }
-    
+
     // Convert file to base64 (temporary workaround)
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
@@ -29,33 +29,39 @@ export const avatarService = {
   },
 
   async updateAvatar(uid, file) {
-    const downloadURL = await this.uploadAvatar(uid, file);
-    await updateDoc(doc(db, 'users', uid), { avatarUrl: downloadURL });
-    return downloadURL;
+    try {
+      const downloadURL = await this.uploadAvatar(uid, file);
+      await updateDoc(doc(db, 'users', uid), { avatarUrl: downloadURL });
+      return downloadURL;
+    } catch (error) {
+      console.error('Error updating avatar:', error);
+      throw error;
+    }
   },
 
   async deleteAvatar(uid) {
-    // For base64, just remove from Firestore
-    await updateDoc(doc(db, 'users', uid), { avatarUrl: null });
-    return true;
+    try {
+      // For base64, just remove from Firestore
+      await updateDoc(doc(db, 'users', uid), { avatarUrl: null });
+      return true;
+    } catch (error) {
+      console.error('Error deleting avatar:', error);
+      throw error;
+    }
   },
 
   async getAvatarUrl(uid) {
-    const userRef = doc(db, 'users', uid);
-    const userDoc = await getDoc(userRef);
-    if (userDoc.exists()) {
-      const userData = userDoc.data();
-      return userData.avatarUrl;
+    try {
+      const userRef = doc(db, 'users', uid);
+      const userDoc = await getDoc(userRef);
+      if (userDoc.exists()) {
+        const userData = userDoc.data();
+        return userData.avatarUrl;
+      }
+      return null;
+    } catch (error) {
+      console.error('Error getting avatar URL:', error);
+      return null;
     }
-    return null;
-  }
-
-
-
-
+  },
 };
-
-
-
-
-

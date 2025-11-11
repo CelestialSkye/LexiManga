@@ -1,17 +1,44 @@
+import { getAuth } from 'firebase/auth';
+
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3001';
+
+/**
+ * Get Firebase ID token for authenticated requests
+ */
+const getIdToken = async () => {
+  try {
+    const auth = getAuth();
+    if (!auth.currentUser) {
+      throw new Error('User not authenticated');
+    }
+    return await auth.currentUser.getIdToken();
+  } catch (error) {
+    console.error('Error getting ID token:', error);
+    throw error;
+  }
+};
 
 export const translateWithGemini = async (text, sourceLanguage, targetLanguage, userId) => {
   try {
+    // Get Firebase ID token for authentication
+    let idToken;
+    try {
+      idToken = await getIdToken();
+    } catch (error) {
+      throw new Error('Authentication required. Please log in.');
+    }
+
     const response = await fetch(`${BACKEND_URL}/api/translate`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        'Authorization': `Bearer ${idToken}`,
       },
       body: JSON.stringify({
         text,
         sourceLang: sourceLanguage,
         targetLang: targetLanguage,
-        userId: userId || 'anonymous',
+        // userId is no longer needed - backend verifies from token
       }),
     });
 
@@ -64,8 +91,8 @@ export const translateWithGemini = async (text, sourceLanguage, targetLanguage, 
     const data = await response.json();
     return data.translation;
   } catch (error) {
-    // Don't log here, let the component handle it
-    throw error; // Re-throw to let the component handle it
+    // Re-throw to let the component handle it
+    throw error;
   }
 };
 

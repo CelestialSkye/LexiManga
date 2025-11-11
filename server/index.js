@@ -4,15 +4,87 @@ require('dotenv').config({ path: path.resolve(__dirname, '../.env') });
 
 const express = require('express');
 const cors = require('cors');
+const helmet = require('helmet');
 const NodeCache = require('node-cache');
 const axios = require('axios');
 const cacheManager = require('./cache-manager');
 const cacheScheduler = require('./cache-scheduler');
 
+// Initialize Firebase Admin
+require('./firebase-admin');
+const admin = require('firebase-admin');
+
+// Import authentication middleware
+const { verifyToken } = require('./middleware/auth');
+
 const app = express();
 const PORT = process.env.PORT || 3001;
 
-app.use(cors());
+// ============ SECURITY: CORS Configuration ============
+const allowedOrigins = [
+  // Development
+  'http://localhost:3000',
+  'http://localhost:5173',
+  'http://127.0.0.1:3000',
+  'http://127.0.0.1:5173',
+  // Production - Render domains (update with your actual domains)
+  'https://leximanga-frontend.onrender.com',
+  'https://leximanga-backend.onrender.com',
+  // Production - Custom domain (add when you have one)
+  // 'https://www.leximanga.com',
+  // 'https://leximanga.com',
+];
+
+const corsOptions = {
+  origin: function (origin, callback) {
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      console.warn(`CORS blocked request from origin: ${origin}`);
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  maxAge: 86400, // 24 hours
+};
+
+app.use(cors(corsOptions));
+
+// ============ SECURITY: Security Headers with Helmet ============
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      scriptSrc: ["'self'"],
+      styleSrc: ["'self'", "'unsafe-inline'"],
+      imgSrc: ["'self'", 'data:', 'https:', 'https://s4.anilist.co'],
+      connectSrc: ["'self'", 'https://graphql.anilist.co', 'https://www.google.com/recaptcha', 'https://www.gstatic.com'],
+      fontSrc: ["'self'", 'data:'],
+      objectSrc: ["'none'"],
+      upgradeInsecureRequests: [],
+    }
+  },
+  hsts: {
+    maxAge: 31536000, // 1 year
+    includeSubDomains: true,
+    preload: true
+  },
+  referrerPolicy: { policy: 'strict-origin-when-cross-origin' },
+  noSniff: true,
+  xssFilter: true,
+}));
+
+// ============ SECURITY: HTTPS Redirect (for production) ============
+app.use((req, res, next) => {
+  if (process.env.NODE_ENV === 'production' && req.header('x-forwarded-proto') !== 'https') {
+    res.redirect(`https://${req.header('host')}${req.url}`);
+  }
+  next();
+});
+
 app.use(express.json());
 
 const cache = new NodeCache({ stdTTL: 3600 });
@@ -306,12 +378,14 @@ app.get('/api/manga/:id', async (req, res) => {
   }
 });
 
-app.post('/api/translate', async (req, res) => {
+// ============ PROTECTED: Translation endpoint requires authentication ============
+app.post('/api/translate', verifyToken, async (req, res) => {
   try {
-    const { text, sourceLang, targetLang, userId } = req.body;
+    const { text, sourceLang, targetLang } = req.body;
+    const userId = req.userId; // From verified token, not from request body
 
-    if (!text || !sourceLang || !targetLang || !userId) {
-      return res.status(400).json({ error: 'Text, sourceLang, targetLang, and userId required' });
+    if (!text || !sourceLang || !targetLang) {
+      return res.status(400).json({ error: 'Text, sourceLang, and targetLang required' });
     }
 
     if (text.length > 50) {
@@ -340,7 +414,7 @@ app.post('/api/translate', async (req, res) => {
     }
 
     const { GoogleGenerativeAI } = require('@google/generative-ai');
-    const geminiApiKey = process.env.GEMINI_API_KEY;
+    const geminiApiKey = process.env.GEMINI_API_KEY || process.env.VITE_GEMINI_API_KEY;
 
     if (!geminiApiKey) {
       return res.status(500).json({ error: 'Gemini API key not configured' });

@@ -28,3 +28,24 @@ dist-ssr
 
 # Personal notes and todo files
 src/todo.txt
+
+# Phase 1 Documentation (reference only, not needed in repo)
+FIRESTORE_RULES_FIX.md
+KEYS_CONFIGURATION.md
+MASTER_CHECKLIST.md
+PHASE1_DEPLOYMENT_GUIDE.md
+PHASE1_SUMMARY.md
+PHASE1_VERIFICATION.md
+QUICK_START_PHASE1.md
+RULES_UPDATED.md
+SETUP_INSTRUCTIONS.md
+TEST_LOCAL.md
+
+# Generated files that shouldn't be committed
+server/package-lock.json
+
+# Local environment files
+server/.env.local
+
+# Server middleware (optional - can exclude if keeping private)
+# server/middleware/

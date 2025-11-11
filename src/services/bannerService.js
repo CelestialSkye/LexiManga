@@ -4,7 +4,7 @@ import { doc, updateDoc, getDoc } from 'firebase/firestore';
 import { db } from '../config/firebase';
 
 const BANNER_FOLDER = 'banners';
-const MAX_FILE_SIZE = 5 * 1024 * 1024; 
+const MAX_FILE_SIZE = 5 * 1024 * 1024;
 const ALLOWED_FILE_TYPES = ['image/jpeg', 'image/png'];
 
 export const bannerService = {
@@ -13,12 +13,12 @@ export const bannerService = {
       throw new Error('No file provided');
     }
     if (file.size > MAX_FILE_SIZE) {
-        throw new Error('File size exceeds 5MB');
+      throw new Error('File size exceeds 5MB');
     }
     if (!ALLOWED_FILE_TYPES.includes(file.type)) {
-        throw new Error('Invalid file type');
+      throw new Error('Invalid file type');
     }
-    
+
     // why use promise man?
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
@@ -29,33 +29,39 @@ export const bannerService = {
   },
 
   async updateBanner(uid, file) {
-    const downloadURL = await this.uploadBanner(uid, file);
-    await updateDoc(doc(db, 'users', uid), { bannerUrl: downloadURL });
-    return downloadURL;
+    try {
+      const downloadURL = await this.uploadBanner(uid, file);
+      await updateDoc(doc(db, 'users', uid), { bannerUrl: downloadURL });
+      return downloadURL;
+    } catch (error) {
+      console.error('Error updating banner:', error);
+      throw error;
+    }
   },
 
   async deleteBanner(uid) {
-    // For base64, just remove from Firestore
-    await updateDoc(doc(db, 'users', uid), { bannerUrl: null });
-    return true;
+    try {
+      // For base64, just remove from Firestore
+      await updateDoc(doc(db, 'users', uid), { bannerUrl: null });
+      return true;
+    } catch (error) {
+      console.error('Error deleting banner:', error);
+      throw error;
+    }
   },
 
   async getBannerUrl(uid) {
-    const userRef = doc(db, 'users', uid);
-    const userDoc = await getDoc(userRef);
-    if (userDoc.exists()) {
-      const userData = userDoc.data();
-      return userData.bannerUrl;
+    try {
+      const userRef = doc(db, 'users', uid);
+      const userDoc = await getDoc(userRef);
+      if (userDoc.exists()) {
+        const userData = userDoc.data();
+        return userData.bannerUrl;
+      }
+      return null;
+    } catch (error) {
+      console.error('Error getting banner URL:', error);
+      return null;
     }
-    return null;
-  }
-
-
-
-
+  },
 };
-
-
-
-
-

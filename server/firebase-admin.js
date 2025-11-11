@@ -1,35 +1,45 @@
-// Firebase Firestore for server-side operations using the web SDK
-// This allows us to use Firebase without needing a service account key
-
-const { initializeApp } = require('firebase/app');
-const { getFirestore } = require('firebase/firestore');
+const admin = require('firebase-admin');
 const path = require('path');
 require('dotenv').config({ path: path.resolve(__dirname, '../.env') });
 
-let db = null;
-
 try {
-  // Firebase web config
-  const firebaseConfig = {
-    apiKey: 'AIzaSyBxHZ8mo0hYCzwn1vdmuNbvqAIZKJo_CAM',
-    authDomain: 'vocabularymanga.firebaseapp.com',
-    projectId: 'vocabularymanga',
-    storageBucket: 'vocabularymanga.firebasestorage.app',
-    messagingSenderId: '640532718693',
-    appId: '1:640532718693:web:1bf8682d59afe9ec41928c',
-  };
-
-  // Initialize Firebase
-  const app = initializeApp(firebaseConfig);
-
-  // Initialize Firestore
-  db = getFirestore(app);
-  console.log('✅ Firebase Firestore initialized (server-side)');
+  // For local development
+  if (process.env.NODE_ENV !== 'production') {
+    // Try to use credentials file if it exists
+    const credentialsPath = process.env.FIREBASE_CREDENTIALS_PATH;
+    if (credentialsPath) {
+      const serviceAccount = require(credentialsPath);
+      admin.initializeApp({
+        credential: admin.credential.cert(serviceAccount),
+        projectId: process.env.VITE_FIREBASE_PROJECT_ID,
+      });
+      console.log('✅ Firebase Admin SDK initialized (dev - from file)');
+    } else {
+      console.warn('⚠️ No FIREBASE_CREDENTIALS_PATH in development. Some features may not work.');
+      console.warn('Set FIREBASE_CREDENTIALS_PATH to your service account JSON file.');
+    }
+  } else {
+    // For production (Render) - use environment variable as JSON string
+    const serviceAccountJson = process.env.FIREBASE_SERVICE_ACCOUNT_JSON;
+    if (!serviceAccountJson) {
+      throw new Error(
+        'FIREBASE_SERVICE_ACCOUNT_JSON environment variable not set. ' +
+        'Set it in your Render dashboard or environment.'
+      );
+    }
+    
+    const serviceAccount = JSON.parse(serviceAccountJson);
+    admin.initializeApp({
+      credential: admin.credential.cert(serviceAccount),
+      projectId: process.env.VITE_FIREBASE_PROJECT_ID,
+    });
+    console.log('✅ Firebase Admin SDK initialized (production)');
+  }
 } catch (error) {
-  console.error('❌ Firebase initialization failed:', error.message);
-  console.error('Cache functionality will not work without Firebase setup');
+  console.error('❌ Firebase Admin initialization failed:', error.message);
+  if (process.env.NODE_ENV === 'production') {
+    console.error('Make sure FIREBASE_SERVICE_ACCOUNT_JSON is properly set in production.');
+  }
 }
 
-module.exports = {
-  db,
-};
+module.exports = admin;
