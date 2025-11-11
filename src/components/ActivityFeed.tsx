@@ -85,24 +85,48 @@ const ActivityFeed = () => {
       case 'word_add': {
         const translation = activity.translation ?? data.translation;
         const translationText = translation ? ` - ${translation}` : '';
+        const mangaTitle =
+          typeof activity.mangaTitle === 'string'
+            ? activity.mangaTitle
+            : activity.mangaTitle?.english ||
+              activity.mangaTitle?.romaji ||
+              activity.mangaTitle?.native ||
+              data.mangaTitle ||
+              'Unknown';
         return {
-          title: `Added "${activity.word ?? data.word ?? 'Unknown'}"${translationText} from ${activity.mangaTitle}`,
+          title: `Added "${activity.word ?? data.word ?? 'Unknown'}"${translationText} from ${mangaTitle}`,
           changes: [],
         };
       }
 
       case 'word_update': {
         const wordName = activity.word ?? data.word ?? 'Unknown';
+        const mangaTitle =
+          typeof activity.mangaTitle === 'string'
+            ? activity.mangaTitle
+            : activity.mangaTitle?.english ||
+              activity.mangaTitle?.romaji ||
+              activity.mangaTitle?.native ||
+              data.mangaTitle ||
+              'Unknown';
         return {
-          title: `Updated "${wordName}" from ${activity.mangaTitle}`,
+          title: `Updated "${wordName}" from ${mangaTitle}`,
           changes: changeEntries,
         };
       }
 
       case 'word_delete': {
         const wordName = activity.word ?? data.word ?? 'Unknown';
+        const mangaTitle =
+          typeof activity.mangaTitle === 'string'
+            ? activity.mangaTitle
+            : activity.mangaTitle?.english ||
+              activity.mangaTitle?.romaji ||
+              activity.mangaTitle?.native ||
+              data.mangaTitle ||
+              'Unknown';
         return {
-          title: `Deleted "${wordName}" from ${activity.mangaTitle}`,
+          title: `Deleted "${wordName}" from ${mangaTitle}`,
           changes: [],
         };
       }

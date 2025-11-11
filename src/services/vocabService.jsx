@@ -63,12 +63,18 @@ export const useAddVocabWord = () => {
       }
 
       await saveVocabWord(uid, mangaId, wordId, wordData);
+      // Extract manga title - handle both string and object formats
+      const mangaTitleForLog =
+        typeof wordData.mangaTitle === 'string'
+          ? wordData.mangaTitle
+          : wordData.mangaTitle?.english ||
+            wordData.mangaTitle?.romaji ||
+            wordData.mangaTitle?.native ||
+            'Unknown';
+
       await logActivity('word_add', {
         word: wordData.word,
-        mangaTitle:
-          typeof wordData.mangaTitle === 'string'
-            ? wordData.mangaTitle
-            : String(wordData.mangaTitle || 'Unknown'),
+        mangaTitle: mangaTitleForLog,
         mangaId,
         coverImage,
       });
@@ -112,9 +118,18 @@ export const useUpdateVocabWord = () => {
           console.warn('Failed to fetch cover image:', err);
         }
 
+        // Extract manga title - handle both string and object formats
+        const mangaTitleForUpdateLog =
+          typeof newData.mangaTitle === 'string'
+            ? newData.mangaTitle
+            : newData.mangaTitle?.english ||
+              newData.mangaTitle?.romaji ||
+              newData.mangaTitle?.native ||
+              'Unknown';
+
         await logActivity('word_update', {
           word: newData.word,
-          mangaTitle: newData.mangaTitle,
+          mangaTitle: mangaTitleForUpdateLog,
           mangaId,
           wordId,
           changes,
@@ -149,9 +164,18 @@ export const useDeleteVocabWord = () => {
         console.warn('Failed to fetch cover image:', err);
       }
 
+      // Extract manga title - handle both string and object formats
+      const mangaTitle =
+        typeof data.wordData?.mangaTitle === 'string'
+          ? data.wordData.mangaTitle
+          : data.wordData?.mangaTitle?.english ||
+            data.wordData?.mangaTitle?.romaji ||
+            data.wordData?.mangaTitle?.native ||
+            'Unknown';
+
       await logActivity('word_delete', {
         word: data.wordData?.word,
-        mangaTitle: data.wordData?.mangaTitle,
+        mangaTitle,
         mangaId: variables.mangaId,
         wordId: variables.wordId,
         coverImage,
