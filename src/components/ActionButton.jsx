@@ -15,7 +15,6 @@ const ActionButton = ({
   buttonPadding = 'px-12 py-4',
   buttonShadow = 'shadow-lg',
   buttonHoverShadow = 'hover:shadow-xl',
-  buttonRounded = 'rounded-xl',
   buttonTransition = 'transition-all duration-200',
   hoverScale = 1.01,
   tapScale = 0.99,
@@ -35,14 +34,15 @@ const ActionButton = ({
         variant={variant}
         color={color}
         size={size}
+        radius={12}
         leftSection={
           icon && (
-            <div className={`flex items-center justify-center ${iconContainerSize}`}>
+            <div className={`flex items-center  justify-center ${iconContainerSize}`}>
               {icon}
             </div>
           )
         }
-        className={`${buttonPadding} ${buttonShadow} ${buttonHoverShadow} ${buttonTransition} ${buttonRounded} ${className}`}
+        className={`${buttonPadding} ${buttonShadow} ${buttonHoverShadow} ${buttonTransition} ${className} `}
         onClick={onClick}
         disabled={disabled}
         loading={loading}

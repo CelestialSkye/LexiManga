@@ -131,7 +131,7 @@ const ProfilePage = () => {
         </div>
 
         {/* Tab Navigation */}
-        <div className='mt-18 mb-2 md:mt-18'>
+        <div className='mt-18  md:mt-18'>
           {isDesktop ? (
             <div className='mr-[calc((100vw-min(80vw,1200px))/2)] ml-[calc((100vw-min(80vw,1200px))/2+192px)] pl-4'>
               <ScrollButtons items={tabs} activeItem={activeTab} onItemClick={setActiveTab} />

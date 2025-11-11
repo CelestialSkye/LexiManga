@@ -49,12 +49,7 @@ const FeedbackModal = ({ opened, closeModal }) => {
       radius='lg'
     >
       <Stack gap='md'>
-        <TextInput
-          label='Email'
-          placeholder='your@email.com'
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-        />
+   
 
         <Select
           label='Feedback Type'
@@ -64,6 +59,7 @@ const FeedbackModal = ({ opened, closeModal }) => {
             { value: 'feature', label: 'Feature Request' },
             { value: 'general', label: 'General Feedback' },
           ]}
+          className='violet-focus'
           value={feedbackType}
           onChange={(value) => setFeedbackType(value || 'general')}
         />
@@ -78,9 +74,7 @@ const FeedbackModal = ({ opened, closeModal }) => {
         />
 
         <Group justify='center' gap='md'>
-          <Button variant='default' onClick={closeModal}>
-            Cancel
-          </Button>
+       
           <Button
             color='violet'
             onClick={handleSubmit}
@@ -89,6 +83,9 @@ const FeedbackModal = ({ opened, closeModal }) => {
             radius={8}
           >
             Send
+          </Button>
+             <Button variant='default' onClick={closeModal}>
+            Cancel
           </Button>
         </Group>
       </Stack>

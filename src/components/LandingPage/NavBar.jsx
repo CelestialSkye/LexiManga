@@ -7,6 +7,7 @@ import { useAuth } from '../../context/AuthContext';
 import { HERO_BANNER_CONFIG } from '../../constants/heroBannerConfig';
 import { dropdownCloseVariants } from '../../utils/animationUtils';
 import logo from '../../assets/logo.svg';
+import ActionButton from '@components/ActionButton';
 
 export default function NavBar() {
   const isMobile = useMediaQuery(`(max-width: ${HERO_BANNER_CONFIG.breakpoints.mobile}px)`);
@@ -110,12 +111,9 @@ export default function NavBar() {
 
         {/* Desktop Menu */}
         <div className='flex items-center gap-8'>
-          <a
-            href='#register'
-            className='font-medium text-gray-800 transition-colors hover:text-purple-600'
-          >
+          <ActionButton variant='filled' size='sm' onClick={() => navigate('/auth')}>
             Register
-          </a>
+          </ActionButton>
         </div>
       </div>
     </nav>

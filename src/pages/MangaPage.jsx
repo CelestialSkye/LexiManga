@@ -119,16 +119,12 @@ const MangaPage = () => {
       {/* page background */}
       <div className='flex flex-1 flex-col rounded-b-[16px] bg-white shadow-sm'>
         {/*  banner section */}
-        <div className={`relative w-full bg-white ${isMobile ? 'h-52' : 'h-96'}`}>
+        <div className={`relative w-full bg-white ${isMobile ? 'h-52' : 'h-94'}`}>
           {/* TopBar overlap with the banner */}
           <div className={`${isDesktop ? 'absolute top-0 right-0 left-0 z-10' : ''}`}>
             <TopBar />
           </div>
-          {/* debug
-        <div className="text-white bg-black p-2 text-xs">
-          isMobile: {isMobile ? 'true' : 'false'} | Height: {isMobile ? 'h-52' : 'h-96'}
-        </div> */}
-          {/* Banner Background - always shows, with fallback gradient if no bannerImage */}
+     
           <div
             className={`relative mb-6 ${isMobile ? 'h-52' : 'h-96'} w-full`}
             style={{
@@ -192,7 +188,7 @@ const MangaPage = () => {
         </div>
 
         {/* Tab Navigation */}
-        <div className='mt-22 mb-2 md:mt-22'>
+        <div className='mt-22  md:mt-22'>
           {isDesktop ? (
             <div className='flex items-center'>
               {/* Buttons directly under cover image */}
