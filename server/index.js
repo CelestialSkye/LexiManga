@@ -2,6 +2,17 @@ const path = require('path');
 const fs = require('fs');
 require('dotenv').config({ path: path.resolve(__dirname, '../.env') });
 
+// Initialize Sentry BEFORE any other code
+const Sentry = require('@sentry/node');
+if (process.env.SENTRY_DSN) {
+  Sentry.init({
+    dsn: process.env.SENTRY_DSN,
+    tracesSampleRate: 1.0,
+    integrations: [new Sentry.Integrations.Http({ tracing: true })],
+    environment: process.env.NODE_ENV,
+  });
+}
+
 const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
@@ -71,6 +82,12 @@ const corsOptions = {
 };
 
 app.use(cors(corsOptions));
+
+// ============ MONITORING: Sentry Request Handler ============
+// Capture transactions for performance monitoring
+if (process.env.SENTRY_DSN) {
+  app.use(Sentry.Handlers.requestHandler());
+}
 
 // ============ SECURITY: Security Headers with Helmet ============
 app.use(
@@ -1286,6 +1303,12 @@ app.get('/api/csrf-token', (req, res) => {
 app.get('/api/health', (req, res) => {
   res.json({ status: 'OK', port: PORT });
 });
+
+// ============ MONITORING: Sentry Error Handler ============
+// Capture exceptions and send to Sentry (must be after all routes and before other error handlers)
+if (process.env.SENTRY_DSN) {
+  app.use(Sentry.Handlers.errorHandler());
+}
 
 // Setup error handlers
 setupErrorHandlers();
