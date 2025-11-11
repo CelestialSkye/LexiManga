@@ -230,7 +230,7 @@ const MangaPage = () => {
         </div>
       </div>
 
-      <div className='page-container mb-96 flex flex-1 flex-col pb-6'>
+      <div className='page-container flex flex-1 flex-col pb-6'>
         <div className='relative mt-6 flex flex-1 flex-col'>
           {/* left section */}
           {isDesktop && (

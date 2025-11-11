@@ -37,7 +37,7 @@ const AppContent = () => {
 
   return (
     <div className='flex min-h-screen flex-col'>
-      <main className='flex-1'>
+      <main className='mb-96 flex-1'>
         <Routes>
           <Route path='/' element={<LandingPage />} />
           <Route path='/auth' element={<Auth />} />
