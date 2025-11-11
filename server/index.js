@@ -1300,8 +1300,73 @@ app.get('/api/csrf-token', (req, res) => {
   }
 });
 
-app.get('/api/health', (req, res) => {
-  res.json({ status: 'OK', port: PORT });
+// ============ MONITORING: Enhanced Health Check Endpoint ============
+// Provides system status, dependency health, and performance metrics
+app.get('/api/health', async (req, res) => {
+  try {
+    const health = {
+      status: 'healthy',
+      timestamp: new Date().toISOString(),
+      uptime: process.uptime(),
+      port: PORT,
+      environment: process.env.NODE_ENV,
+      memory: {
+        used: Math.round(process.memoryUsage().heapUsed / 1024 / 1024), // MB
+        total: Math.round(process.memoryUsage().heapTotal / 1024 / 1024), // MB
+      },
+      checks: {
+        firebase: 'pending',
+        cache: 'pending',
+        anilist: 'pending',
+      },
+    };
+
+    // Check Firebase connection
+    try {
+      await admin.firestore().collection('_health').limit(1).get();
+      health.checks.firebase = 'connected';
+    } catch (error) {
+      health.checks.firebase = 'error';
+      health.status = 'degraded';
+      console.error('Firebase health check failed:', error.message);
+    }
+
+    // Check cache availability
+    try {
+      health.checks.cache = cache && cache.has ? 'available' : 'unavailable';
+    } catch (error) {
+      health.checks.cache = 'error';
+    }
+
+    // Check AniList API connectivity
+    try {
+      const response = await axios.post('https://graphql.anilist.co', {
+        query: 'query { Page { pageInfo { total } } }',
+      });
+
+      if (response.status === 200) {
+        health.checks.anilist = 'available';
+      } else {
+        health.checks.anilist = 'error';
+        health.status = 'degraded';
+      }
+    } catch (error) {
+      health.checks.anilist = 'error';
+      health.status = 'degraded';
+      console.error('AniList API health check failed:', error.message);
+    }
+
+    // Return appropriate status code
+    const statusCode = health.status === 'healthy' ? 200 : 503;
+    res.status(statusCode).json(health);
+  } catch (error) {
+    console.error('Health check error:', error);
+    res.status(503).json({
+      status: 'unhealthy',
+      error: 'Health check failed',
+      timestamp: new Date().toISOString(),
+    });
+  }
 });
 
 // ============ MONITORING: Sentry Error Handler ============
