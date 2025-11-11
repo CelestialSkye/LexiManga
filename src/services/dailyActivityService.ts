@@ -113,37 +113,48 @@ export const calculateStreak = async (userId: string): Promise<number> => {
       return 0;
     }
 
-    let streak = 0;
-    let currentDate = getStartOfDay();
-
+    // Get unique dates with activities, sorted descending
+    const uniqueDates = new Set<number>();
     for (const activity of activities) {
-      const activityDate = getStartOfDay(activity.timestamp);
+      const activityDate = getStartOfDay(activity.timestamp).getTime();
+      uniqueDates.add(activityDate);
+    }
 
-      // Check if activity is on the current date we're checking
-      if (activityDate.getTime() === currentDate.getTime()) {
-        // Activity on this date exists, move to previous day
-        currentDate.setDate(currentDate.getDate() - 1);
-        // Increment streak only if we haven't already counted this day
-        if (
-          streak === 0 ||
-          getStartOfDay(activities[0].timestamp).getTime() !== getStartOfDay().getTime()
-        ) {
-          streak++;
-        }
-      } else if (activityDate.getTime() < currentDate.getTime()) {
-        // Activity is from an earlier date
-        const daysDifference = Math.floor(
-          (currentDate.getTime() - activityDate.getTime()) / (1000 * 60 * 60 * 24)
-        );
+    const sortedDates = Array.from(uniqueDates).sort((a, b) => b - a);
 
-        if (daysDifference === 1) {
-          // Activity is from yesterday, continue streak
-          currentDate = activityDate;
-          streak++;
-        } else {
-          // Gap in days, streak is broken
-          break;
-        }
+    if (sortedDates.length === 0) {
+      return 0;
+    }
+
+    // Check if the most recent activity is today or yesterday
+    const today = getStartOfDay().getTime();
+    const mostRecentDate = sortedDates[0];
+    const daysDifferenceFromToday = Math.floor((today - mostRecentDate) / (1000 * 60 * 60 * 24));
+
+    // If no activity in last 2 days, streak is broken
+    if (daysDifferenceFromToday > 1) {
+      return 0;
+    }
+
+    // Calculate streak by counting consecutive days backwards
+    let streak = 0;
+    let expectedDate = mostRecentDate;
+
+    for (const date of sortedDates) {
+      const daysDifference = Math.floor((expectedDate - date) / (1000 * 60 * 60 * 24));
+
+      if (daysDifference === 0) {
+        // Same day as expected, increment streak
+        streak++;
+        // Move to previous day
+        expectedDate = date - 24 * 60 * 60 * 1000;
+      } else if (daysDifference === 1) {
+        // Previous day, continue streak
+        streak++;
+        expectedDate = date - 24 * 60 * 60 * 1000;
+      } else {
+        // Gap found, streak is broken
+        break;
       }
     }
 
