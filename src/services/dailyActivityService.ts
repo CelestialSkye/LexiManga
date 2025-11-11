@@ -3,11 +3,9 @@ import { db } from '../config/firebase';
 import { getAuth } from 'firebase/auth';
 
 export interface DailyActivity {
-  readManga: boolean;
-  mangaAddedCount: number;
   addedWordsCount: number;
+  mangaAddedCount: number;
   streak: number;
-  lastActivityDate: string | null;
 }
 
 /**
@@ -46,11 +44,9 @@ export const getDailyActivities = async (): Promise<DailyActivity> => {
 
   if (!user) {
     return {
-      readManga: false,
-      mangaAddedCount: 0,
       addedWordsCount: 0,
+      mangaAddedCount: 0,
       streak: 0,
-      lastActivityDate: null,
     };
   }
 
@@ -82,9 +78,6 @@ export const getDailyActivities = async (): Promise<DailyActivity> => {
       });
 
     // Count different activity types
-    const mangaReadActivities = activities.filter(
-      (a) => a.type === 'manga_update' && a.chapterRead
-    );
     const mangaAddedActivities = activities.filter((a) => a.type === 'manga_add');
     const wordAddedActivities = activities.filter((a) => a.type === 'word_add');
 
@@ -92,21 +85,16 @@ export const getDailyActivities = async (): Promise<DailyActivity> => {
     const streak = await calculateStreak(user.uid);
 
     return {
-      readManga: mangaReadActivities.length > 0,
       mangaAddedCount: mangaAddedActivities.length,
       addedWordsCount: wordAddedActivities.length,
       streak,
-      lastActivityDate:
-        activities.length > 0 ? (activities[0].timestamp?.toISOString() ?? null) : null,
     };
   } catch (error) {
     console.error('Error fetching daily activities:', error);
     return {
-      readManga: false,
       mangaAddedCount: 0,
       addedWordsCount: 0,
       streak: 0,
-      lastActivityDate: null,
     };
   }
 };
