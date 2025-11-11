@@ -179,14 +179,17 @@ const TopBar = () => {
                           />
                         </button>
 
-                        <AnimatePresence mode='wait'>
+                        <AnimatePresence>
                           {isNotificationsOpen && (
                             <motion.div
                               variants={dropdownCloseVariants}
                               initial='closed'
                               animate='open'
                               exit='closed'
-                              className={`notifications-container pointer-events-auto absolute top-14 right-0 z-[9999] flex min-w-[300px] flex-col gap-0 rounded-lg ${dropdownBgClass} p-0 shadow-lg`}
+                              className={`notifications-container pointer-events-auto absolute top-14 right-0 z-50 flex min-w-[300px] flex-col gap-0 overflow-hidden rounded-lg shadow-lg`}
+                              style={{
+                                backgroundColor: isDarkTopbar ? 'rgba(0, 0, 0, 0.4)' : 'white',
+                              }}
                             >
                               <div className='space-y-4 p-4'>
                                 <div className='flex items-center justify-between border-b pb-4'>
