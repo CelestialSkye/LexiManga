@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { db } from '../config/firebase';
-import { doc, getDoc, setDoc, deleteDoc, getDocs, collection } from 'firebase/firestore';
+import { doc, getDoc, setDoc, deleteDoc, getDocs, collection, addDoc } from 'firebase/firestore';
+import { getAuth } from 'firebase/auth';
 
 export const useIsFavorited = (uid, mangaId) => {
   return useQuery({
@@ -38,6 +39,12 @@ const toggleFavorite = async (uid, mangaId, mangaData) => {
 
   if (existingDoc.exists()) {
     await deleteDoc(favoriteRef);
+    // Log activity for removing from favorites
+    await logActivity('favorite_remove', {
+      mangaId,
+      title: mangaData.title?.english || mangaData.title?.romaji || 'Unknown',
+      coverImage: mangaData.coverImage?.large || '',
+    });
   } else {
     const favoriteData = {
       mangaId,
@@ -48,6 +55,12 @@ const toggleFavorite = async (uid, mangaId, mangaData) => {
       favoritedAt: new Date().toISOString(),
     };
     await setDoc(favoriteRef, favoriteData);
+    // Log activity for adding to favorites
+    await logActivity('favorite_add', {
+      mangaId,
+      title: favoriteData.title,
+      coverImage: favoriteData.coverImage,
+    });
   }
 
   return { isFavorited: !existingDoc.exists() };
@@ -70,4 +83,27 @@ export const getFavoritedManga = async (uid) => {
     id: doc.id,
     ...doc.data(),
   }));
+};
+
+/**
+ * Log favorite activity to user's activity feed
+ */
+const logActivity = async (type, data) => {
+  try {
+    const auth = getAuth();
+    const user = auth.currentUser;
+    if (!user) {
+      console.warn('No user logged in for activity logging');
+      return;
+    }
+
+    await addDoc(collection(db, 'users', user.uid, 'activities'), {
+      type,
+      ...data,
+      userId: user.uid,
+      timestamp: new Date(),
+    });
+  } catch (error) {
+    console.error('Error logging favorite activity:', error);
+  }
 };
