@@ -117,7 +117,7 @@ const MangaPage = () => {
   return (
     <div className='flex min-h-screen flex-col'>
       {/* page background */}
-      <div className='flex-1 rounded-b-[16px] bg-white shadow-sm'>
+      <div className='flex flex-1 flex-col rounded-b-[16px] bg-white shadow-sm'>
         {/*  banner section */}
         <div className={`relative w-full bg-white ${isMobile ? 'h-52' : 'h-96'}`}>
           {/* TopBar overlap with the banner */}
@@ -230,8 +230,8 @@ const MangaPage = () => {
         </div>
       </div>
 
-      <div className='page-container pb-6'>
-        <div className='relative mt-6'>
+      <div className='page-container flex flex-1 flex-col pb-6'>
+        <div className='relative mt-6 flex flex-1 flex-col'>
           {/* left section */}
           {isDesktop && (
             <div className='absolute left-0 w-48 pb-4'>
@@ -362,10 +362,12 @@ const MangaPage = () => {
           )}
 
           {/* main container - positioned to the right of sidebar */}
-          <div className={`w-full ${isDesktop ? 'ml-50 max-w-[calc(100%-200px)] pl-2' : ''}`}>
+          <div
+            className={`flex w-full flex-1 flex-col ${isDesktop ? 'ml-50 max-w-[calc(100%-200px)] pl-2' : ''}`}
+          >
             {isMobile && <SideScrollinfo manga={manga} />}
 
-            <div className='mb-4'>
+            <div className='mb-4 flex-1'>
               {activeTab === 'overview' && <OverviewTab manga={manga} />}
 
               {activeTab === 'read' && (
