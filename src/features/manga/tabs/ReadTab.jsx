@@ -36,7 +36,6 @@ const ReadTab = ({ manga }) => {
   const searchMangaPlus = () => {
     const title = manga?.title?.english || manga?.title?.romaji || manga?.title?.native;
     if (!title) {
-      console.log('No title found for manga:', manga);
       return;
     }
     const encodedTitle = encodeURIComponent(title);
@@ -47,7 +46,6 @@ const ReadTab = ({ manga }) => {
   const searchAzuki = () => {
     const title = manga?.title?.english || manga?.title?.romaji || manga?.title?.native;
     if (!title) {
-      console.log('No title found for manga:', manga);
       return;
     }
 

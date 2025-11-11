@@ -47,7 +47,7 @@ export const AuthProvider = ({ children }) => {
       setUser(newUser);
       setProfile({ nickname, nativeLang, targetLang });
     } catch (error) {
-      console.error('Registration error:', error);
+      console.error('Registration failed');
       throw error;
     }
   };
@@ -75,7 +75,7 @@ export const AuthProvider = ({ children }) => {
       setProfile((prev) => ({ ...prev, avatarUrl }));
       return avatarUrl;
     } catch (error) {
-      console.error('Error updating avatar:', error);
+      console.warn('Avatar update failed');
       throw error;
     }
   };
@@ -95,7 +95,7 @@ export const AuthProvider = ({ children }) => {
 
       return true;
     } catch (error) {
-      console.error('Avatar delete error:', error);
+      console.warn('Avatar deletion failed');
       throw error;
     }
   };
@@ -111,7 +111,7 @@ export const AuthProvider = ({ children }) => {
       setProfile((prev) => ({ ...prev, bannerUrl }));
       return bannerUrl;
     } catch (error) {
-      console.error('Error updating banner:', error);
+      console.warn('Banner update failed');
       throw error;
     }
   };
@@ -131,7 +131,7 @@ export const AuthProvider = ({ children }) => {
 
       return true;
     } catch (error) {
-      console.error('Banner delete error:', error);
+      console.warn('Banner deletion failed');
       throw error;
     }
   };
