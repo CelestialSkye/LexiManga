@@ -6,6 +6,7 @@ import { useAuth } from '../../hooks/useAuth';
 import { getDailyActivities } from '../../services/dailyActivityService';
 import defaultAvatar from '../../assets/defaultAvatar.jpg';
 import logo from '../../assets/logo.svg';
+import { capitalizeFirstLetter } from '../../utils/formatUtils';
 
 const TopBarMobile = () => {
   const [isMounted, setIsMounted] = useState(false);
@@ -86,7 +87,7 @@ const TopBarMobile = () => {
             />
             <div>
               <h2 className='text-xl font-bold text-gray-800'>
-                Hello {profile?.nickname || 'User'}!
+                Hello {capitalizeFirstLetter(profile?.nickname || 'User')}!
               </h2>
               <p className='text-sm text-gray-500'>
                 {dailyActivities?.mangaAddedCount === 0 && dailyActivities?.addedWordsCount === 0
