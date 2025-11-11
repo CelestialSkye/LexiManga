@@ -230,11 +230,11 @@ const MangaPage = () => {
         </div>
       </div>
 
-      <div className='page-container flex flex-1 flex-col pb-6'>
-        <div className='relative mt-6 flex flex-1 flex-col'>
+      <div className='page-container flex flex-1 flex-col'>
+        <div className={`mt-6 flex flex-1 gap-4 ${isDesktop ? 'flex-row' : 'flex-col'}`}>
           {/* left section */}
           {isDesktop && (
-            <div className='absolute left-0 w-48 pb-4'>
+            <div className='w-48 flex-shrink-0'>
               <div className='mt-0 rounded-[16px] bg-white p-4 shadow-sm'>
                 <h3 className='mb-4 text-sm font-bold text-gray-800'>Quick Info</h3>
                 <div className='space-y-3'>
@@ -362,9 +362,7 @@ const MangaPage = () => {
           )}
 
           {/* main container - positioned to the right of sidebar */}
-          <div
-            className={`flex w-full flex-1 flex-col ${isDesktop ? 'ml-50 max-w-[calc(100%-200px)] pl-2' : ''}`}
-          >
+          <div className={`flex flex-1 flex-col`}>
             {isMobile && <SideScrollinfo manga={manga} />}
 
             <div className='mb-4 flex-1'>
