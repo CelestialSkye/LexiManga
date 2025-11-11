@@ -1,18 +1,19 @@
+import { Center, Stack, Text } from '@mantine/core';
 import { useMediaQuery } from '@mantine/hooks';
+import { useEffect, useState } from 'react';
+
 import DataTable from './DataTable';
 import MobileWordCard from './MobileWordCard';
 import WordDetailModal from './WordDetailModal';
-import { useState, useEffect } from 'react';
-import { Stack, Text, Center } from '@mantine/core';
 
-const ResponsiveWordList = ({ 
-  data, 
-  columns, 
-  loading, 
+const ResponsiveWordList = ({
+  data,
+  columns,
+  loading,
   emptyMessage,
   onWordClick,
   onEditWord,
-  onDeleteWord 
+  onDeleteWord,
 }) => {
   const isMobile = useMediaQuery('(max-width: 768px)');
   const [selectedWord, setSelectedWord] = useState(null);
@@ -28,11 +29,10 @@ const ResponsiveWordList = ({
     });
   };
 
-
   // ensures selected word is updated while modal is open
   useEffect(() => {
     if (isDetailModalOpen && selectedWord) {
-      const updatedWord = data.find(w => w.id === selectedWord.id);
+      const updatedWord = data.find((w) => w.id === selectedWord.id);
       if (updatedWord && updatedWord !== selectedWord) {
         setSelectedWord(updatedWord);
       }
@@ -41,16 +41,16 @@ const ResponsiveWordList = ({
 
   if (loading) {
     return (
-      <Center py="xl">
-        <Text c="dimmed">Loading words...</Text>
+      <Center py='xl'>
+        <Text c='dimmed'>Loading words...</Text>
       </Center>
     );
   }
 
   if (data.length === 0) {
     return (
-      <Center py="xl">
-        <Text c="dimmed">{emptyMessage}</Text>
+      <Center py='xl'>
+        <Text c='dimmed'>{emptyMessage}</Text>
       </Center>
     );
   }
@@ -58,7 +58,7 @@ const ResponsiveWordList = ({
   return (
     <>
       {isMobile ? (
-        <Stack gap="sm">
+        <Stack gap='sm'>
           {data.map((word, index) => (
             <MobileWordCard
               key={word.id || index}

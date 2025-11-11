@@ -1,8 +1,9 @@
-import { useState, useRef } from 'react';
-import { useAuth } from '../context/AuthContext';
-import { Modal, Alert } from '@mantine/core';
-import ActionButton from './ActionButton';
+import { Alert, Modal } from '@mantine/core';
 import { useMediaQuery } from '@mantine/hooks';
+import { useRef, useState } from 'react';
+
+import { useAuth } from '../context/AuthContext';
+import ActionButton from './ActionButton';
 const defaultBanner = new URL('../assets/defaultBanner.jpg', import.meta.url).href;
 
 const BannerUpload = () => {

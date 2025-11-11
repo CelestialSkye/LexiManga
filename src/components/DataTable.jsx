@@ -1,24 +1,20 @@
-import { Table, Center, Loader } from '@mantine/core';
+import { Center, Loader, Table } from '@mantine/core';
 
-const DataTable = ({ 
-  data, 
-  columns, 
+const DataTable = ({
+  data,
+  columns,
   loading = false,
-  emptyMessage = "No data found",
+  emptyMessage = 'No data found',
   onRowClick,
-  ...props 
+  ...props
 }) => {
-
   return (
-    <div className="w-full overflow-x-auto">
-      <Table {...props} className="w-full table-auto">
+    <div className='w-full overflow-x-auto'>
+      <Table {...props} className='w-full table-auto'>
         <Table.Thead>
           <Table.Tr>
             {columns.map((col, index) => (
-              <Table.Th
-                key={index}
-                className="text-left px-4 py-3 whitespace-nowrap"
-              >
+              <Table.Th key={index} className='px-4 py-3 text-left whitespace-nowrap'>
                 {col.header}
               </Table.Th>
             ))}
@@ -29,7 +25,9 @@ const DataTable = ({
           {loading ? (
             <Table.Tr>
               <Table.Td colSpan={columns.length}>
-                <Center><Loader size="sm" /></Center>
+                <Center>
+                  <Loader size='sm' />
+                </Center>
               </Table.Td>
             </Table.Tr>
           ) : data.length === 0 ? (
@@ -43,13 +41,10 @@ const DataTable = ({
               <Table.Tr
                 key={rowIndex}
                 onClick={() => onRowClick?.(row)}
-                className="hover:bg-gray-50 cursor-pointer"
+                className='cursor-pointer hover:bg-gray-50'
               >
                 {columns.map((col, colIndex) => (
-                  <Table.Td
-                    key={colIndex}
-                    className="text-left px-4 py-3 whitespace-nowrap"
-                  >
+                  <Table.Td key={colIndex} className='px-4 py-3 text-left whitespace-nowrap'>
                     {col.render ? col.render(row) : row[col.key]}
                   </Table.Td>
                 ))}

@@ -1,11 +1,12 @@
 // Authentication service
 import {
-  signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
-  signOut,
   onAuthStateChanged,
+  signInWithEmailAndPassword,
+  signOut,
 } from 'firebase/auth';
-import { collection, getDocs, doc, deleteDoc, writeBatch, query, where } from 'firebase/firestore';
+import { collection, deleteDoc, doc, getDocs, query, where, writeBatch } from 'firebase/firestore';
+
 import { auth, db } from '../config/firebase';
 import firestoreService from './firestoreService';
 
@@ -144,8 +145,8 @@ export const authService = {
       throw error;
     }
   },
-  
- async getUserLearningWords(uid) {
+
+  async getUserLearningWords(uid) {
     try {
       const learningWords = await firestoreService.query(`users/${uid}/words`, [
         { field: 'status', operator: '==', value: 'learning' },
@@ -154,7 +155,7 @@ export const authService = {
     } catch (error) {
       throw error;
     }
-  }, 
+  },
 };
 
 export default authService;

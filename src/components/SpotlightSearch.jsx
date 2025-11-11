@@ -1,9 +1,10 @@
-import { useState } from 'react';
-import { Spotlight, spotlight } from '@mantine/spotlight';
 import { useDebouncedValue } from '@mantine/hooks';
+import { Spotlight, spotlight } from '@mantine/spotlight';
 import { IconSearch } from '@tabler/icons-react';
+import { useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
+
 import { useSearchManga } from '../services/anilistApi';
-import { useNavigate, useLocation } from 'react-router-dom';
 
 // Helper functions
 const cleanSearchQuery = (query) => {

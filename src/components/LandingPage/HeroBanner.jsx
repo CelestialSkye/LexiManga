@@ -1,13 +1,17 @@
-import React from 'react';
 import { useMediaQuery } from '@mantine/hooks';
 import { motion } from 'framer-motion';
-import { HERO_BANNER_CONFIG } from '../../constants/heroBannerConfig';
+import React from 'react';
+import { useNavigate } from 'react-router-dom';
+
 import image1 from '../../assets/1.jpg';
 import image2 from '../../assets/2.jpg';
 import image3 from '../../assets/3.jpg';
+import { HERO_BANNER_CONFIG } from '../../constants/heroBannerConfig';
 
 export default function TiltedPhotos() {
   const isMobile = useMediaQuery(`(max-width: ${HERO_BANNER_CONFIG.breakpoints.mobile}px)`);
+  const navigate = useNavigate();
+  const { title, paragraph } = HERO_BANNER_CONFIG.text;
 
   const photos = [
     { id: 1, src: image1, alt: 'Left photo', tilt: -12, startX: -20, startY: 15 },
@@ -15,7 +19,6 @@ export default function TiltedPhotos() {
     { id: 3, src: image3, alt: 'Right photo', tilt: 12, startX: 20, startY: 15 },
   ];
 
-  // Animation for all photos together
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
@@ -85,15 +88,75 @@ export default function TiltedPhotos() {
         ))}
       </motion.div>
 
-      {/* Placeholder text */}
       <motion.div
-        className='pt-6 text-center'
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.8, duration: 0.6 }}
+        className='space-y-4 pt-8 text-center'
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.6, duration: 0.6, ease: 'easeOut' }}
       >
-        <h2 className='text-2xl font-bold text-gray-800'>Lexicon Manga</h2>
-        <p>Leanr Vocabullary through manga reading</p>
+        <h2 className='text-3xl font-extrabold tracking-tight text-violet-600 drop-shadow-sm sm:text-4xl'>
+          <div className='flex flex-wrap justify-center gap-2'>
+            {title.line1.map((word, index) => (
+              <motion.span
+                key={word}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{
+                  duration: 1.2,
+                  ease: [0.22, 1, 0.36, 1],
+                  delay: 0.7 + index * 0.15,
+                }}
+                className='inline-block'
+              >
+                {word}
+              </motion.span>
+            ))}
+          </div>
+          <div className='mt-2 flex flex-wrap justify-center gap-2'>
+            {title.line2.map((word, index) => (
+              <motion.span
+                key={word}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{
+                  duration: 1.2,
+                  ease: [0.22, 1, 0.36, 1],
+                  delay: 0.7 + (title.line1.length + index) * 0.15,
+                }}
+                className='inline-block'
+              >
+                {word}
+              </motion.span>
+            ))}
+          </div>
+        </h2>
+        <motion.p
+          className='mx-auto max-w-md text-sm leading-relaxed text-gray-600 sm:text-base'
+          initial={{ opacity: 0, y: 15 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{
+            duration: 1.2,
+            ease: [0.22, 1, 0.36, 1],
+            delay: 1.1,
+          }}
+        >
+          {paragraph}
+        </motion.p>
+        <motion.button
+          onClick={() => navigate('/home')}
+          className='mt-6 rounded-full bg-violet-600 px-6 py-2 text-sm font-semibold text-white transition-colors duration-300 hover:bg-violet-700 sm:px-8 sm:py-3 sm:text-base'
+          initial={{ opacity: 0, y: 15 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{
+            duration: 1.2,
+            ease: [0.22, 1, 0.36, 1],
+            delay: 1.3,
+          }}
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+        >
+          Get Started
+        </motion.button>
       </motion.div>
     </div>
   );

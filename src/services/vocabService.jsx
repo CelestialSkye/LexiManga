@@ -1,6 +1,6 @@
 // External libraries
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { getAuth } from 'firebase/auth';
-import { AUTO_UPDATE_FIELDS } from './fsrsService';
 import {
   addDoc,
   collection,
@@ -11,11 +11,11 @@ import {
   setDoc,
   updateDoc,
 } from 'firebase/firestore';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 // Internal modules
 import { db } from '../config/firebase';
 import { getMangaDetails } from './anilistApi';
+import { AUTO_UPDATE_FIELDS } from './fsrsService';
 
 // get 1 word
 export const useVocabWord = (uid, mangaId, wordId) => {

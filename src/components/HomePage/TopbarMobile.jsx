@@ -1,11 +1,12 @@
-import React, { useState, useEffect } from 'react';
-import { useMediaQuery } from '@mantine/hooks';
 import { Drawer, Skeleton } from '@mantine/core';
+import { useMediaQuery } from '@mantine/hooks';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../../hooks/useAuth';
-import { getDailyActivities } from '../../services/dailyActivityService';
+
 import defaultAvatar from '../../assets/defaultAvatar.jpg';
 import logo from '../../assets/logo.svg';
+import { useAuth } from '../../hooks/useAuth';
+import { getDailyActivities } from '../../services/dailyActivityService';
 import { capitalizeFirstLetter } from '../../utils/formatUtils';
 
 const TopBarMobile = () => {

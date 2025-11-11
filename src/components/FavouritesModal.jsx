@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from 'src/context/AuthContext';
 import { getFavoritedManga } from 'src/services/favoriteService';
-import { useNavigate } from 'react-router-dom';
 
 const FavouritesModal = () => {
   const { user } = useAuth();
@@ -27,7 +27,7 @@ const FavouritesModal = () => {
       {favorites.map((fav) => (
         <li
           key={fav.id}
-          className='mb-3 flex items-center gap-3 cursor-pointer' 
+          className='mb-3 flex cursor-pointer items-center gap-3'
           onClick={() => navigate(`/manga/${fav.id}`)}
         >
           {fav.coverImage && (

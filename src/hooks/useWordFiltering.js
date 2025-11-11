@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useMemo, useState } from 'react';
 
 const useWordFiltering = (words = []) => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -6,16 +6,17 @@ const useWordFiltering = (words = []) => {
 
   // Filter words based on search term and status
   const filteredWords = useMemo(() => {
-    return words.filter(word => {
+    return words.filter((word) => {
       // Search filter (word, translation, context)
-      const matchesSearch = searchTerm === '' || 
+      const matchesSearch =
+        searchTerm === '' ||
         word.word?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         word.translation?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         word.context?.toLowerCase().includes(searchTerm.toLowerCase());
-      
+
       // Status filter
       const matchesStatus = statusFilter === 'all' || word.status === statusFilter;
-      
+
       return matchesSearch && matchesStatus;
     });
   }, [words, searchTerm, statusFilter]);
@@ -31,7 +32,7 @@ const useWordFiltering = (words = []) => {
       setSearchTerm('');
       setStatusFilter('all');
     },
-    hasActiveFilters: searchTerm !== '' || statusFilter !== 'all'
+    hasActiveFilters: searchTerm !== '' || statusFilter !== 'all',
   };
 };
 

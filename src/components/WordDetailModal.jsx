@@ -1,28 +1,29 @@
 import {
-  Modal,
-  Stack,
-  Text,
-  Badge,
-  Group,
-  Divider,
-  Button,
   ActionIcon,
-  TextInput,
+  Badge,
+  Button,
+  Divider,
+  Group,
+  Modal,
   NumberInput,
   Radio,
+  Stack,
+  Text,
+  TextInput,
 } from '@mantine/core';
 import {
-  IconEdit,
-  IconTrash,
-  IconSearch,
-  IconLanguage,
   IconCheck,
+  IconEdit,
+  IconLanguage,
+  IconSearch,
+  IconTrash,
   IconX,
 } from '@tabler/icons-react';
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
+
 import { useAuth } from '../context/AuthContext';
 import { translateWithGemini } from '../services/geminiApi';
-import { useUpdateVocabWord, useDeleteVocabWord } from '../services/vocabService';
+import { useDeleteVocabWord, useUpdateVocabWord } from '../services/vocabService';
 import { openDeleteConfirmation } from './DeleteConfirmationModal';
 
 const WordDetailModal = ({ opened, onClose, word, onEdit, onDelete }) => {

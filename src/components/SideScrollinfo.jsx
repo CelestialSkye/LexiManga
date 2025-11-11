@@ -1,4 +1,4 @@
-import { ScrollArea, Box, Text, Group, Badge } from '@mantine/core';
+import { Badge, Box, Group, ScrollArea, Text } from '@mantine/core';
 
 function SideScrollinfo({ manga }) {
   if (!manga) return null;

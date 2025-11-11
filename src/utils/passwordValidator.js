@@ -83,10 +83,10 @@ export const validatePasswordStrength = (password) => {
  */
 export const getPasswordStrengthColor = (strength) => {
   const colors = {
-    weak: '#ef4444',      // red
-    fair: '#f97316',      // orange
-    good: '#eab308',      // yellow
-    strong: '#22c55e',    // green
+    weak: '#ef4444', // red
+    fair: '#f97316', // orange
+    good: '#eab308', // yellow
+    strong: '#22c55e', // green
   };
   return colors[strength] || colors.weak;
 };

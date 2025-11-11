@@ -1,16 +1,17 @@
+import HeroBanner from '@components/HeroBanner';
+import Benefits from '@components/LandingPage/Benefits';
+import HeroBannerMobile from '@components/LandingPage/HeroBanner';
+import HowItWorks from '@components/LandingPage/HowItWorks';
+import NavBar from '@components/LandingPage/NavBar';
 import { Container, Text } from '@mantine/core';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
-import { useResponsive } from '../hooks/useResponsive';
-import { ActionButton } from '../components';
-import HeroBanner from '@components/HeroBanner';
-import HeroBannerMobile from '@components/LandingPage/HeroBanner';
-import NavBar from '@components/LandingPage/NavBar';
-import Benefits from '@components/LandingPage/Benefits';
-import HowItWorks from '@components/LandingPage/HowItWorks';
-import screenshot from '../assets/landing/screenshot1.png';
+
 import image1 from '../assets/landing/image1.jpg';
 import image2 from '../assets/landing/image2.jpg';
+import screenshot from '../assets/landing/screenshot1.png';
+import { ActionButton } from '../components';
+import { useAuth } from '../context/AuthContext';
+import { useResponsive } from '../hooks/useResponsive';
 
 const LandingPage = () => {
   const navigate = useNavigate();
@@ -97,7 +98,7 @@ const LandingPage = () => {
 
             <button
               onClick={handleGoToWebsite}
-              className='relative mt-8 rounded-lg bg-purple-600 px-8 py-3 font-semibold text-white transition-colors duration-300 hover:bg-purple-700'
+              className='relative mt-8 rounded-full bg-purple-600 px-8 py-3 font-semibold text-white transition-colors duration-300 hover:bg-purple-700'
             >
               Get Started
             </button>

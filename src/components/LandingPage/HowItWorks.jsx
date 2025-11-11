@@ -1,5 +1,6 @@
-import React from 'react';
 import { useMediaQuery } from '@mantine/hooks';
+import React from 'react';
+
 import screenshot2 from '../../assets/landing/screenshot2.png';
 import screenshot3 from '../../assets/landing/screenshot3.png';
 import screenshot4 from '../../assets/landing/screenshot4.png';
@@ -42,7 +43,11 @@ export default function HowItWorks() {
 
       <div className='grid grid-cols-1 gap-12 md:grid-cols-3 md:gap-10'>
         {steps.map((step) => (
-          <div key={step.id} className='flex flex-col' style={{ minHeight: '600px' }}>
+          <div
+            key={step.id}
+            className='flex flex-col'
+            style={{ minHeight: isMobile ? 'auto' : '600px' }}
+          >
             {/* Images for ID 1 only */}
             {step.id === 1 && step.images && (
               <div

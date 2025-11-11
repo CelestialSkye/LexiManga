@@ -1,13 +1,15 @@
-import React from 'react';
-import { Carousel } from '@mantine/carousel';
 import '@mantine/carousel/styles.css';
+
+import { Carousel } from '@mantine/carousel';
 import { useMediaQuery } from '@mantine/hooks';
-import { useTrendingManga } from 'src/services/anilistApi';
-import { useNavigate } from 'react-router-dom';
+import React from 'react';
 import { FaStar } from 'react-icons/fa6';
-import TopBarMobile from './TopbarMobile';
+import { useNavigate } from 'react-router-dom';
+import { useTrendingManga } from 'src/services/anilistApi';
+
 import { CustomTooltip } from '../CustomTooltip';
 import { MangaTooltipWithWordCount } from '../MangaWithWordCount';
+import TopBarMobile from './TopbarMobile';
 
 function getMainCreators(staffEdges) {
   if (!staffEdges?.length) return 'Unknown';

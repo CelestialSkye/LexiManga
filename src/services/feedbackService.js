@@ -1,7 +1,8 @@
-import { db } from '../config/firebase';
-import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
-import { useMutation } from '@tanstack/react-query';
 import { notifications } from '@mantine/notifications';
+import { useMutation } from '@tanstack/react-query';
+import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
+
+import { db } from '../config/firebase';
 
 /**
  * Save feedback to Firestore

@@ -1,11 +1,12 @@
-import { useState } from 'react';
 import { Badge } from '@mantine/core';
+import { useState } from 'react';
+
 import AddWordModal from '../../../components/AddWordModal';
-import ResponsiveWordList from '../../../components/ResponsiveWordList';
 import FilterControls from '../../../components/FilterControls';
+import ResponsiveWordList from '../../../components/ResponsiveWordList';
 import { useAuth } from '../../../context/AuthContext';
-import { useVocabWordsByManga } from '../../../services/vocabService';
 import useWordFiltering from '../../../hooks/useWordFiltering';
+import { useVocabWordsByManga } from '../../../services/vocabService';
 
 const VocabularyTab = ({ manga }) => {
   const { user } = useAuth();

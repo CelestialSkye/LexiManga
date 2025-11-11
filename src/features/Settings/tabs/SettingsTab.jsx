@@ -1,6 +1,7 @@
-import { useState } from 'react';
 import { collection, getDocs } from 'firebase/firestore';
+import { useState } from 'react';
 import { db } from 'src/config/firebase';
+
 import { useAuth } from '../../../context/AuthContext';
 
 const SettingsTab = () => {

@@ -1,7 +1,8 @@
+import { Badge, Button, Center, Group, Loader, NumberInput, Stack, Text } from '@mantine/core';
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { FaStar } from 'react-icons/fa';
-import { Text, Button, Group, Stack, Center, Badge, Loader, NumberInput } from '@mantine/core';
+import { useNavigate } from 'react-router-dom';
+
 import { CustomTooltip } from './CustomTooltip';
 import { MangaTooltipWithWordCount } from './MangaWithWordCount';
 

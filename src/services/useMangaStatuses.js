@@ -1,7 +1,8 @@
 import { useQuery } from '@tanstack/react-query';
-import { db } from '../config/firebase';
 import { getDocs } from 'firebase/firestore';
 import { collection } from 'firebase/firestore';
+
+import { db } from '../config/firebase';
 import { getMangaDetails } from './anilistApi';
 
 export const useMangaStatuses = (uid) => {

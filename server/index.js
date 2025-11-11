@@ -839,8 +839,8 @@ const SUGGESTED_QUERY = `
   }
 `;
 
-// ============ PROTECTED: Trending endpoint requires authentication ============
-app.get('/api/trending', verifyToken, async (req, res) => {
+// ============ PUBLIC: Trending endpoint ============
+app.get('/api/trending', async (req, res) => {
   try {
     // Validate query parameters using Zod schema
     const validationResult = validateInput(trendingSchema, {
@@ -903,8 +903,8 @@ app.get('/api/trending', verifyToken, async (req, res) => {
   }
 });
 
-// ============ PROTECTED: Suggested endpoint requires authentication ============
-app.get('/api/suggested', verifyToken, async (req, res) => {
+// ============ PUBLIC: Suggested endpoint ============
+app.get('/api/suggested', async (req, res) => {
   try {
     const { limit = 4, genres = '', excludeGenres = '' } = req.query;
 
@@ -1142,8 +1142,8 @@ app.get('/api/monthly', async (req, res) => {
   }
 });
 
-// ============ PROTECTED: Browse endpoint requires authentication ============
-app.get('/api/browse', verifyToken, async (req, res) => {
+// ============ PUBLIC: Browse endpoint ============
+app.get('/api/browse', async (req, res) => {
   try {
     // Validate query parameters using Zod schema
     const validationResult = validateInput(browseSchema, {
@@ -1163,7 +1163,7 @@ app.get('/api/browse', verifyToken, async (req, res) => {
       });
     }
 
-    const { search, genres: genreArray, status, sort, limit, offset } = validationResult.data;
+    const { search, genres: genreArray, status, sort, limit, offset, year } = validationResult.data;
 
     // Calculate page from offset
     const page = Math.floor(offset / limit) + 1;
@@ -1251,6 +1251,31 @@ app.get('/api/browse', verifyToken, async (req, res) => {
     res.status(500).json({ error: 'Failed to fetch browse manga' });
   }
 });
+
+// IP-based rate limiter for registration
+const ipRegistrationAttempts = new Map();
+const checkIPRateLimit = (ip) => {
+  const now = Date.now();
+  const oneHourAgo = now - 3600000; // 1 hour in milliseconds
+
+  if (!ipRegistrationAttempts.has(ip)) {
+    ipRegistrationAttempts.set(ip, []);
+  }
+
+  // Clean old attempts
+  const attempts = ipRegistrationAttempts.get(ip).filter((time) => time > oneHourAgo);
+  ipRegistrationAttempts.set(ip, attempts);
+
+  // Check if limit exceeded (max 5 attempts per hour)
+  if (attempts.length >= 5) {
+    return false;
+  }
+
+  // Add current attempt
+  attempts.push(now);
+  ipRegistrationAttempts.set(ip, attempts);
+  return true;
+};
 
 // Authentication endpoint for registration with reCAPTCHA and IP rate limiting
 app.post('/api/auth/register', async (req, res) => {

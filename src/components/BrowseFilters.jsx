@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
-import { TextInput, Select, Button, Stack, Paper, Title, Grid } from '@mantine/core';
+import './BrowseFilters.css';
+
+import { Button, Grid, Paper, Select, Stack, TextInput, Title } from '@mantine/core';
 import { IconChevronDown } from '@tabler/icons-react';
 import { motion } from 'framer-motion';
-import './BrowseFilters.css';
+import React, { useState } from 'react';
 
 const BrowseFilters = ({ filters, onFilterChange }) => {
   const [filtersOpen, setFiltersOpen] = useState(false);

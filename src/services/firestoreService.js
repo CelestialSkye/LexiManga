@@ -1,18 +1,19 @@
 // Firestore service for database operations
 import {
-  collection,
-  doc,
-  getDocs,
-  getDoc,
   addDoc,
-  updateDoc,
+  collection,
   deleteDoc,
-  query,
-  where,
-  orderBy,
+  doc,
+  getDoc,
+  getDocs,
   limit,
   onSnapshot,
+  orderBy,
+  query,
+  updateDoc,
+  where,
 } from 'firebase/firestore';
+
 import { db } from '../config/firebase';
 
 // Generic CRUD operations

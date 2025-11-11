@@ -1,21 +1,22 @@
-import { useState, useEffect } from 'react';
-import { Text, TextInput, PasswordInput, Button, Alert } from '@mantine/core';
+import { Alert, Button, PasswordInput, Text, TextInput } from '@mantine/core';
+import { useMediaQuery } from '@mantine/hooks';
+import { modals } from '@mantine/modals';
+import { getAuth, sendPasswordResetEmail } from 'firebase/auth';
+import { useEffect, useState } from 'react';
+import { useGoogleReCaptcha } from 'react-google-recaptcha-v3';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
+
+import image3 from '../assets/landing/image3.jpg';
+import logo from '../assets/logo.svg';
 import { ActionButton } from '../components';
 import LanguageSelect from '../components/LanguageSelect';
-import { getAuth, sendPasswordResetEmail } from 'firebase/auth';
-import { useMediaQuery } from '@mantine/hooks';
-import { useGoogleReCaptcha } from 'react-google-recaptcha-v3';
-import { modals } from '@mantine/modals';
-import { getFirebaseErrorMessage, extractErrorCode } from '../utils/errorMessages';
+import { useAuth } from '../context/AuthContext';
+import { extractErrorCode, getFirebaseErrorMessage } from '../utils/errorMessages';
 import {
-  validatePasswordStrength,
   getPasswordStrengthColor,
   getPasswordStrengthLabel,
+  validatePasswordStrength,
 } from '../utils/passwordValidator';
-import logo from '../assets/logo.svg';
-import image3 from '../assets/landing/image3.jpg';
 
 const Auth = () => {
   const navigate = useNavigate();
@@ -214,9 +215,9 @@ const Auth = () => {
   }, []);
 
   return (
-    <div className='min-h-screen bg-white'>
+    <div className='bg-white'>
       {/* 2-Column Layout */}
-      <div className='grid min-h-screen grid-cols-1 md:grid-cols-2'>
+      <div className='grid grid-cols-1 md:grid-cols-2' style={{ minHeight: '100vh' }}>
         {/* Left Section - Image */}
         {!isMobile && (
           <div className='relative hidden md:flex md:h-screen md:items-center md:justify-center'>
@@ -232,10 +233,13 @@ const Auth = () => {
         )}
 
         {/* Right Section - Form */}
-        <div className='flex flex-col justify-center px-4 py-8 md:px-12 md:py-0'>
-          <div className='w-full max-w-md pt-8'>
+        <div
+          className='flex flex-col justify-center overflow-y-auto px-4 py-3 md:px-12 md:py-0'
+          style={{ maxHeight: '100vh' }}
+        >
+          <div className='w-full max-w-md py-3'>
             {/* Header with Logo */}
-            <div className='mb-8 flex items-start gap-4'>
+            <div className='mb-4 flex items-start gap-4'>
               <img
                 src={logo}
                 alt='LexiManga Logo'
@@ -253,16 +257,16 @@ const Auth = () => {
 
             {/* Error Alert */}
             {error && (
-              <Alert color='red' className='mb-6' title='Error'>
+              <Alert color='red' className='mb-3' title='Error'>
                 {error}
               </Alert>
             )}
 
             {/* Tab Buttons */}
-            <div className='mb-8 flex gap-2 rounded-lg bg-gray-100 p-1'>
+            <div className='mb-4 flex gap-2 rounded-lg bg-gray-100 p-1'>
               <button
                 onClick={() => setActiveTab('login')}
-                className={`flex-1 rounded-md py-2 font-medium transition-all ${
+                className={`flex-1 rounded-md py-1.5 text-sm font-medium transition-all ${
                   activeTab === 'login'
                     ? 'bg-white text-violet-600 shadow-sm'
                     : 'text-gray-600 hover:text-gray-800'
@@ -272,7 +276,7 @@ const Auth = () => {
               </button>
               <button
                 onClick={() => setActiveTab('register')}
-                className={`flex-1 rounded-md py-2 font-medium transition-all ${
+                className={`flex-1 rounded-md py-1.5 text-sm font-medium transition-all ${
                   activeTab === 'register'
                     ? 'bg-white text-violet-600 shadow-sm'
                     : 'text-gray-600 hover:text-gray-800'
@@ -284,9 +288,9 @@ const Auth = () => {
 
             {/* Login Form */}
             {(activeTab === 'login' && (
-              <form onSubmit={handleLogin} className='space-y-4'>
+              <form onSubmit={handleLogin} className='space-y-3'>
                 <div>
-                  <label className='mb-2 block text-sm font-medium text-gray-700'>Email</label>
+                  <label className='mb-1 block text-xs font-medium text-gray-700'>Email</label>
                   <TextInput
                     placeholder='your@email.com'
                     value={email}
@@ -298,14 +302,14 @@ const Auth = () => {
                 </div>
 
                 <div>
-                  <label className='mb-2 block text-sm font-medium text-gray-700'>Password</label>
+                  <label className='mb-1 block text-xs font-medium text-gray-700'>Password</label>
                   <PasswordInput
                     placeholder='Your password'
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
                     variant='default'
-                    size='md'
+                    size='sm'
                     styles={(theme) => ({
                       root: {
                         width: '100%',
@@ -322,14 +326,19 @@ const Auth = () => {
                 </div>
 
                 {/* Sign In and Forgot Password Buttons */}
-                <div className='mt-6 flex justify-center gap-3'>
-                  <ActionButton type='submit' loading={loading} buttonRounded='rounded-[12px]'>
+                <div className='mt-3 flex items-center justify-center gap-3'>
+                  <ActionButton
+                    type='submit'
+                    loading={loading}
+                    className='!text-md !rounded-[12px] !py-3'
+                    size='lg'
+                  >
                     Sign In
                   </ActionButton>
                   <button
                     type='button'
                     onClick={() => handleForgotPassword(email)}
-                    className='rounded-[12px] px-4 py-2 text-sm font-medium text-violet-600 transition-colors hover:bg-violet-50 hover:text-violet-700'
+                    className='rounded-[12px] border border-violet-200 px-4 py-3 text-sm font-medium text-violet-600 transition-colors hover:bg-violet-50 hover:text-violet-700'
                   >
                     Forgot Password?
                   </button>
@@ -340,9 +349,9 @@ const Auth = () => {
 
             {/* Register Form */}
             {activeTab === 'register' && (
-              <form onSubmit={handleRegister} className='space-y-4'>
+              <form onSubmit={handleRegister} className='space-y-3'>
                 <div>
-                  <label className='mb-2 block text-sm font-medium text-gray-700'>Email</label>
+                  <label className='mb-1 block text-xs font-medium text-gray-700'>Email</label>
                   <TextInput
                     placeholder='your@email.com'
                     value={email}
@@ -354,7 +363,7 @@ const Auth = () => {
                 </div>
 
                 <div>
-                  <label className='mb-2 block text-sm font-medium text-gray-700'>Password</label>
+                  <label className='mb-1 block text-xs font-medium text-gray-700'>Password</label>
                   <PasswordInput
                     placeholder='Your password'
                     value={password}
@@ -367,7 +376,7 @@ const Auth = () => {
                     }}
                     required
                     variant='default'
-                    size='md'
+                    size='sm'
                     styles={(theme) => ({
                       root: {
                         width: '100%',
@@ -384,9 +393,9 @@ const Auth = () => {
 
                   {/* Password Strength Indicator (only show in register tab) */}
                   {activeTab === 'register' && password && (
-                    <div className='mt-3 space-y-2'>
+                    <div className='mt-2 space-y-1'>
                       {/* Strength Bar */}
-                      <div className='h-2 w-full overflow-hidden rounded-full bg-gray-200'>
+                      <div className='h-1.5 w-full overflow-hidden rounded-full bg-gray-200'>
                         <div
                           style={{
                             width: `${(passwordValidation.score / 6) * 100}%`,
@@ -397,42 +406,29 @@ const Auth = () => {
                         />
                       </div>
 
-                      {/* Strength Label */}
-                      <div className='flex justify-between text-xs'>
-                        <span className='text-gray-600'>Strength:</span>
-                        <span
-                          style={{ color: getPasswordStrengthColor(passwordValidation.strength) }}
-                          className='font-medium'
-                        >
-                          {getPasswordStrengthLabel(passwordValidation.strength)}
-                        </span>
+                      {/* Strength Label and Errors in one line */}
+                      <div className='text-xs'>
+                        {passwordValidation.isValid ? (
+                          <span
+                            style={{ color: getPasswordStrengthColor(passwordValidation.strength) }}
+                            className='font-medium'
+                          >
+                            ✓ {getPasswordStrengthLabel(passwordValidation.strength)}
+                          </span>
+                        ) : passwordValidation.errors.length > 0 ? (
+                          <span className='text-red-600'>✗ {passwordValidation.errors[0]}</span>
+                        ) : (
+                          <span className='text-gray-600'>
+                            Strength: {getPasswordStrengthLabel(passwordValidation.strength)}
+                          </span>
+                        )}
                       </div>
-
-                      {/* Validation Errors */}
-                      {passwordValidation.errors.length > 0 && (
-                        <div className='space-y-1 rounded bg-red-50 p-2'>
-                          {passwordValidation.errors.map((error, idx) => (
-                            <p key={idx} className='text-xs text-red-600'>
-                              ✗ {error}
-                            </p>
-                          ))}
-                        </div>
-                      )}
-
-                      {/* Requirements Met */}
-                      {passwordValidation.isValid && (
-                        <div className='rounded bg-green-50 p-2'>
-                          <p className='text-xs font-medium text-green-600'>
-                            ✓ Password meets all requirements
-                          </p>
-                        </div>
-                      )}
                     </div>
                   )}
                 </div>
 
                 <div>
-                  <label className='mb-2 block text-sm font-medium text-gray-700'>Nickname</label>
+                  <label className='mb-1 block text-xs font-medium text-gray-700'>Nickname</label>
                   <TextInput
                     placeholder='Your nickname'
                     value={nickname}
@@ -443,7 +439,7 @@ const Auth = () => {
                 </div>
 
                 <div>
-                  <label className='mb-2 block text-sm font-medium text-gray-700'>
+                  <label className='mb-1 block text-xs font-medium text-gray-700'>
                     Native Language
                   </label>
                   <LanguageSelect
@@ -456,7 +452,7 @@ const Auth = () => {
                 </div>
 
                 <div>
-                  <label className='mb-2 block text-sm font-medium text-gray-700'>
+                  <label className='mb-1 block text-xs font-medium text-gray-700'>
                     Target Language
                   </label>
                   <LanguageSelect
@@ -469,14 +465,19 @@ const Auth = () => {
                 </div>
 
                 {/* Sign Up Button */}
-                <ActionButton type='submit' loading={loading} className='mt-6 w-full'>
+                <ActionButton
+                  type='submit'
+                  loading={loading}
+                  className='!text-md mt-3 w-full !rounded-[12px] !py-3'
+                  size='lg'
+                >
                   Sign Up
                 </ActionButton>
               </form>
             )}
 
             {/* Back to Landing */}
-            <div className='mt-8 flex flex-col gap-4'>
+            <div className='mt-4 flex flex-col gap-2'>
               <button
                 onClick={() => navigate('/home')}
                 className='rounded-lg bg-violet-600 px-6 py-2 text-sm font-medium text-white transition-colors hover:bg-violet-700'

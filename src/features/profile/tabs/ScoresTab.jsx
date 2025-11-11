@@ -1,7 +1,7 @@
+import MangaListModal from '@components/MangaListModal';
 import React from 'react';
 import { useAuth } from 'src/context/AuthContext';
 import { useMangaStatuses } from 'src/services/useMangaStatuses';
-import MangaListModal from '@components/MangaListModal';
 
 const ScoresTab = () => {
   const { user } = useAuth();

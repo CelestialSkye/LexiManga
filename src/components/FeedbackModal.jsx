@@ -1,5 +1,6 @@
-import { useState, useEffect } from 'react';
-import { Modal, Button, Stack, Textarea, TextInput, Select, Group } from '@mantine/core';
+import { Button, Group, Modal, Select, Stack, Textarea, TextInput } from '@mantine/core';
+import { useEffect, useState } from 'react';
+
 import { useAuth } from '../context/AuthContext';
 import { useSendFeedback } from '../services/feedbackService';
 
@@ -49,8 +50,6 @@ const FeedbackModal = ({ opened, closeModal }) => {
       radius='lg'
     >
       <Stack gap='md'>
-   
-
         <Select
           label='Feedback Type'
           placeholder='Select feedback type'
@@ -74,7 +73,6 @@ const FeedbackModal = ({ opened, closeModal }) => {
         />
 
         <Group justify='center' gap='md'>
-       
           <Button
             color='violet'
             onClick={handleSubmit}
@@ -84,7 +82,7 @@ const FeedbackModal = ({ opened, closeModal }) => {
           >
             Send
           </Button>
-             <Button variant='default' onClick={closeModal}>
+          <Button variant='default' onClick={closeModal}>
             Cancel
           </Button>
         </Group>

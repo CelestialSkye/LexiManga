@@ -1,16 +1,17 @@
-import { motion, AnimatePresence } from 'framer-motion';
-import { useState, useEffect, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { spotlight } from '@mantine/spotlight';
 import {
+  IconBook,
+  IconHome,
   IconLogout,
   IconMenu2,
-  IconUser,
-  IconHome,
   IconSearch,
-  IconBook,
   IconSettings,
+  IconUser,
 } from '@tabler/icons-react';
-import { spotlight } from '@mantine/spotlight';
+import { AnimatePresence, motion } from 'framer-motion';
+import { useEffect, useRef, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+
 import { useAuth } from '../context/AuthContext';
 
 const MobileFAB = () => {

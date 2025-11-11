@@ -23,22 +23,24 @@ const FeatureCard = ({
       whileHover={{ scale: hoverScale }}
       whileTap={{ scale: tapScale }}
       transition={{ duration: animationDuration }}
-      className="h-full"
+      className='h-full'
     >
-      <Card 
+      <Card
         className={`${cardBgColor} ${cardShadow} ${cardRounded} ${padding} h-full ${className}`}
         {...props}
       >
-        <div className="text-center">
-          <div className={`w-${iconSize} h-${iconSize} ${iconBgColor} rounded-full flex items-center justify-center mx-auto mb-6`}>
+        <div className='text-center'>
+          <div
+            className={`w-${iconSize} h-${iconSize} ${iconBgColor} mx-auto mb-6 flex items-center justify-center rounded-full`}
+          >
             {icon}
           </div>
-          
-          <Text size="lg" fw={600} className="text-gray-800 mb-4">
+
+          <Text size='lg' fw={600} className='mb-4 text-gray-800'>
             {title}
           </Text>
-          
-          <Text size="md" c="dimmed" className="text-gray-600 leading-relaxed">
+
+          <Text size='md' c='dimmed' className='leading-relaxed text-gray-600'>
             {description}
           </Text>
         </div>
