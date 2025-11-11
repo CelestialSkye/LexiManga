@@ -17,6 +17,25 @@ const admin = require('firebase-admin');
 // Import authentication middleware
 const { verifyToken } = require('./middleware/auth');
 
+// Import CSRF protection middleware
+const cookieParser = require('cookie-parser');
+const { csrfMiddleware, getCsrfToken, csrfErrorHandler } = require('./middleware/csrf');
+
+// Import rate limiter
+const rateLimiter = require('./utils/rate-limiter');
+
+// Import validation schemas
+const {
+  translateSchema,
+  browseSchema,
+  mangaIdSchema,
+  trendingSchema,
+  monthlySchema,
+  suggestedSchema,
+  recaptchaSchema,
+  validateInput,
+} = require('./validation/schemas');
+
 const app = express();
 const PORT = process.env.PORT || 3001;
 
@@ -54,28 +73,35 @@ const corsOptions = {
 app.use(cors(corsOptions));
 
 // ============ SECURITY: Security Headers with Helmet ============
-app.use(helmet({
-  contentSecurityPolicy: {
-    directives: {
-      defaultSrc: ["'self'"],
-      scriptSrc: ["'self'"],
-      styleSrc: ["'self'", "'unsafe-inline'"],
-      imgSrc: ["'self'", 'data:', 'https:', 'https://s4.anilist.co'],
-      connectSrc: ["'self'", 'https://graphql.anilist.co', 'https://www.google.com/recaptcha', 'https://www.gstatic.com'],
-      fontSrc: ["'self'", 'data:'],
-      objectSrc: ["'none'"],
-      upgradeInsecureRequests: [],
-    }
-  },
-  hsts: {
-    maxAge: 31536000, // 1 year
-    includeSubDomains: true,
-    preload: true
-  },
-  referrerPolicy: { policy: 'strict-origin-when-cross-origin' },
-  noSniff: true,
-  xssFilter: true,
-}));
+app.use(
+  helmet({
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'"],
+        scriptSrc: ["'self'"],
+        styleSrc: ["'self'", "'unsafe-inline'"],
+        imgSrc: ["'self'", 'data:', 'https:', 'https://s4.anilist.co'],
+        connectSrc: [
+          "'self'",
+          'https://graphql.anilist.co',
+          'https://www.google.com/recaptcha',
+          'https://www.gstatic.com',
+        ],
+        fontSrc: ["'self'", 'data:'],
+        objectSrc: ["'none'"],
+        upgradeInsecureRequests: [],
+      },
+    },
+    hsts: {
+      maxAge: 31536000, // 1 year
+      includeSubDomains: true,
+      preload: true,
+    },
+    referrerPolicy: { policy: 'strict-origin-when-cross-origin' },
+    noSniff: true,
+    xssFilter: true,
+  })
+);
 
 // ============ SECURITY: HTTPS Redirect (for production) ============
 app.use((req, res, next) => {
@@ -87,10 +113,19 @@ app.use((req, res, next) => {
 
 app.use(express.json());
 
+// ============ SECURITY: CSRF Protection ============
+// Cookie parser MUST be before CSRF middleware
+app.use(cookieParser());
+app.use(csrfMiddleware);
+
+// ============ SECURITY: CSRF Error Handler ============
+// Add after all routes
+const setupErrorHandlers = () => {
+  app.use(csrfErrorHandler);
+};
+
 const cache = new NodeCache({ stdTTL: 3600 });
 const translationCache = new NodeCache({ stdTTL: 86400 });
-const ipRateLimits = new NodeCache({ stdTTL: 3600 }); // 1 hour for IP-based rate limiting
-const rateLimits = new Map();
 
 // Function to verify reCAPTCHA token
 const verifyRecaptcha = async (token) => {
@@ -111,57 +146,6 @@ const verifyRecaptcha = async (token) => {
     console.error('reCAPTCHA verification error:', error.message);
     return false;
   }
-};
-
-// Function to check IP-based rate limit for registrations
-const checkIPRateLimit = (ip, limit = 5) => {
-  const key = `reg:${ip}`;
-  const current = ipRateLimits.get(key) || 0;
-
-  if (current >= limit) {
-    return false;
-  }
-
-  ipRateLimits.set(key, current + 1);
-  return true;
-};
-
-const checkRateLimit = (userId, limit = 20) => {
-  const now = Date.now();
-  const hourAgo = now - 60 * 60 * 1000;
-
-  for (const [key, data] of rateLimits.entries()) {
-    if (data.resetTime < now) {
-      rateLimits.delete(key);
-    }
-  }
-
-  const userKey = `user:${userId}`;
-  let userData = rateLimits.get(userKey);
-
-  if (!userData || userData.resetTime < now) {
-    userData = {
-      count: 0,
-      resetTime: now + 60 * 60 * 1000,
-    };
-    rateLimits.set(userKey, userData);
-  }
-
-  if (userData.count >= limit) {
-    return {
-      allowed: false,
-      remaining: 0,
-      resetTime: userData.resetTime,
-    };
-  }
-
-  userData.count++;
-
-  return {
-    allowed: true,
-    remaining: limit - userData.count,
-    resetTime: userData.resetTime,
-  };
 };
 
 const ANILIST_API = 'https://graphql.anilist.co';
@@ -332,11 +316,17 @@ app.get('/api/search', async (req, res) => {
 
 app.get('/api/manga/:id', async (req, res) => {
   try {
-    const { id } = req.params;
+    // Validate manga ID using Zod schema
+    const validationResult = validateInput(mangaIdSchema, { id: req.params.id });
 
-    if (!id || isNaN(id)) {
-      return res.status(400).json({ error: 'Valid ID required' });
+    if (!validationResult.success) {
+      return res.status(400).json({
+        error: 'Invalid manga ID',
+        details: validationResult.errors,
+      });
     }
+
+    const { id } = validationResult.data;
 
     const cacheKey = `manga:${id}`;
 
@@ -381,23 +371,32 @@ app.get('/api/manga/:id', async (req, res) => {
 // ============ PROTECTED: Translation endpoint requires authentication ============
 app.post('/api/translate', verifyToken, async (req, res) => {
   try {
-    const { text, sourceLang, targetLang } = req.body;
+    // Validate input using Zod schema
+    const validationResult = validateInput(translateSchema, {
+      word: req.body.text,
+      sourceLang: req.body.sourceLang,
+      targetLang: req.body.targetLang,
+      context: req.body.context,
+    });
+
+    if (!validationResult.success) {
+      return res.status(400).json({
+        error: 'Validation failed',
+        details: validationResult.errors,
+      });
+    }
+
+    const { word: text, sourceLang, targetLang, context } = validationResult.data;
     const userId = req.userId; // From verified token, not from request body
 
-    if (!text || !sourceLang || !targetLang) {
-      return res.status(400).json({ error: 'Text, sourceLang, and targetLang required' });
-    }
-
-    if (text.length > 50) {
-      return res.status(400).json({ error: 'Text too long (max 50 characters)' });
-    }
-
-    const rateLimit = checkRateLimit(userId, 20);
+    // Check rate limit using persistent Firestore-backed limiter
+    const rateLimit = await rateLimiter.checkTranslationLimit(userId);
     if (!rateLimit.allowed) {
       return res.status(429).json({
         error: 'Rate limit exceeded',
         remaining: rateLimit.remaining,
         resetTime: rateLimit.resetTime,
+        retryAfter: rateLimit.retryAfter,
       });
     }
 
@@ -430,7 +429,7 @@ app.post('/api/translate', verifyToken, async (req, res) => {
     const translation = response.text().trim();
 
     if (!translation) {
-      throw new Error('No translation received from Gemini');
+      throw new Error('Translation failed - invalid response');
     }
 
     translationCache.set(cacheKey, translation, 86400);
@@ -529,7 +528,6 @@ const loadFrequencyLists = () => {
           frequencyLists[lang][word.toLowerCase()] = frequency;
         }
       });
-      console.log(`Loaded ${Object.keys(frequencyLists[lang]).length} words for ${lang}`);
     } catch (error) {
       console.error(`Failed to load frequency list for ${lang}:`, error.message);
     }
@@ -816,30 +814,38 @@ const SUGGESTED_QUERY = `
   }
 `;
 
-app.get('/api/trending', async (req, res) => {
+// ============ PROTECTED: Trending endpoint requires authentication ============
+app.get('/api/trending', verifyToken, async (req, res) => {
   try {
-    const { limit = 10 } = req.query;
-    console.log(`Fetching trending manga with limit: ${limit}`);
+    // Validate query parameters using Zod schema
+    const validationResult = validateInput(trendingSchema, {
+      limit: req.query.limit ? parseInt(req.query.limit) : undefined,
+    });
 
+    if (!validationResult.success) {
+      return res.status(400).json({
+        error: 'Invalid query parameters',
+        details: validationResult.errors,
+      });
+    }
+
+    const { limit } = validationResult.data;
     const cacheKey = `trending:${limit}`;
 
     // Layer 1: Check NodeCache
     const cached = cache.get(cacheKey);
     if (cached) {
-      console.log('Returning cached trending manga from memory');
       return res.json({ data: cached, cached: true });
     }
 
     // Layer 2: Check Firebase cache
     const fbCached = await cacheManager.getCacheFromFirebase(cacheKey);
     if (fbCached) {
-      console.log('Returning cached trending manga from Firebase');
       cache.set(cacheKey, fbCached.data, 300); // Warm NodeCache
       return res.json({ data: fbCached.data, cached: true });
     }
 
     // Layer 3: Fetch from AniList
-    console.log('Fetching trending manga from AniList API');
     const response = await fetch(ANILIST_API, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -872,10 +878,10 @@ app.get('/api/trending', async (req, res) => {
   }
 });
 
-app.get('/api/suggested', async (req, res) => {
+// ============ PROTECTED: Suggested endpoint requires authentication ============
+app.get('/api/suggested', verifyToken, async (req, res) => {
   try {
     const { limit = 4, genres = '', excludeGenres = '' } = req.query;
-    console.log(`Fetching suggested manga: limit=${limit}, genres=${genres}`);
 
     const genreArray = genres ? genres.split(',').filter((g) => g.trim()) : [];
     const excludeGenreArray = excludeGenres
@@ -887,20 +893,17 @@ app.get('/api/suggested', async (req, res) => {
     // Layer 1: Check NodeCache
     const cached = cache.get(cacheKey);
     if (cached) {
-      console.log('Returning cached suggested manga from memory');
       return res.json({ data: cached, cached: true });
     }
 
     // Layer 2: Check Firebase cache
     const fbCached = await cacheManager.getCacheFromFirebase(cacheKey);
     if (fbCached) {
-      console.log('Returning cached suggested manga from Firebase');
       cache.set(cacheKey, fbCached.data, 300); // Warm NodeCache
       return res.json({ data: fbCached.data, cached: true });
     }
 
     // Layer 3: Fetch from AniList
-    console.log('Fetching suggested manga from AniList API');
     const response = await fetch(ANILIST_API, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -1051,28 +1054,35 @@ const BROWSE_QUERY = `
 
 app.get('/api/monthly', async (req, res) => {
   try {
-    const { limit = 15 } = req.query;
-    console.log(`Fetching monthly seasonal manga with limit: ${limit}`);
+    // Validate query parameters using Zod schema
+    const validationResult = validateInput(monthlySchema, {
+      limit: req.query.limit ? parseInt(req.query.limit) : undefined,
+    });
 
+    if (!validationResult.success) {
+      return res.status(400).json({
+        error: 'Invalid query parameters',
+        details: validationResult.errors,
+      });
+    }
+
+    const { limit } = validationResult.data;
     const cacheKey = `monthly:${limit}`;
 
     // Layer 1: Check NodeCache
     const cached = cache.get(cacheKey);
     if (cached) {
-      console.log('Returning cached monthly manga from memory');
       return res.json({ data: cached, cached: true });
     }
 
     // Layer 2: Check Firebase cache
     const fbCached = await cacheManager.getCacheFromFirebase(cacheKey);
     if (fbCached) {
-      console.log('Returning cached monthly manga from Firebase');
       cache.set(cacheKey, fbCached.data, 300); // Warm NodeCache
       return res.json({ data: fbCached.data, cached: true });
     }
 
     // Layer 3: Fetch from AniList
-    console.log('Fetching monthly manga from AniList API');
     const response = await fetch(ANILIST_API, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -1107,29 +1117,68 @@ app.get('/api/monthly', async (req, res) => {
   }
 });
 
-app.get('/api/browse', async (req, res) => {
+// ============ PROTECTED: Browse endpoint requires authentication ============
+app.get('/api/browse', verifyToken, async (req, res) => {
   try {
-    const {
-      page = 1,
-      search = '',
-      genre = '',
-      sort = 'POPULARITY_DESC',
-      status = '',
-      year = '',
-    } = req.query;
-    console.log(`Fetching browse manga: page=${page}, search=${search}, genre=${genre}`);
+    // Validate query parameters using Zod schema
+    const validationResult = validateInput(browseSchema, {
+      search: req.query.search,
+      genres: req.query.genre,
+      format: req.query.format,
+      status: req.query.status,
+      sort: req.query.sort,
+      limit: req.query.limit ? parseInt(req.query.limit) : undefined,
+      offset: req.query.offset ? parseInt(req.query.offset) : undefined,
+    });
 
-    // Determine which statuses to filter by
-    let statusInValues = null;
-    if (status) {
-      statusInValues = [status];
-    } else if (search) {
-      statusInValues = ['RELEASING', 'FINISHED'];
-    } else {
-      statusInValues = ['RELEASING', 'FINISHED'];
+    if (!validationResult.success) {
+      return res.status(400).json({
+        error: 'Invalid query parameters',
+        details: validationResult.errors,
+      });
     }
 
-    const genreArray = genre ? [genre] : null;
+    const { search, genres: genreArray, status, sort, limit, offset } = validationResult.data;
+
+    // Calculate page from offset
+    const page = Math.floor(offset / limit) + 1;
+
+    // Whitelist valid statuses to prevent parameter injection
+    const VALID_STATUSES = ['ONGOING', 'COMPLETED', 'NOT_YET_RELEASED', 'CANCELLED', 'HIATUS'];
+    const statusInValues =
+      status && VALID_STATUSES.includes(status)
+        ? [status]
+        : search
+          ? ['RELEASING', 'FINISHED']
+          : ['RELEASING', 'FINISHED'];
+
+    // Whitelisted genres to prevent injection (common manga genres)
+    const VALID_GENRES = [
+      'Action',
+      'Adventure',
+      'Comedy',
+      'Drama',
+      'Fantasy',
+      'Horror',
+      'Mecha',
+      'Music',
+      'Mystery',
+      'Psychological',
+      'Romance',
+      'Sci-Fi',
+      'Slice of Life',
+      'Sports',
+      'Supernatural',
+      'Thriller',
+    ];
+
+    // Filter genres to only whitelisted values
+    const validatedGenres = genreArray.filter((g) => VALID_GENRES.includes(g));
+
+    // Whitelisted sort options
+    const VALID_SORTS = ['TRENDING_DESC', 'SCORE_DESC', 'POPULARITY_DESC', 'UPDATED_TIME_DESC'];
+    const validatedSort = VALID_SORTS.includes(sort) ? sort : 'TRENDING_DESC';
+
     const excludeGenres = ['Hentai', 'Ecchi'];
 
     const response = await fetch(ANILIST_API, {
@@ -1138,12 +1187,12 @@ app.get('/api/browse', async (req, res) => {
       body: JSON.stringify({
         query: BROWSE_QUERY,
         variables: {
-          page: parseInt(page),
-          perPage: 20,
+          page: Math.max(1, page),
+          perPage: Math.min(limit, 20), // Cap at 20
           search: search || null,
-          genres: genreArray,
+          genres: validatedGenres,
           excludeGenres,
-          sort: [sort],
+          sort: [validatedSort],
           statusIn: statusInValues,
         },
       }),
@@ -1221,9 +1270,25 @@ app.post('/api/auth/register', async (req, res) => {
   }
 });
 
+// ============ SECURITY: Get CSRF Token ============
+// Clients should call this endpoint once and include the token in POST/PUT/DELETE requests
+app.get('/api/csrf-token', (req, res) => {
+  try {
+    res.json({
+      csrfToken: req.csrfToken(),
+      expiresIn: 3600, // 1 hour in seconds
+    });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to generate CSRF token' });
+  }
+});
+
 app.get('/api/health', (req, res) => {
   res.json({ status: 'OK', port: PORT });
 });
+
+// Setup error handlers
+setupErrorHandlers();
 
 app.listen(PORT, () => {
   console.log(` Backend running on port ${PORT}`);

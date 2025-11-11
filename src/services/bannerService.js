@@ -7,60 +7,145 @@ const BANNER_FOLDER = 'banners';
 const MAX_FILE_SIZE = 5 * 1024 * 1024;
 const ALLOWED_FILE_TYPES = ['image/jpeg', 'image/png'];
 
+// Magic bytes for file type validation
+const MAGIC_BYTES = {
+  'image/jpeg': [0xff, 0xd8, 0xff],
+  'image/png': [0x89, 0x50, 0x4e, 0x47],
+};
+
+/**
+ * Validates file magic bytes to ensure file type matches declared MIME type
+ * Prevents malicious files disguised with wrong extensions
+ */
+const validateMagicBytes = async (file) => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const arr = new Uint8Array(e.target.result).subarray(0, 4);
+      const bytes = Array.from(arr);
+
+      const mimeType = file.type;
+      const expectedBytes = MAGIC_BYTES[mimeType];
+
+      if (!expectedBytes) {
+        reject(new Error('Unsupported file type'));
+        return;
+      }
+
+      const matches = expectedBytes.every((byte, index) => bytes[index] === byte);
+      if (!matches) {
+        reject(new Error('File signature does not match MIME type'));
+      } else {
+        resolve(true);
+      }
+    };
+    reader.onerror = () => reject(new Error('Failed to read file'));
+    reader.readAsArrayBuffer(file.slice(0, 4));
+  });
+};
+
 export const bannerService = {
+  /**
+   * Uploads banner to Firebase Storage (not Firestore)
+   * Uses magic byte validation to prevent malicious files
+   */
   async uploadBanner(uid, file) {
     if (!file) {
       throw new Error('No file provided');
     }
+
     if (file.size > MAX_FILE_SIZE) {
-      throw new Error('File size exceeds 5MB');
-    }
-    if (!ALLOWED_FILE_TYPES.includes(file.type)) {
-      throw new Error('Invalid file type');
+      throw new Error('File size exceeds 5MB limit');
     }
 
-    // why use promise man?
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = () => resolve(reader.result);
-      reader.onerror = reject;
-      reader.readAsDataURL(file);
-    });
+    if (!ALLOWED_FILE_TYPES.includes(file.type)) {
+      throw new Error('Only JPEG and PNG files are allowed');
+    }
+
+    try {
+      // Validate magic bytes to ensure file type is legitimate
+      await validateMagicBytes(file);
+
+      // Upload to Firebase Storage with user isolation
+      const timestamp = Date.now();
+      const filename = `${uid}_${timestamp}_${file.name.replace(/\s+/g, '_')}`;
+      const storageRef = ref(storage, `${BANNER_FOLDER}/${uid}/${filename}`);
+
+      const snapshot = await uploadBytes(storageRef, file, {
+        contentType: file.type,
+        customMetadata: {
+          uploadedBy: uid,
+          uploadedAt: new Date().toISOString(),
+        },
+      });
+
+      const downloadURL = await getDownloadURL(snapshot.ref);
+      return downloadURL;
+    } catch (error) {
+      throw new Error(`Banner upload failed: ${error.message}`);
+    }
   },
 
+  /**
+   * Updates user's banner URL in Firestore
+   */
   async updateBanner(uid, file) {
     try {
       const downloadURL = await this.uploadBanner(uid, file);
-      await updateDoc(doc(db, 'users', uid), { bannerUrl: downloadURL });
+      await updateDoc(doc(db, 'users', uid), {
+        bannerUrl: downloadURL,
+        bannerUpdatedAt: new Date(),
+      });
       return downloadURL;
     } catch (error) {
-      console.error('Error updating banner:', error);
-      throw error;
+      throw new Error(`Failed to update banner: ${error.message}`);
     }
   },
 
+  /**
+   * Deletes banner from Firebase Storage and Firestore
+   */
   async deleteBanner(uid) {
     try {
-      // For base64, just remove from Firestore
-      await updateDoc(doc(db, 'users', uid), { bannerUrl: null });
+      const userRef = doc(db, 'users', uid);
+      const userDoc = await getDoc(userRef);
+
+      if (userDoc.exists() && userDoc.data().bannerUrl) {
+        // Delete from Storage if it's a Firebase Storage URL
+        const bannerUrl = userDoc.data().bannerUrl;
+        if (bannerUrl.includes('firebasestorage.googleapis.com')) {
+          try {
+            const fileRef = ref(storage, bannerUrl);
+            await deleteObject(fileRef);
+          } catch (storageError) {
+            // File might not exist, continue anyway
+            console.warn('Could not delete banner file from storage');
+          }
+        }
+      }
+
+      // Remove URL from Firestore
+      await updateDoc(userRef, { bannerUrl: null });
       return true;
     } catch (error) {
-      console.error('Error deleting banner:', error);
-      throw error;
+      throw new Error(`Failed to delete banner: ${error.message}`);
     }
   },
 
+  /**
+   * Retrieves user's banner URL from Firestore
+   */
   async getBannerUrl(uid) {
     try {
       const userRef = doc(db, 'users', uid);
       const userDoc = await getDoc(userRef);
+
       if (userDoc.exists()) {
-        const userData = userDoc.data();
-        return userData.bannerUrl;
+        return userDoc.data().bannerUrl || null;
       }
       return null;
     } catch (error) {
-      console.error('Error getting banner URL:', error);
+      console.warn('Could not retrieve banner URL:', error.message);
       return null;
     }
   },

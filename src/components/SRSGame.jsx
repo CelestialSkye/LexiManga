@@ -152,8 +152,7 @@ const SRSGame = ({ manga, words: initialWords }) => {
 
     // Validate the current card before processing
     if (isNaN(currentCard.stability) || isNaN(currentCard.difficulty)) {
-      console.error('Corrupted card detected, resetting:', currentCard);
-      // Reset the card to a fresh state
+      // Corrupted card detected, reset to fresh state
       const freshCard = createEmptyCard();
       freshCard.due = now;
       freshCard.wordData = currentCard.wordData;
@@ -171,7 +170,7 @@ const SRSGame = ({ manga, words: initialWords }) => {
     const recordItem = result[rating];
 
     if (!recordItem) {
-      console.error('Invalid rating or result:', { rating, result });
+      // Invalid rating or result, skip update
       return;
     }
 
@@ -179,7 +178,7 @@ const SRSGame = ({ manga, words: initialWords }) => {
 
     // ensure the due date is valid
     if (!newCard.due || isNaN(new Date(newCard.due).getTime())) {
-      console.error('Invalid due date from FSRS:', newCard);
+      // Invalid due date, skip update
       return;
     }
 
@@ -339,7 +338,7 @@ const SRSGame = ({ manga, words: initialWords }) => {
                   setSessionActive(true);
                 }}
               >
-                Start Study Session
+                Start Preview Session
               </Button>
             )}
           </Stack>
