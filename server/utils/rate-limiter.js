@@ -4,7 +4,7 @@ const NodeCache = require('node-cache');
 /**
  * Enhanced Rate Limiter with Firestore Persistence
  * Survives server restarts and handles distributed deployments
- * 
+ *
  * Supports multiple limit strategies:
  * - IP-based: For registration and signup endpoints
  * - User-based: For authenticated API endpoints
@@ -15,7 +15,20 @@ class RateLimiter {
   constructor() {
     // In-memory cache for fast lookups (expires after 1 hour)
     this.memoryCache = new NodeCache({ stdTTL: 3600, checkperiod: 600 });
-    this.db = admin.firestore();
+    this.db = null; // Will be initialized on first use
+  }
+
+  // Lazy initialization of Firestore
+  getDb() {
+    if (!this.db) {
+      try {
+        this.db = admin.firestore();
+      } catch (error) {
+        console.warn('Firebase not initialized yet, using memory cache only');
+        return null;
+      }
+    }
+    return this.db;
   }
 
   /**
@@ -32,42 +45,52 @@ class RateLimiter {
   async checkLimit(identifier, limit = 10, windowSeconds = 3600, strategy = 'ip') {
     const key = this.getKey(identifier, strategy);
     const now = Date.now();
-    const resetTime = now + (windowSeconds * 1000);
+    const resetTime = now + windowSeconds * 1000;
 
     try {
       // Try memory cache first (fast path)
       let data = this.memoryCache.get(key);
 
       if (!data) {
-        // Not in cache, try Firestore
-        const docRef = this.db.collection('rateLimits').doc(key);
-        const doc = await docRef.get();
+        // Not in cache, try Firestore if available
+        const db = this.getDb();
+        if (db) {
+          const docRef = db.collection('rateLimits').doc(key);
+          const doc = await docRef.get();
 
-        if (doc.exists) {
-          data = doc.data();
+          if (doc.exists) {
+            data = doc.data();
 
-          // Check if window has expired
-          if (data.resetTime < now) {
-            // Window expired, reset counter
+            // Check if window has expired
+            if (data.resetTime < now) {
+              // Window expired, reset counter
+              data = {
+                count: 0,
+                resetTime,
+                createdAt: now,
+              };
+              await docRef.set(data);
+            } else {
+              // Cache it for fast lookups
+              const ttl = Math.ceil((data.resetTime - now) / 1000);
+              this.memoryCache.set(key, data, ttl);
+            }
+          } else {
+            // First request in window
             data = {
               count: 0,
               resetTime,
               createdAt: now,
             };
             await docRef.set(data);
-          } else {
-            // Cache it for fast lookups
-            const ttl = Math.ceil((data.resetTime - now) / 1000);
-            this.memoryCache.set(key, data, ttl);
           }
         } else {
-          // First request in window
+          // Firebase not available, use memory cache only
           data = {
             count: 0,
             resetTime,
             createdAt: now,
           };
-          await docRef.set(data);
         }
       }
 
@@ -89,10 +112,13 @@ class RateLimiter {
       this.memoryCache.set(key, data, ttl);
 
       // Async update to Firestore (non-blocking)
-      const docRef = this.db.collection('rateLimits').doc(key);
-      docRef.update({ count: data.count }).catch(err => {
-        console.warn('Failed to update rate limit in Firestore:', err.message);
-      });
+      const db = this.getDb();
+      if (db) {
+        const docRef = db.collection('rateLimits').doc(key);
+        docRef.update({ count: data.count }).catch((err) => {
+          console.warn('Failed to update rate limit in Firestore:', err.message);
+        });
+      }
 
       return {
         allowed: true,
@@ -106,7 +132,7 @@ class RateLimiter {
       return {
         allowed: true,
         remaining: limit,
-        resetTime: now + (windowSeconds * 1000),
+        resetTime: now + windowSeconds * 1000,
         retryAfter: null,
       };
     }
@@ -153,7 +179,10 @@ class RateLimiter {
     this.memoryCache.del(key);
 
     try {
-      await this.db.collection('rateLimits').doc(key).delete();
+      const db = this.getDb();
+      if (db) {
+        await db.collection('rateLimits').doc(key).delete();
+      }
     } catch (error) {
       console.warn('Failed to reset rate limit:', error.message);
     }
@@ -164,13 +193,17 @@ class RateLimiter {
    */
   async cleanupExpired() {
     try {
-      const now = Date.now();
-      const snapshot = await this.db.collection('rateLimits')
-        .where('resetTime', '<', now)
-        .get();
+      const db = this.getDb();
+      if (!db) {
+        console.warn('Firebase not available for cleanup');
+        return;
+      }
 
-      const batch = this.db.batch();
-      snapshot.forEach(doc => {
+      const now = Date.now();
+      const snapshot = await db.collection('rateLimits').where('resetTime', '<', now).get();
+
+      const batch = db.batch();
+      snapshot.forEach((doc) => {
         batch.delete(doc.ref);
       });
 
@@ -182,5 +215,15 @@ class RateLimiter {
   }
 }
 
-// Export singleton instance
-module.exports = new RateLimiter();
+// Export class and create singleton instance after Firebase is initialized
+let rateLimiterInstance = null;
+
+function getRateLimiter() {
+  if (!rateLimiterInstance) {
+    rateLimiterInstance = new RateLimiter();
+  }
+  return rateLimiterInstance;
+}
+
+module.exports = getRateLimiter();
+module.exports.RateLimiter = RateLimiter;

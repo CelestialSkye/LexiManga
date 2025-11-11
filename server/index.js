@@ -553,7 +553,14 @@ const loadFrequencyLists = () => {
   return frequencyLists;
 };
 
-const FREQUENCY_LISTS = loadFrequencyLists();
+// Lazy load frequency lists on first use to avoid blocking server startup
+let FREQUENCY_LISTS = null;
+const getFrequencyLists = () => {
+  if (!FREQUENCY_LISTS) {
+    FREQUENCY_LISTS = loadFrequencyLists();
+  }
+  return FREQUENCY_LISTS;
+};
 
 // Initialize cache scheduler with queries
 const TRENDING_QUERY_FOR_SCHEDULER = `
@@ -709,7 +716,8 @@ app.get('/api/word-difficulty', async (req, res) => {
       return res.json({ data: cached, cached: true });
     }
 
-    const frequencyLists = FREQUENCY_LISTS[language] || {};
+    const allFrequencyLists = getFrequencyLists();
+    const frequencyLists = allFrequencyLists[language] || {};
     const wordLower = word.toLowerCase();
     const frequency = frequencyLists[wordLower];
 
