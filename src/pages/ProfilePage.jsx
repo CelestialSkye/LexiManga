@@ -87,9 +87,9 @@ const ProfilePage = () => {
   };
 
   return (
-    <>
+    <div className='flex min-h-screen flex-col'>
       {/* page background */}
-      <div className='rounded-b-[16px] bg-white shadow-sm'>
+      <div className='flex-1 rounded-b-[16px] bg-white shadow-sm'>
         {/* banner section */}
         <div className={`relative w-full bg-white ${isMobile ? 'h-52' : 'h-96'}`}>
           {/* TopBar  */}
@@ -218,7 +218,8 @@ const ProfilePage = () => {
             </div>
           </div>
         </div>
-      </div></>
+      </div>
+    </div>
   );
 };
 
