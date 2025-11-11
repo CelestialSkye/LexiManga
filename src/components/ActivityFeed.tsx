@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { db } from '../config/firebase';
 import { collection, query, orderBy, onSnapshot, limit } from 'firebase/firestore';
@@ -32,13 +32,26 @@ const ActivityFeed = () => {
   const userId = user?.uid;
   const [activities, setActivities] = useState<Activity[]>([]);
   const [loading, setLoading] = useState(true);
+  const [showSkeleton, setShowSkeleton] = useState(false);
+  const skeletonTimeoutRef = useRef<ReturnType<typeof setTimeout>>();
 
   useEffect(() => {
     if (!userId) {
       setActivities([]);
       setLoading(false);
+      setShowSkeleton(false);
+      if (skeletonTimeoutRef.current) {
+        clearTimeout(skeletonTimeoutRef.current);
+      }
       return;
     }
+
+    // Only show skeleton after 300ms if still loading
+    skeletonTimeoutRef.current = setTimeout(() => {
+      if (loading) {
+        setShowSkeleton(true);
+      }
+    }, 300);
 
     // Query from user's activities subcollection
     const q = query(
@@ -52,10 +65,19 @@ const ActivityFeed = () => {
       snapshot.forEach((doc) => fetched.push({ ...(doc.data() as Activity), id: doc.id }));
       setActivities(fetched);
       setLoading(false);
+      setShowSkeleton(false);
+      if (skeletonTimeoutRef.current) {
+        clearTimeout(skeletonTimeoutRef.current);
+      }
     });
 
-    return () => unsubscribe();
-  }, [userId]);
+    return () => {
+      unsubscribe();
+      if (skeletonTimeoutRef.current) {
+        clearTimeout(skeletonTimeoutRef.current);
+      }
+    };
+  }, [userId, loading]);
 
   const renderActivityMessage = (activity: Activity) => {
     const { type, mangaTitle, mangaId, word, translation, changes = {} } = activity;
@@ -146,7 +168,7 @@ const ActivityFeed = () => {
     }
   };
 
-  if (loading) {
+  if (showSkeleton) {
     return (
       <div className='min-h-[400px] rounded-lg p-4'>
         <div className='animate-pulse space-y-3'>
