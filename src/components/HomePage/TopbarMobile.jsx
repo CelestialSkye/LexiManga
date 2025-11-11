@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useMediaQuery } from '@mantine/hooks';
 import { Drawer, Skeleton } from '@mantine/core';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
 import { getDailyActivities } from '../../services/dailyActivityService';
 import defaultAvatar from '../../assets/defaultAvatar.jpg';
@@ -13,6 +14,7 @@ const TopBarMobile = () => {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [dailyActivities, setDailyActivities] = useState(null);
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     setIsMounted(true);
@@ -48,12 +50,21 @@ const TopBarMobile = () => {
 
           {/* Right  */}
           <div className='flex items-center'>
-            <img
-              src={profile?.avatarUrl || defaultAvatar}
-              alt='User Avatar'
-              className='h-12 w-12 cursor-pointer rounded-[8px] object-cover ring-2 ring-violet-400 ring-offset-2 transition-all hover:ring-violet-500'
-              onClick={() => setDrawerOpen(true)}
-            />
+            {user ? (
+              <img
+                src={profile?.avatarUrl || defaultAvatar}
+                alt='User Avatar'
+                className='h-12 w-12 cursor-pointer rounded-[8px] object-cover ring-2 ring-violet-400 ring-offset-2 transition-all hover:ring-violet-500'
+                onClick={() => setDrawerOpen(true)}
+              />
+            ) : (
+              <button
+                onClick={() => navigate('/auth')}
+                className='rounded-lg bg-violet-600 px-4 py-2 font-medium text-white transition-all hover:bg-violet-700'
+              >
+                Sign In
+              </button>
+            )}
           </div>
         </div>
       </div>
