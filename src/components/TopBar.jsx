@@ -12,6 +12,7 @@ import { getDailyActivities } from '../services/dailyActivityService';
 import { dropdownCloseVariants } from '../utils/animationUtils';
 import { capitalizeFirstLetter } from '../utils/formatUtils';
 import logo from '../assets/logo.svg';
+import defaultAvatar from '../assets/defaultAvatar.jpg';
 
 const TopBar = () => {
   const navigate = useNavigate();
@@ -348,7 +349,7 @@ const TopBar = () => {
                         radius={8}
                         color='violet'
                         className='cursor-pointer'
-                        src={profile?.avatarUrl || null}
+                        src={profile?.avatarUrl || defaultAvatar}
                       >
                         {profile?.nickname?.charAt(0).toUpperCase() ||
                           user.email?.charAt(0).toUpperCase()}
