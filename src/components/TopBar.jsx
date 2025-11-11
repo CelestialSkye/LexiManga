@@ -186,15 +186,27 @@ const TopBar = () => {
                               initial='closed'
                               animate='open'
                               exit='closed'
-                              className={`notifications-container pointer-events-auto absolute top-14 right-0 z-50 flex min-w-[300px] flex-col gap-0 overflow-hidden rounded-lg shadow-lg`}
+                              className='notifications-container pointer-events-auto absolute top-14 right-0 z-50 flex min-w-[300px] flex-col gap-0 overflow-hidden rounded-lg shadow-lg'
                               style={{
-                                backgroundColor: isDarkTopbar ? 'rgba(0, 0, 0, 0.4)' : 'white',
+                                backgroundColor: isDarkTopbar ? 'rgba(0, 0, 0, 0.4)' : '#ffffff',
+                                willChange: 'transform, opacity',
                               }}
                             >
                               <div className='space-y-4 p-4'>
-                                <div className='flex items-center justify-between border-b pb-4'>
+                                <div
+                                  className='flex items-center justify-between border-b pb-4'
+                                  style={{
+                                    borderBottomColor: isDarkTopbar
+                                      ? 'rgba(255, 255, 255, 0.1)'
+                                      : '#e5e7eb',
+                                  }}
+                                >
                                   <h3
-                                    className={`text-sm font-bold ${isDarkTopbar ? 'text-white' : 'text-gray-800'}`}
+                                    style={{
+                                      color: isDarkTopbar ? '#ffffff' : '#1f2937',
+                                      fontSize: '14px',
+                                      fontWeight: 'bold',
+                                    }}
                                   >
                                     Daily Activity
                                   </h3>
@@ -204,10 +216,22 @@ const TopBar = () => {
                                 <div className='space-y-3'>
                                   {/* Words Added Today */}
                                   <div
-                                    className={`rounded-lg p-4 ${isDarkTopbar ? 'border border-violet-400/20 bg-violet-900/20' : 'bg-violet-50'}`}
+                                    style={{
+                                      borderRadius: '8px',
+                                      padding: '16px',
+                                      backgroundColor: isDarkTopbar
+                                        ? 'rgba(88, 28, 135, 0.2)'
+                                        : '#faf5ff',
+                                      border: isDarkTopbar
+                                        ? '1px solid rgba(167, 139, 250, 0.2)'
+                                        : 'none',
+                                    }}
                                   >
                                     <p
-                                      className={`text-sm ${isDarkTopbar ? 'text-gray-300' : 'text-gray-600'}`}
+                                      style={{
+                                        fontSize: '14px',
+                                        color: isDarkTopbar ? '#d1d5db' : '#4b5563',
+                                      }}
                                     >
                                       Words Added Today
                                     </p>
@@ -216,7 +240,12 @@ const TopBar = () => {
                                         <Skeleton height={32} width='100%' />
                                       ) : (
                                         <p
-                                          className={`text-2xl font-bold ${isDarkTopbar ? 'text-violet-400' : 'text-violet-600'}`}
+                                          style={{
+                                            fontSize: '20px',
+                                            fontWeight: 'bold',
+                                            color: isDarkTopbar ? '#a78bfa' : '#7c3aed',
+                                            margin: 0,
+                                          }}
                                         >
                                           {dailyActivities?.addedWordsCount || 0}
                                         </p>
@@ -226,10 +255,22 @@ const TopBar = () => {
 
                                   {/* Manga Added Today */}
                                   <div
-                                    className={`rounded-lg p-4 ${isDarkTopbar ? 'border border-violet-400/20 bg-violet-900/20' : 'bg-violet-50'}`}
+                                    style={{
+                                      borderRadius: '8px',
+                                      padding: '16px',
+                                      backgroundColor: isDarkTopbar
+                                        ? 'rgba(88, 28, 135, 0.2)'
+                                        : '#faf5ff',
+                                      border: isDarkTopbar
+                                        ? '1px solid rgba(167, 139, 250, 0.2)'
+                                        : 'none',
+                                    }}
                                   >
                                     <p
-                                      className={`text-sm ${isDarkTopbar ? 'text-gray-300' : 'text-gray-600'}`}
+                                      style={{
+                                        fontSize: '14px',
+                                        color: isDarkTopbar ? '#d1d5db' : '#4b5563',
+                                      }}
                                     >
                                       Manga Added Today
                                     </p>
@@ -238,7 +279,12 @@ const TopBar = () => {
                                         <Skeleton height={32} width='100%' />
                                       ) : (
                                         <p
-                                          className={`text-2xl font-bold ${isDarkTopbar ? 'text-violet-400' : 'text-violet-600'}`}
+                                          style={{
+                                            fontSize: '20px',
+                                            fontWeight: 'bold',
+                                            color: isDarkTopbar ? '#a78bfa' : '#7c3aed',
+                                            margin: 0,
+                                          }}
                                         >
                                           {dailyActivities?.mangaAddedCount || 0}
                                         </p>
@@ -248,10 +294,22 @@ const TopBar = () => {
 
                                   {/* Learning Streak */}
                                   <div
-                                    className={`rounded-lg p-4 ${isDarkTopbar ? 'border border-violet-400/20 bg-violet-900/20' : 'bg-violet-50'}`}
+                                    style={{
+                                      borderRadius: '8px',
+                                      padding: '16px',
+                                      backgroundColor: isDarkTopbar
+                                        ? 'rgba(88, 28, 135, 0.2)'
+                                        : '#faf5ff',
+                                      border: isDarkTopbar
+                                        ? '1px solid rgba(167, 139, 250, 0.2)'
+                                        : 'none',
+                                    }}
                                   >
                                     <p
-                                      className={`text-sm ${isDarkTopbar ? 'text-gray-300' : 'text-gray-600'}`}
+                                      style={{
+                                        fontSize: '14px',
+                                        color: isDarkTopbar ? '#d1d5db' : '#4b5563',
+                                      }}
                                     >
                                       Learning Streak
                                     </p>
@@ -260,7 +318,12 @@ const TopBar = () => {
                                         <Skeleton height={32} width='100%' />
                                       ) : (
                                         <p
-                                          className={`text-2xl font-bold ${isDarkTopbar ? 'text-violet-400' : 'text-violet-600'}`}
+                                          style={{
+                                            fontSize: '20px',
+                                            fontWeight: 'bold',
+                                            color: isDarkTopbar ? '#a78bfa' : '#7c3aed',
+                                            margin: 0,
+                                          }}
                                         >
                                           {dailyActivities?.streak || 0}
                                         </p>
