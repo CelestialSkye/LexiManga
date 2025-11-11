@@ -14,7 +14,7 @@ const Footer = () => {
 
   return (
     <>
-      <footer className='border-t border-gray-200 bg-white'>
+      <footer className='sticky bottom-0 z-40 border-t border-gray-200 bg-white'>
         <div className='mx-auto max-w-[95%] px-4 py-8 sm:px-6 md:max-w-[85%] md:px-8'>
           <div className='flex items-center justify-between'>
             {/* Left: Logo */}
@@ -43,7 +43,9 @@ const Footer = () => {
                     rel={link.href?.startsWith('http') ? 'noopener noreferrer' : undefined}
                     className='group flex items-center gap-2 text-sm text-gray-600 transition-colors hover:text-violet-600'
                   >
-                    {Icon && <Icon size={16} className='transition-colors group-hover:text-violet-600' />}
+                    {Icon && (
+                      <Icon size={16} className='transition-colors group-hover:text-violet-600' />
+                    )}
                     {!Icon && link.label}
                   </a>
                 );
