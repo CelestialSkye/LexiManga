@@ -131,13 +131,13 @@ const ActivityFeed = () => {
 
       case 'favorite_add':
         return {
-          title: `Added to favorites: ${activity.title ?? data.title ?? 'Unknown'}`,
+          title: `Added to favorites: ${activity.title ?? 'Unknown'}`,
           changes: [],
         };
 
       case 'favorite_remove':
         return {
-          title: `Removed from favorites: ${activity.title ?? data.title ?? 'Unknown'}`,
+          title: `Removed from favorites: ${activity.title ?? 'Unknown'}`,
           changes: [],
         };
 
