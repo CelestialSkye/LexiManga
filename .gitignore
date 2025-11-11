@@ -50,5 +50,8 @@ server/package-lock.json
 server/.env
 server/.env.local
 
+# Firebase service account key (contains sensitive credentials)
+serviceAccountKey.json
+
 # Server middleware (optional - can exclude if keeping private)
 # server/middleware/
