@@ -8,6 +8,12 @@ export interface DailyActivity {
   streak: number;
 }
 
+interface Activity {
+  type: 'manga_add' | 'word_add' | string;
+  timestamp?: Date;
+  [key: string]: any;
+}
+
 /**
  * Get today's date at midnight (start of day)
  */
@@ -43,7 +49,7 @@ export const getDailyActivities = async (): Promise<DailyActivity> => {
     const allActivities = activitiesSnapshot.docs.map((doc) => ({
       ...doc.data(),
       timestamp: doc.data().timestamp?.toDate?.(),
-    }));
+    })) as Activity[];
 
     // Sort by timestamp descending and filter activities to only today's activities
     const activities = allActivities
@@ -101,7 +107,7 @@ export const calculateStreak = async (userId: string): Promise<number> => {
         const timeA = a.timestamp?.getTime?.() ?? 0;
         const timeB = b.timestamp?.getTime?.() ?? 0;
         return timeB - timeA;
-      });
+      }) as Activity[];
 
     if (activities.length === 0) {
       return 0;
