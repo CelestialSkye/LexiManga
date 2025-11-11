@@ -9,14 +9,16 @@ interface Activity {
   type: string;
   userId: string;
   mangaId?: string;
-  mangaTitle?: string;
+  mangaTitle?: string | { english?: string; romaji?: string; native?: string };
   coverImage?: string;
   word?: string;
   translation?: string;
   context?: string;
+  title?: string;
   data?: Record<string, any>;
   changes?: Record<string, { from: any; to: any }>;
   timestamp?: { seconds: number; nanoseconds: number } | null;
+  [key: string]: any;
 }
 
 const formatTimestamp = (timestamp: Activity['timestamp']): string => {
