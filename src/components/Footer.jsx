@@ -1,20 +1,32 @@
 import { useState } from 'react';
 import { Group, Text } from '@mantine/core';
 import { IconBrandGithub, IconMail, IconBrandTwitter } from '@tabler/icons-react';
+import { useAuth } from '../context/AuthContext';
+import { useNavigate } from 'react-router-dom';
 import FeedbackModal from './FeedbackModal';
 import logo from '../assets/logo.svg';
 
 const Footer = () => {
   const [feedbackModalOpen, setFeedbackModalOpen] = useState(false);
+  const { user } = useAuth();
+  const navigate = useNavigate();
+
+  const handleFeedbackClick = () => {
+    if (!user) {
+      navigate('/auth');
+      return;
+    }
+    setFeedbackModalOpen(true);
+  };
 
   const links = [
-    { label: 'Feedback', href: '#', action: () => setFeedbackModalOpen(true) },
+    { label: 'Feedback', href: '#', action: handleFeedbackClick },
     { label: 'GitHub', href: 'https://github.com', icon: IconBrandGithub },
   ];
 
   return (
     <>
-      <footer className='border-t border-gray-200 bg-white'>
+      <footer className='mt-6 border-t border-gray-200 bg-white'>
         <div className='mx-auto max-w-[95%] px-4 py-8 sm:px-6 md:max-w-[85%] md:px-8'>
           <div className='flex items-center justify-between'>
             {/* Left: Logo */}
