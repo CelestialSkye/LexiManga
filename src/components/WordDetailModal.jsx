@@ -371,7 +371,14 @@ const WordDetailModal = ({ opened, onClose, word, onEdit, onDelete }) => {
               <Text size='sm' fw={500} c='dimmed'>
                 From:
               </Text>
-              <Text size='md'>{word.mangaTitle}</Text>
+              <Text size='md'>
+                {typeof word.mangaTitle === 'string'
+                  ? word.mangaTitle
+                  : word.mangaTitle?.english ||
+                    word.mangaTitle?.romaji ||
+                    word.mangaTitle?.native ||
+                    'Unknown'}
+              </Text>
             </div>
           )}
         </Stack>
