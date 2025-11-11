@@ -107,6 +107,18 @@ const ActivityFeed = () => {
         };
       }
 
+      case 'favorite_add':
+        return {
+          title: `Added to favorites: ${activity.title ?? data.title ?? 'Unknown'}`,
+          changes: [],
+        };
+
+      case 'favorite_remove':
+        return {
+          title: `Removed from favorites: ${activity.title ?? data.title ?? 'Unknown'}`,
+          changes: [],
+        };
+
       default:
         return { title: 'Performed an activity', changes: [] };
     }
@@ -147,10 +159,12 @@ const ActivityFeed = () => {
                   activity.type === 'manga_delete' ||
                   activity.type === 'word_add' ||
                   activity.type === 'word_update' ||
-                  activity.type === 'word_delete') && (
+                  activity.type === 'word_delete' ||
+                  activity.type === 'favorite_add' ||
+                  activity.type === 'favorite_remove') && (
                   <img
                     src={activity.coverImage}
-                    alt={activity.mangaTitle ?? 'Manga'}
+                    alt={activity.title ?? 'Manga'}
                     className='h-28 w-16 flex-shrink-0 rounded-[8px] object-cover'
                   />
                 )}
