@@ -1,6 +1,8 @@
+import { useEffect } from 'react';
 import { MantineProvider } from '@mantine/core';
 import { ModalsProvider } from '@mantine/modals';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
+import { GoogleReCaptchaProvider } from 'react-google-recaptcha-v3';
 import { AuthProvider } from './context/AuthContext';
 import Footer from './components/Footer';
 import LandingPage from './pages/LandingPage';
@@ -12,35 +14,77 @@ import ProfilePage from './pages/ProfilePage';
 import SettingsPage from './pages/SettingsPage';
 import Browse from './pages/Browse';
 
-const App = () => {
+const AppContent = () => {
+  const location = useLocation();
+  const recaptchaKey = import.meta.env.VITE_RECAPTCHA_SITE_KEY;
+  const hideFooter = location.pathname === '/auth';
+
   const theme = {
     fontFamily: 'Inter Variable, sans-serif',
+    components: {
+      PasswordInput: {
+        styles: (theme) => ({
+          input: {
+            '&:focus': {
+              borderColor: `${theme.colors.violet[6]} !important`,
+              boxShadow: `0 0 0 2px ${theme.colors.violet[6]} !important`,
+            },
+          },
+        }),
+      },
+    },
   };
 
   return (
-    <MantineProvider theme={theme} defaultColorScheme='light' primaryColor='violet'>
-      <ModalsProvider>
-        <AuthProvider>
-          <BrowserRouter>
-            <div className='flex min-h-screen flex-col'>
-              <main className='flex-1'>
-                <Routes>
-                  <Route path='/' element={<LandingPage />} />
-                  <Route path='/auth' element={<Auth />} />
-                  <Route path='/home' element={<Home />} />
-                  <Route path='/dashboard' element={<Dashboard />} />
-                  <Route path='/manga/:id' element={<MangaPage />} />
-                  <Route path='/profile' element={<ProfilePage />} />
-                  <Route path='/settings' element={<SettingsPage />} />
-                  <Route path='/browse' element={<Browse />} />
-                </Routes>
-              </main>
-              <Footer />
-            </div>
-          </BrowserRouter>
-        </AuthProvider>
-      </ModalsProvider>
-    </MantineProvider>
+    <div className='flex min-h-screen flex-col'>
+      <main className='flex-1'>
+        <Routes>
+          <Route path='/' element={<LandingPage />} />
+          <Route path='/auth' element={<Auth />} />
+          <Route path='/home' element={<Home />} />
+          <Route path='/dashboard' element={<Dashboard />} />
+          <Route path='/manga/:id' element={<MangaPage />} />
+          <Route path='/profile' element={<ProfilePage />} />
+          <Route path='/settings' element={<SettingsPage />} />
+          <Route path='/browse' element={<Browse />} />
+        </Routes>
+      </main>
+      {!hideFooter && <Footer />}
+    </div>
+  );
+};
+
+const App = () => {
+  const recaptchaKey = import.meta.env.VITE_RECAPTCHA_SITE_KEY;
+
+  const theme = {
+    fontFamily: 'Inter Variable, sans-serif',
+    components: {
+      PasswordInput: {
+        styles: (theme) => ({
+          input: {
+            '&:focus': {
+              borderColor: `${theme.colors.violet[6]} !important`,
+              boxShadow: `0 0 0 2px ${theme.colors.violet[6]} !important`,
+            },
+          },
+        }),
+      },
+    },
+  };
+
+  return (
+    <GoogleReCaptchaProvider reCaptchaKey={recaptchaKey}>
+      <MantineProvider theme={theme} defaultColorScheme='light' primaryColor='violet'>
+        <ModalsProvider>
+          <AuthProvider>
+            <BrowserRouter>
+              <AppContent />
+            </BrowserRouter>
+          </AuthProvider>
+        </ModalsProvider>
+      </MantineProvider>
+    </GoogleReCaptchaProvider>
   );
 };
 

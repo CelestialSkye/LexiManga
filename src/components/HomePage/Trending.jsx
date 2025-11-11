@@ -7,7 +7,7 @@ import { useNavigate } from 'react-router-dom';
 import { FaStar } from 'react-icons/fa6';
 import TopBarMobile from './TopbarMobile';
 import { CustomTooltip } from '../CustomTooltip';
-import { MangaTooltipContent } from '../MangaTooltipContent';
+import { MangaTooltipWithWordCount } from '../MangaWithWordCount';
 
 function getMainCreators(staffEdges) {
   if (!staffEdges?.length) return 'Unknown';
@@ -95,7 +95,7 @@ const Trending = () => {
           <Carousel.Slide key={manga.id}>
             <div className='flex flex-col items-center text-center'>
               <CustomTooltip
-                label={<MangaTooltipContent manga={manga} />}
+                label={<MangaTooltipWithWordCount manga={manga} />}
                 position='left'
                 multiline
                 w={280}

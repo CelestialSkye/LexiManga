@@ -51,13 +51,13 @@ export default function Benefits() {
   ];
 
   return (
-    <div className='mx-auto max-w-[95%] px-4 py-6 sm:px-6 md:max-w-[85%] md:px-8 md:py-16'>
+    <div className='mx-auto max-w-[95%] px-4 py-12 sm:px-6 md:max-w-[85%] md:px-8 md:py-20'>
       <h2 className='mb-8 text-center text-3xl font-bold text-gray-800 md:mb-12 md:text-4xl'>
         Why Learn with LexiManga?
       </h2>
 
       {/* Responsive grid: 1 column on mobile, 2 columns on desktop */}
-      <div className='grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-6'>
+      <div className='grid grid-cols-1 gap-6 md:grid-cols-2 md:gap-6'>
         {benefits.map((benefit) => (
           <div
             key={benefit.id}

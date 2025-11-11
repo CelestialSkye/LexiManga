@@ -8,7 +8,7 @@ import { FaStar } from 'react-icons/fa6';
 import TopBarMobile from './TopbarMobile';
 import logo from '../../assets/logo.svg';
 import { CustomTooltip } from '../CustomTooltip';
-import { MangaTooltipContent } from '../MangaTooltipContent';
+import { MangaTooltipWithWordCount } from '../MangaWithWordCount';
 
 function getMainCreators(staffEdges) {
   if (!staffEdges?.length) return 'Unknown';
@@ -79,7 +79,7 @@ const Trending = () => {
       <section className='mt-4 w-full overflow-hidden rounded-[16px] bg-black px-6 py-8'>
         {/* Text */}
         <div className='mb-6'>
-          <h2 className='mb-2  text-2xl font-bold whitespace-nowrap text-white'>
+          <h2 className='mb-2 text-2xl font-bold whitespace-nowrap text-white'>
             Monthly Manga Picks
           </h2>
         </div>
@@ -105,7 +105,7 @@ const Trending = () => {
             <Carousel.Slide key={manga.id}>
               <div className='flex flex-col gap-3'>
                 <CustomTooltip
-                  label={<MangaTooltipContent manga={manga} />}
+                  label={<MangaTooltipWithWordCount manga={manga} />}
                   position='left'
                   multiline
                   w={280}
@@ -158,12 +158,12 @@ const Trending = () => {
     <section className='mb-4 w-full overflow-hidden rounded-[16px] bg-black px-6 py-8'>
       <div className='flex gap-8'>
         {/* text on left */}
-        <div className='w-65 flex-shrink-0 pt-3 pr-7 pl-7 '>
+        <div className='w-72 flex-shrink-0 pt-3 pr-7 pl-7'>
           <p className='text-sm'>
             <img src={logo} alt='Vocabulary Manga' className='h-5 w-5' />
           </p>
 
-          <h2 className='pt-5  text-2xl font-bold whitespace-nowrap text-white'>
+          <h2 className='pt-5 text-2xl font-bold whitespace-nowrap text-white'>
             Monthly Manga Picks
           </h2>
           <p className='mt-40 max-w-sm text-sm leading-relaxed text-gray-400'>
@@ -194,7 +194,7 @@ const Trending = () => {
               <Carousel.Slide key={manga.id}>
                 <div className='flex flex-col gap-3'>
                   <CustomTooltip
-                    label={<MangaTooltipContent manga={manga} />}
+                    label={<MangaTooltipWithWordCount manga={manga} />}
                     position='left'
                     multiline
                     w={280}

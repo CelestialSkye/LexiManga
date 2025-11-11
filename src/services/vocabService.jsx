@@ -191,12 +191,15 @@ const getVocabWordsByManga = async (uid, mangaId) => {
   const wordsRef = collection(db, 'users', uid, 'words');
   const wordsSnapshot = await getDocs(wordsRef);
 
+  // Convert mangaId to string for comparison since it might be passed as a number
+  const mangaIdString = String(mangaId);
+
   return wordsSnapshot.docs
     .map((doc) => ({
       id: doc.id,
       ...doc.data(),
     }))
-    .filter((word) => word.mangaId === mangaId);
+    .filter((word) => String(word.mangaId) === mangaIdString);
 };
 
 const saveVocabWord = async (uid, mangaId, wordId, wordData) => {

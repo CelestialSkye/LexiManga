@@ -57,7 +57,7 @@ export default function TiltedPhotos() {
   }
 
   return (
-    <div style={{ height: '240px', overflow: 'visible' }}>
+    <div style={{ minHeight: '240px', overflow: 'visible', paddingBottom: '4rem' }}>
       <motion.div
         className='mb-20 flex items-end justify-center gap-0 pt-10'
         style={{ perspective: '1000px' }}

@@ -35,12 +35,12 @@ export default function HowItWorks() {
   ];
 
   return (
-    <div className='mx-auto max-w-[95%] px-4 py-6 sm:px-6 md:max-w-[95%] md:px-8 md:py-16'>
+    <div className='mx-auto max-w-[95%] px-4 py-12 sm:px-6 md:max-w-[95%] md:px-8 md:py-20'>
       <h2 className='mb-8 text-center text-3xl font-bold text-gray-800 md:mb-12 md:text-4xl'>
         How It Works
       </h2>
 
-      <div className='grid grid-cols-1 gap-8 md:grid-cols-3 md:gap-10'>
+      <div className='grid grid-cols-1 gap-12 md:grid-cols-3 md:gap-10'>
         {steps.map((step) => (
           <div key={step.id} className='flex flex-col' style={{ minHeight: '600px' }}>
             {/* Images for ID 1 only */}
