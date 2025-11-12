@@ -17,13 +17,20 @@ export const useMangaStatuses = (uid) => {
 
 const fetchMangaStatuses = async (uid) => {
   try {
+    console.log('🔍 fetchMangaStatuses - START - uid:', uid);
+    if (!uid) {
+      console.warn('⚠️ fetchMangaStatuses - NO UID PROVIDED!');
+      return [];
+    }
+
     const statusesRef = collection(db, 'users', uid, 'mangaStatus');
+    console.log('🔍 fetchMangaStatuses - collection ref created, calling getDocs...');
     const statusesSnapshot = await getDocs(statusesRef);
 
-    console.log('🔍 fetchMangaStatuses - uid:', uid);
-    console.log('🔍 fetchMangaStatuses - docs count:', statusesSnapshot.docs.length);
+    console.log('✅ fetchMangaStatuses - uid:', uid);
+    console.log('✅ fetchMangaStatuses - docs count:', statusesSnapshot.docs.length);
     console.log(
-      '🔍 fetchMangaStatuses - docs:',
+      '✅ fetchMangaStatuses - docs:',
       statusesSnapshot.docs.map((d) => ({ id: d.id, data: d.data() }))
     );
 
