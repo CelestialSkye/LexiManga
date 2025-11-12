@@ -224,12 +224,6 @@ const AddWordModal = ({ manga, opened, closeModal, showMangaSelector = false }) 
               {translationError}
             </Text>
           )}
-          {!translationError && (
-            <Text size='12px' c='dimmed' mt='xs'>
-              💡 You can translate up to 20 words per hour. Enter translations manually if you need
-              to.
-            </Text>
-          )}
         </div>
 
         <div className='pb-2'>

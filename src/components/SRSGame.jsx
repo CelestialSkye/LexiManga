@@ -400,7 +400,7 @@ const SRSGame = ({ manga, words: initialWords }) => {
             </Text>
             <Progress value={(currentCardIndex / totalCards) * 100} size='sm' mt='sm' />
             <Text size='xs' c='dimmed' mt='xs'>
-              Card {cards.length} of {totalCards}
+              {cards.length} cards left
             </Text>
           </div>
 
