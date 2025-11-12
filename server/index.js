@@ -466,30 +466,48 @@ app.post('/api/translate', verifyToken, async (req, res) => {
     let responseText = '';
 
     try {
+      console.log('DEBUG: Attempting to extract text from result');
+
       // Try new SDK format first
       if (result.response && typeof result.response.text === 'function') {
-        console.log('Using result.response.text() format');
+        console.log('✅ Using result.response.text() format');
         responseText = result.response.text().trim();
       }
       // Try text() directly on result
       else if (typeof result.text === 'function') {
-        console.log('Using result.text() format');
+        console.log('✅ Using result.text() format');
         responseText = result.text().trim();
       }
-      // Try content property
+      // Try content property - check each step
       else if (result.candidates && Array.isArray(result.candidates) && result.candidates[0]) {
-        console.log('Using result.candidates format');
-        responseText = result.candidates[0].content.parts[0].text.trim();
+        console.log('✅ Using result.candidates format');
+        const candidate = result.candidates[0];
+        console.log('Candidate structure:', JSON.stringify(candidate, null, 2).substring(0, 500));
+
+        if (
+          candidate.content &&
+          candidate.content.parts &&
+          Array.isArray(candidate.content.parts) &&
+          candidate.content.parts[0]
+        ) {
+          responseText = candidate.content.parts[0].text.trim();
+        } else {
+          console.error('Invalid candidate structure - content.parts not found');
+          throw new Error('Candidate structure missing content.parts');
+        }
       }
       // Fallback - try to stringify and extract
       else {
-        console.log('Using fallback String format');
+        console.log('⚠️ Using fallback String format');
         responseText = String(result).trim();
       }
+
+      console.log('✅ Extracted text:', responseText.substring(0, 100));
     } catch (parseError) {
-      console.error('Error extracting text from Gemini response:', parseError);
+      console.error('❌ Error extracting text from Gemini response:', parseError);
+      console.error('Error message:', parseError.message);
       console.error('parseError stack:', parseError.stack);
-      throw new Error('Translation service returned invalid format');
+      throw new Error(`Translation service error: ${parseError.message}`);
     }
 
     const translation = responseText;
