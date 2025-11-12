@@ -133,25 +133,28 @@ app.use(express.json());
 // Try multiple possible locations for the dist folder
 const possibleDistPaths = [
   path.join(__dirname, '../dist'), // ../dist (if running from server/)
-  path.join(__dirname, '../../../dist'), // ../../../dist (if running from somewhere else)
-  '/app/dist', // Absolute path on Render
-  '/app/repo/dist', // Alternative on Render
+  path.join(__dirname, '../../dist'), // ../../dist (Render structure)
+  '/opt/render/project/dist', // Render absolute path
+  path.join(process.cwd(), 'dist'), // Current working directory
 ];
 
 let frontendDistPath = null;
 for (const distPath of possibleDistPaths) {
   if (fs.existsSync(distPath)) {
     frontendDistPath = distPath;
-    console.log(`✅ [Startup] Found dist at: ${distPath}`);
+    console.log(`✅ [Startup] Found dist folder at: ${distPath}`);
     break;
   }
 }
 
 if (!frontendDistPath) {
-  console.warn(`⚠️  [Startup] dist folder NOT found. Tried:`);
+  console.warn(`⚠️  [Startup] dist folder NOT found in these locations:`);
   possibleDistPaths.forEach((p) => console.warn(`   - ${p}`));
-  // Default to the expected location anyway
+  console.warn(`   Current working directory: ${process.cwd()}`);
+  console.warn(`   __dirname: ${__dirname}`);
+  // Default to first option - static middleware will just not find files
   frontendDistPath = path.join(__dirname, '../dist');
+  console.warn(`   Using default: ${frontendDistPath}`);
 }
 
 // Always try to serve static files
@@ -1479,38 +1482,49 @@ if (process.env.SENTRY_DSN) {
 // ============ SPA FALLBACK: Route all non-API requests to index.html ============
 // This enables client-side routing for React Router
 // This MUST be the last route handler before error handlers
-app.get('*', (req, res, next) => {
+app.get('*', (req, res) => {
   // Skip if this is an API request (shouldn't reach here, but just in case)
   if (req.path.startsWith('/api')) {
-    return next();
+    return res.status(404).json({ error: 'API endpoint not found' });
   }
 
-  const indexPath = path.join(__dirname, '../dist/index.html');
+  // Try multiple possible dist paths since Render structure is different
+  const possibleIndexPaths = [
+    path.join(__dirname, '../dist/index.html'), // From server/ directory
+    path.join(__dirname, '../../dist/index.html'), // From server/ if deeper
+    '/opt/render/project/dist/index.html', // Render absolute path
+    path.join(process.cwd(), 'dist/index.html'), // Current working directory
+  ];
 
-  console.log(`[SPA Fallback] Handling request for: ${req.path}`);
-  console.log(`[SPA Fallback] Attempting to serve index.html from: ${indexPath}`);
-  console.log(`[SPA Fallback] File exists: ${fs.existsSync(indexPath)}`);
+  let indexPath = null;
+  for (const p of possibleIndexPaths) {
+    if (fs.existsSync(p)) {
+      indexPath = p;
+      console.log(`✅ [SPA Fallback] Found index.html at: ${indexPath}`);
+      break;
+    }
+  }
+
+  if (!indexPath) {
+    console.error(`❌ [SPA Fallback] Could not find index.html. Searched paths:`);
+    possibleIndexPaths.forEach((p) => console.error(`   - ${p}`));
+    console.error(`Current working directory: ${process.cwd()}`);
+    console.error(`__dirname (server/): ${__dirname}`);
+    return res.status(404).json({
+      error: 'Frontend application not found',
+      searchedPaths: possibleIndexPaths,
+      cwd: process.cwd(),
+      dirname: __dirname,
+    });
+  }
 
   try {
-    if (fs.existsSync(indexPath)) {
-      // Set proper cache headers for HTML
-      res.set('Cache-Control', 'public, max-age=0, s-maxage=300');
-      res.sendFile(indexPath);
-    } else {
-      console.error(`[SPA Fallback] index.html NOT FOUND at: ${indexPath}`);
-      // List dist directory contents for debugging
-      const distPath = path.join(__dirname, '../dist');
-      if (fs.existsSync(distPath)) {
-        const files = fs.readdirSync(distPath);
-        console.log(`[SPA Fallback] dist directory contents:`, files);
-      } else {
-        console.error(`[SPA Fallback] dist directory does NOT exist: ${distPath}`);
-      }
-      res.status(404).send('Frontend not found - check server logs');
-    }
+    // Set proper cache headers for HTML
+    res.set('Cache-Control', 'public, max-age=0, s-maxage=300');
+    res.sendFile(indexPath);
   } catch (err) {
-    console.error(`[SPA Fallback] Error serving index.html:`, err);
-    res.status(500).send('Error loading application');
+    console.error(`❌ [SPA Fallback] Error serving index.html:`, err.message);
+    res.status(500).json({ error: 'Error loading application' });
   }
 });
 
