@@ -1485,7 +1485,8 @@ app.listen(PORT, () => {
   );
 
   // Start cache scheduler after server is listening (non-blocking)
-  setImmediate(() => {
-    cacheScheduler.startScheduler();
-  });
+  // DISABLED: Cache scheduler was causing memory leaks on free tier
+  // setImmediate(() => {
+  //   cacheScheduler.startScheduler();
+  // });
 });
