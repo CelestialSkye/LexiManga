@@ -168,7 +168,9 @@ const verifyRecaptcha = async (token) => {
       '📥 [verifyRecaptcha] Full Google response:',
       JSON.stringify(response.data, null, 2)
     );
-    const { success, score, error_codes, action, challenge_ts } = response.data;
+    // Note: Google returns "error-codes" (with hyphen), not "error_codes"
+    const { success, score, action, challenge_ts } = response.data;
+    const error_codes = response.data['error-codes'] || response.data.error_codes;
 
     console.log('📊 [verifyRecaptcha] Parsed response:', {
       success,
