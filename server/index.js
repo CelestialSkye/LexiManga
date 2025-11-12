@@ -1525,10 +1525,20 @@ app.get('*', (req, res) => {
   try {
     // Set proper cache headers for HTML
     res.set('Cache-Control', 'public, max-age=0, s-maxage=300');
-    res.sendFile(indexPath);
+    res.sendFile(indexPath, (err) => {
+      if (err) {
+        console.error(`❌ [SPA Fallback] Error serving index.html:`, err.message);
+        // Only send error response if headers haven't been sent yet
+        if (!res.headersSent) {
+          res.status(500).json({ error: 'Error loading application' });
+        }
+      }
+    });
   } catch (err) {
-    console.error(`❌ [SPA Fallback] Error serving index.html:`, err.message);
-    res.status(500).json({ error: 'Error loading application' });
+    console.error(`❌ [SPA Fallback] Sync error:`, err.message);
+    if (!res.headersSent) {
+      res.status(500).json({ error: 'Error loading application' });
+    }
   }
 });
 
