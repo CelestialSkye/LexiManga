@@ -42,7 +42,7 @@ LexiManga is a web-based vocabulary tracking and learning application designed f
 ### 📚 Vocabulary Management
 
 - Capture vocabulary directly from your reading with full context
-- AI-powered translations using **Google Gemini API**
+- Translation assistance with context-aware lookups
 - Word difficulty classification (Easy, Medium, Hard) based on frequency lists
 - Archive and export your complete vocabulary history
 - Spaced Repetition (FSRS algorithm) for optimal learning
@@ -295,19 +295,19 @@ LexiManga/
 
 ### Frontend
 
-| Technology            | Purpose                     | Version  |
-| --------------------- | --------------------------- | -------- |
-| **React**             | UI library                  | 19.0.0   |
-| **Vite**              | Build tool & dev server     | 6.1.0    |
-| **Tailwind CSS**      | Utility-first CSS framework | 4.0.4    |
-| **Mantine**           | React component library     | 8.2.7+   |
-| **React Router**      | Client-side routing         | 7.8.2    |
-| **React Query**       | Data fetching & caching     | 5.87.0   |
-| **Firebase**          | Auth, Firestore, Storage    | 12.1.0   |
-| **Framer Motion**     | Animation library           | 12.23.22 |
-| **Sentry**            | Error tracking              | 10.25.0  |
-| **Google Gemini API** | AI translations             | 0.24.1   |
-| **reCAPTCHA v3**      | Bot protection              | Latest   |
+| Technology          | Purpose                     | Version  |
+| ------------------- | --------------------------- | -------- |
+| **React**           | UI library                  | 19.0.0   |
+| **Vite**            | Build tool & dev server     | 6.1.0    |
+| **Tailwind CSS**    | Utility-first CSS framework | 4.0.4    |
+| **Mantine**         | React component library     | 8.2.7+   |
+| **React Router**    | Client-side routing         | 7.8.2    |
+| **React Query**     | Data fetching & caching     | 5.87.0   |
+| **Firebase**        | Auth, Firestore, Storage    | 12.1.0   |
+| **Framer Motion**   | Animation library           | 12.23.22 |
+| **Sentry**          | Error tracking              | 10.25.0  |
+| **Translation API** | Language support            | Latest   |
+| **reCAPTCHA v3**    | Bot protection              | Latest   |
 
 ### Backend
 
@@ -426,13 +426,13 @@ The MIT License allows you to:
 - **Helmet** ([https://helmetjs.github.io/](https://helmetjs.github.io/)) - Express security middleware
 - **DOMPurify** ([https://github.com/cure53/DOMPurify](https://github.com/cure53/DOMPurify)) - XSS sanitization
 
-### AI & APIs
+### External Services
 
-- **Google Gemini API** ([https://ai.google.dev/](https://ai.google.dev/)) - AI-powered translations
 - **Google reCAPTCHA** ([https://www.google.com/recaptcha/](https://www.google.com/recaptcha/)) - Bot prevention
 - **Firebase** ([https://firebase.google.com/](https://firebase.google.com/)) - Backend infrastructure
+- **Render** ([https://render.com/](https://render.com/)) - Hosting and deployment
 
-### Tutorials & References
+### References & Resources
 
 - **Render Deployment Guide** ([https://render.com/docs](https://render.com/docs))
 - **Firebase Security Rules** ([https://firebase.google.com/docs/firestore/security/start](https://firebase.google.com/docs/firestore/security/start))
@@ -447,18 +447,10 @@ The project includes word frequency lists for 14 languages used for word difficu
 
 These lists are sourced from frequency analysis corpora and linguistic databases.
 
-### Font & Design
+### Design Resources
 
 - **Inter Font** ([https://fonts.google.com/specimen/Inter](https://fonts.google.com/specimen/Inter)) - Google Fonts
 - **Tabler Icons** ([https://tabler-icons.io/](https://tabler-icons.io/)) - Open-source icon library
-- Design inspiration from modern SaaS applications
-
-### Special Thanks
-
-- The open-source community for creating and maintaining the libraries used
-- Firebase and Google Cloud for providing free tier services
-- Render for affordable and reliable deployment hosting
-- The manga and anime community for the inspiration
 
 ---
 
