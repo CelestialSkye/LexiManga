@@ -50,6 +50,10 @@ export const useSaveMangaStatus = () => {
     },
 
     onSuccess: async ({ previousData, newData, isNew, mangaId, uid }) => {
+      console.log('✅ useSaveMangaStatus.onSuccess - save was successful');
+      console.log('✅ newData:', newData);
+      console.log('✅ isNew:', isNew);
+
       let changes = {};
 
       if (!isNew && previousData) {
@@ -83,18 +87,23 @@ export const useSaveMangaStatus = () => {
         activityPayload.changes = changes;
       }
 
+      console.log('📝 Logging activity:', isNew ? 'manga_add' : 'manga_update', activityPayload);
       await logActivity(isNew ? 'manga_add' : 'manga_update', activityPayload);
 
       // Invalidate both the single manga query and the list query
+      console.log('🔄 Invalidating queries for uid:', uid);
       queryClient.invalidateQueries({
         queryKey: ['mangaStatus', uid, mangaId],
       });
       queryClient.invalidateQueries({
         queryKey: ['mangaStatuses', uid],
       });
+      console.log('✅ Queries invalidated');
     },
 
     onError: (error, variables, context) => {
+      console.error('❌ useSaveMangaStatus.onError - save failed:', error);
+      console.error('❌ Variables:', variables);
       if (context?.previousStatus !== undefined) {
         queryClient.setQueryData(
           ['mangaStatus', variables.uid, variables.mangaId],
@@ -116,7 +125,10 @@ const saveMangaStatus = async (uid, mangaId, statusData) => {
     createdAt: statusData.createdAt || now,
   };
 
+  console.log('💾 saveMangaStatus - saving to path:', `users/${uid}/mangaStatus/${mangaId}`);
+  console.log('💾 saveMangaStatus - data:', dataToSave);
   await setDoc(statusRef, dataToSave);
+  console.log('✅ saveMangaStatus - save successful');
   return dataToSave;
 };
 
