@@ -70,21 +70,13 @@ const shouldSkipCsrf = (req) => {
 };
 
 const csrfMiddleware = (req, res, next) => {
-  // Always initialize CSRF token generation capability (even for GET)
-  csrfProtection(req, res, (err) => {
-    // If there's an error with CSRF (non-GET requests), handle it
-    if (err) {
-      return next(err);
-    }
+  // Skip CSRF protection entirely for GET requests and whitelisted endpoints
+  if (req.method === 'GET' || shouldSkipCsrf(req)) {
+    return next();
+  }
 
-    // Skip CSRF validation for GET requests and whitelisted endpoints
-    if (req.method === 'GET' || shouldSkipCsrf(req)) {
-      return next();
-    }
-
-    // For POST, PUT, DELETE, check the token was already validated by csrfProtection
-    next();
-  });
+  // Only apply CSRF protection to POST, PUT, DELETE requests
+  csrfProtection(req, res, next);
 };
 
 module.exports = {
