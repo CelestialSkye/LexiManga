@@ -129,43 +129,8 @@ app.use((req, res, next) => {
 app.use(express.json());
 
 // ============ SERVE FRONTEND STATIC FILES ============
-// Serve static files from the frontend dist directory
-// Try multiple possible locations for the dist folder
-const possibleDistPaths = [
-  path.join(__dirname, '../dist'), // ../dist (if running from server/)
-  path.join(__dirname, '../../dist'), // ../../dist (if src/server/)
-  path.join(__dirname, '../../../dist'), // ../../../dist (deeper nesting)
-  '/opt/render/project/dist', // Render absolute path (root)
-  '/opt/render/project/src/dist', // Render absolute path (in src/)
-  path.join(process.cwd(), 'dist'), // Current working directory
-];
-
-let frontendDistPath = null;
-for (const distPath of possibleDistPaths) {
-  if (fs.existsSync(distPath)) {
-    frontendDistPath = distPath;
-    console.log(`✅ [Startup] Found dist folder at: ${distPath}`);
-    break;
-  }
-}
-
-if (!frontendDistPath) {
-  console.warn(`⚠️  [Startup] dist folder NOT found in these locations:`);
-  possibleDistPaths.forEach((p) => console.warn(`   - ${p}`));
-  console.warn(`   Current working directory: ${process.cwd()}`);
-  console.warn(`   __dirname: ${__dirname}`);
-  // Default to first option - static middleware will just not find files
-  frontendDistPath = path.join(__dirname, '../dist');
-  console.warn(`   Using default: ${frontendDistPath}`);
-}
-
-// Always try to serve static files
-app.use(
-  express.static(frontendDistPath, {
-    dotfiles: 'deny',
-    index: ['index.html'],
-  })
-);
+// Note: Static files are now served via the SPA fallback route to ensure proper routing
+// The express.static middleware was causing issues with 404 handling
 
 const cache = new NodeCache({ stdTTL: 3600 });
 const translationCache = new NodeCache({ stdTTL: 86400 });
@@ -1480,6 +1445,32 @@ app.get('/api/health', async (req, res) => {
 if (process.env.SENTRY_DSN) {
   app.use(Sentry.Handlers.errorHandler());
 }
+
+// ============ SERVE STATIC ASSETS ============
+// Serve any files that exist in the dist folder (CSS, JS, images, etc.)
+app.get(/^\/(?!api\/).*/, (req, res, next) => {
+  // Try to find the file in dist
+  const possibleDistPaths = [
+    path.join(__dirname, '../dist'), // ../dist (if running from server/)
+    path.join(__dirname, '../../dist'), // ../../dist (if src/server/)
+    path.join(__dirname, '../../../dist'), // ../../../dist (deeper nesting)
+    '/opt/render/project/dist', // Render absolute path
+    '/opt/render/project/src/dist', // Render in src/
+    path.join(process.cwd(), 'dist'), // Current working directory
+  ];
+
+  for (const distPath of possibleDistPaths) {
+    if (fs.existsSync(distPath)) {
+      const filePath = path.join(distPath, req.path);
+      if (fs.existsSync(filePath) && fs.statSync(filePath).isFile()) {
+        return res.sendFile(filePath);
+      }
+    }
+  }
+
+  // If file not found, continue to SPA fallback
+  next();
+});
 
 // ============ SPA FALLBACK: Route all non-API requests to index.html ============
 // This enables client-side routing for React Router
