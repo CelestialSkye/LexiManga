@@ -5,6 +5,12 @@
     "rules": "firestore.rules",
     "indexes": "firestore.indexes.json"
   },
+  "storage": [
+    {
+      "bucket": "vocabularymanga-storage",
+      "rules": "storage.rules"
+    }
+  ],
   "functions": [
     {
       "source": "functions",
