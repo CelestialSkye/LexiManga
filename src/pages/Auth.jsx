@@ -1,4 +1,5 @@
-import { Alert, Button, PasswordInput, Text, TextInput } from '@mantine/core';
+import { Alert, Button, PasswordInput, Text, TextInput, Tooltip, Group } from '@mantine/core';
+import { IconInfoCircle } from '@tabler/icons-react';
 import { useMediaQuery } from '@mantine/hooks';
 import { modals } from '@mantine/modals';
 import { getAuth, sendPasswordResetEmail } from 'firebase/auth';
@@ -351,7 +352,18 @@ const Auth = () => {
             {activeTab === 'register' && (
               <form onSubmit={handleRegister} className='space-y-3'>
                 <div>
-                  <label className='mb-1 block text-xs font-medium text-gray-700'>Email</label>
+                  <Group justify='space-between' align='center' mb={8}>
+                    <label className='text-xs font-medium text-gray-700'>Email</label>
+                    <Tooltip
+                      label='Placeholder: This will explain email requirements'
+                      position='top'
+                      withArrow
+                      multiline
+                      w={200}
+                    >
+                      <IconInfoCircle size={16} style={{ cursor: 'pointer', color: '#9c36b5' }} />
+                    </Tooltip>
+                  </Group>
                   <TextInput
                     placeholder='your@email.com'
                     value={email}
