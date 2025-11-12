@@ -364,9 +364,9 @@ firebase deploy --only firestore,storage
 
 ---
 
-## 🤝 Contributing
+##  Contributing
 
-This is a **portfolio project** developed as a demonstration of modern full-stack web development practices.
+This is a **portfolio project** 
 
 ### Guidelines for Contributors
 
@@ -404,42 +404,10 @@ The MIT License allows you to:
 
 ---
 
-## 🙏 Acknowledgments & Credits
+##  Acknowledgments & Credits
 
-### Inspiration & Learning Resources
 
-- **AniList** ([https://anilist.co/](https://anilist.co/)) - Comprehensive manga database and GraphQL API
-- **React Documentation** ([https://react.dev/](https://react.dev/)) - Official React guides
-- **Vite** ([https://vitejs.dev/](https://vitejs.dev/)) - Modern frontend build tool
-- **Tailwind CSS** ([https://tailwindcss.com/](https://tailwindcss.com/)) - Utility-first CSS framework
-- **Mantine UI** ([https://mantine.dev/](https://mantine.dev/)) - React components library
-- **Firebase Documentation** ([https://firebase.google.com/docs](https://firebase.google.com/docs)) - Backend services
-- **Express.js** ([https://expressjs.com/](https://expressjs.com/)) - Node.js web framework
-
-### Third-Party Code & Libraries
-
-- **React Query** ([https://tanstack.com/query](https://tanstack.com/query)) - Server state management
-- **React Router** ([https://reactrouter.com/](https://reactrouter.com/)) - Client-side routing
-- **Framer Motion** ([https://www.framer.com/motion/](https://www.framer.com/motion/)) - Animation library
-- **Sentry** ([https://sentry.io/](https://sentry.io/)) - Error tracking and monitoring
-- **Zod** ([https://zod.dev/](https://zod.dev/)) - TypeScript-first schema validation
-- **Helmet** ([https://helmetjs.github.io/](https://helmetjs.github.io/)) - Express security middleware
-- **DOMPurify** ([https://github.com/cure53/DOMPurify](https://github.com/cure53/DOMPurify)) - XSS sanitization
-
-### External Services
-
-- **Google reCAPTCHA** ([https://www.google.com/recaptcha/](https://www.google.com/recaptcha/)) - Bot prevention
-- **Firebase** ([https://firebase.google.com/](https://firebase.google.com/)) - Backend infrastructure
-- **Render** ([https://render.com/](https://render.com/)) - Hosting and deployment
-
-### References & Resources
-
-- **Render Deployment Guide** ([https://render.com/docs](https://render.com/docs))
-- **Firebase Security Rules** ([https://firebase.google.com/docs/firestore/security/start](https://firebase.google.com/docs/firestore/security/start))
-- **CORS in Express** - Multiple community guides and documentation
-- **Spaced Repetition Learning** - Educational psychology principles
-
-### Word Frequency Lists
+https://github.com/hermitdave/FrequencyWords
 
 The project includes word frequency lists for 14 languages used for word difficulty classification:
 
@@ -447,14 +415,17 @@ The project includes word frequency lists for 14 languages used for word difficu
 
 These lists are sourced from frequency analysis corpora and linguistic databases.
 
-### Design Resources
+A production ready, scalable starter template for Vite + React
+https://github.com/RicardoValdovinos/vite-react-boilerplate
 
-- **Inter Font** ([https://fonts.google.com/specimen/Inter](https://fonts.google.com/specimen/Inter)) - Google Fonts
-- **Tabler Icons** ([https://tabler-icons.io/](https://tabler-icons.io/)) - Open-source icon library
+Art Used in the Project By いちご飴
+
+https://www.pixiv.net/en/users/33886650/artworks
+
 
 ---
 
-## 📞 Support
+## Support
 
 For questions, suggestions, or bug reports:
 
@@ -462,14 +433,11 @@ For questions, suggestions, or bug reports:
 2. **Check existing discussions** before creating a new issue
 3. **Provide detailed information** about your problem or suggestion
 
-## 🔗 Links
+## Links
 
 - **GitHub Repository**: [https://github.com/CelestialSkye/LexiManga](https://github.com/CelestialSkye/LexiManga)
-- **Live Application**: [https://vocabularymanga.onrender.com](https://vocabularymanga.onrender.com)
 - **AniList API**: [https://anilist.co/](https://anilist.co/)
 
 ---
 
-**Made with ❤️ for language learners who love manga** 📚✨
 
-_Last Updated: November 2025_
