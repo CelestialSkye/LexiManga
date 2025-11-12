@@ -226,6 +226,7 @@ const AddWordModal = ({ manga, opened, closeModal, showMangaSelector = false }) 
               error={!translationError && !translation.trim() ? 'Translation is required' : ''}
               className='violet-focus'
             />
+            {/* TODO: Re-enable translation button once Firebase Admin is configured */}
             <ActionIcon
               onClick={handleTranslate}
               loading={isTranslating}
@@ -236,6 +237,7 @@ const AddWordModal = ({ manga, opened, closeModal, showMangaSelector = false }) 
               color='violet'
               title={`Translate from ${profile?.targetLang || 'target'} to ${profile?.nativeLang || 'native'}`}
               className='mb-5'
+              style={{ display: 'none' }}
             >
               <IconLanguage size={16} />
             </ActionIcon>
