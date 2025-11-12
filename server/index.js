@@ -444,7 +444,12 @@ app.post('/api/translate', verifyToken, async (req, res) => {
 
     const prompt = `Translate the following ${sourceLang} text to ${targetLang}. Only return the translation, nothing else: "${text}"`;
 
-    const result = await model.generateContent(prompt);
+    // Add timeout to prevent long-running requests
+    const timeoutPromise = new Promise((_, reject) =>
+      setTimeout(() => reject(new Error('Translation request timeout')), 30000)
+    );
+
+    const result = await Promise.race([model.generateContent(prompt), timeoutPromise]);
     const response = await result.response;
     const translation = response.text().trim();
 
