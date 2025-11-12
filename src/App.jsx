@@ -64,6 +64,8 @@ const App = () => {
     console.error('❌ VITE_RECAPTCHA_SITE_KEY is not set');
   } else {
     console.log('✅ reCAPTCHA key loaded');
+    console.log('🔑 Site key:', recaptchaKey);
+    console.log('🔑 Site key length:', recaptchaKey.length);
   }
 
   const theme = {
