@@ -10,9 +10,18 @@ const MangaListModal = () => {
   const [selectedManga, setSelectedManga] = useState(null);
   const [isStatusModalOpen, setIsStatusModalOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
-  const filteredManga = mangaStatus.filter((manga) =>
-    manga.title.toLowerCase().includes(searchTerm.toLowerCase())
+
+  // DEBUG: Log the actual manga status data
+  console.log('MangaListModal - mangaStatus data:', mangaStatus);
+  console.log(
+    'MangaListModal - mangaStatus count:',
+    Array.isArray(mangaStatus) ? mangaStatus.length : 'not an array'
   );
+
+  const filteredManga = mangaStatus.filter((manga) => {
+    const title = manga.title || '';
+    return title.toString().toLowerCase().includes(searchTerm.toLowerCase());
+  });
 
   if (!user) return <div>Please log in to view your manga statuses.</div>;
   if (isLoading)
@@ -52,8 +61,15 @@ const MangaListModal = () => {
           onChange={setSearchTerm}
           placeholder='Search manga..'
         />
-        {filteredManga.length === 0 ? (
-          <div className='text-gray-500'>No manga statuses found</div>
+        {mangaStatus.length === 0 ? (
+          <div className='rounded-lg bg-blue-50 p-4 text-center text-blue-700'>
+            <p className='font-semibold'>No manga added yet</p>
+            <p className='mt-2 text-sm'>
+              Go to the Manga page and click "Add to Reading List" to get started!
+            </p>
+          </div>
+        ) : filteredManga.length === 0 ? (
+          <div className='text-center text-gray-500'>No results for "{searchTerm}"</div>
         ) : (
           <div className='grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4'>
             {filteredManga.map((manga) => (
@@ -70,10 +86,17 @@ const MangaListModal = () => {
 
                 <div className='text-center'>
                   <div className='text-sm font-semibold'>{manga.title}</div>
+                  <div className='text-xs text-gray-600'>Status: {manga.status || 'Not set'}</div>
                   <div className='text-xs text-gray-600'>
-                    Progress: {manga.progress || 'Not started'}
-                    {manga.score && ` | Score: ${manga.score}`}
+                    {manga.progress !== null && manga.progress !== undefined
+                      ? `Progress: ${manga.progress}`
+                      : 'No progress set'}
                   </div>
+                  {manga.score && (
+                    <div className='text-xs font-semibold text-violet-600'>
+                      Score: {manga.score}/10
+                    </div>
+                  )}
                 </div>
               </div>
             ))}
@@ -83,8 +106,11 @@ const MangaListModal = () => {
 
       <MangaStatusModal
         manga={{
-          id: selectedManga?.mangaId,
-          title: { romaji: selectedManga?.title },
+          id: selectedManga?.id || selectedManga?.mangaId,
+          title: {
+            romaji: selectedManga?.title,
+            english: selectedManga?.title,
+          },
         }}
         opened={isStatusModalOpen}
         closeModal={() => setIsStatusModalOpen(false)}
