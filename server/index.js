@@ -5,6 +5,7 @@ require('dotenv').config({ path: path.resolve(__dirname, '../.env') });
 const express = require('express');
 const NodeCache = require('node-cache');
 const axios = require('axios');
+const cacheManager = require('./cache-manager');
 
 // Initialize Firebase Admin
 require('./firebase-admin');
