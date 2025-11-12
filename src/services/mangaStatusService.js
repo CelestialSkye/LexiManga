@@ -85,8 +85,12 @@ export const useSaveMangaStatus = () => {
 
       await logActivity(isNew ? 'manga_add' : 'manga_update', activityPayload);
 
+      // Invalidate both the single manga query and the list query
       queryClient.invalidateQueries({
         queryKey: ['mangaStatus', uid, mangaId],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ['mangaStatuses', uid],
       });
     },
 
