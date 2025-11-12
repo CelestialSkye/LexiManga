@@ -132,6 +132,12 @@ const translationCache = new NodeCache({ stdTTL: 86400 });
 // Function to verify reCAPTCHA token
 const verifyRecaptcha = async (token) => {
   try {
+    // Check if secret key is configured
+    if (!process.env.VITE_RECAPTCHA_SECRET_KEY) {
+      console.error('❌ VITE_RECAPTCHA_SECRET_KEY is not set in environment variables');
+      return false;
+    }
+
     const response = await axios.post('https://www.google.com/recaptcha/api/siteverify', null, {
       params: {
         secret: process.env.VITE_RECAPTCHA_SECRET_KEY,
@@ -141,11 +147,26 @@ const verifyRecaptcha = async (token) => {
 
     const { success, score, error_codes } = response.data;
 
+    console.log('reCAPTCHA verification result:', { success, score, error_codes });
+
     // reCAPTCHA v3 returns a score between 0 and 1
     // 1.0 is very likely a legitimate interaction, 0.0 is very likely a bot
-    return success && score > 0.3; // Accept if score is above 0.3 (more lenient for testing)
+    if (!success) {
+      console.error('reCAPTCHA verification failed:', error_codes);
+      return false;
+    }
+
+    if (score <= 0.3) {
+      console.warn(`reCAPTCHA score too low: ${score}`);
+      return false;
+    }
+
+    return true;
   } catch (error) {
     console.error('reCAPTCHA verification error:', error.message);
+    if (error.response) {
+      console.error('reCAPTCHA API response:', error.response.data);
+    }
     return false;
   }
 };
@@ -1360,6 +1381,15 @@ app.get('/api/health', async (req, res) => {
       health.status = 'degraded';
       console.error('AniList API health check failed:', error.message);
     }
+
+    // Check environment variables (without exposing secrets)
+    health.checks.env = {
+      recaptcha_secret: !!process.env.VITE_RECAPTCHA_SECRET_KEY,
+      gemini_api: !!process.env.GEMINI_API_KEY,
+      firebase_service_account: !!process.env.FIREBASE_SERVICE_ACCOUNT_JSON,
+      firebase_project_id: !!process.env.VITE_FIREBASE_PROJECT_ID,
+      node_env: process.env.NODE_ENV,
+    };
 
     // Return appropriate status code
     const statusCode = health.status === 'healthy' ? 200 : 503;
