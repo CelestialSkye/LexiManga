@@ -47,23 +47,31 @@ app.use((req, res, next) => {
 // ============ SERVE FRONTEND ============
 // Find dist folder - checked on startup
 let distPath = null;
+
+// Log directory info for debugging
+console.log(`📍 __dirname: ${__dirname}`);
+console.log(`📍 process.cwd(): ${process.cwd()}`);
+
 const possiblePaths = [
-  path.join(__dirname, '../dist'),
-  path.join(__dirname, '../../dist'),
-  path.join(process.cwd(), 'dist'),
+  path.join(__dirname, '../dist'), // ../dist from server/
+  path.join(__dirname, '../../dist'), // ../../dist if deeper nesting
+  path.join(process.cwd(), 'dist'), // CWD/dist
+  '/opt/render/project/dist', // Render absolute path
 ];
 
+console.log(`🔍 Looking for dist folder...`);
 for (const p of possiblePaths) {
-  if (fs.existsSync(p)) {
+  const exists = fs.existsSync(p);
+  console.log(`   ${exists ? '✅' : '❌'} ${p}`);
+  if (exists) {
     distPath = p;
-    console.log(`✅ Serving frontend from: ${distPath}`);
+    console.log(`✅ Using: ${distPath}`);
     break;
   }
 }
 
 if (!distPath) {
-  console.warn(`⚠️  dist folder not found. Checked:`);
-  possiblePaths.forEach((p) => console.warn(`   - ${p}`));
+  console.error(`❌ ERROR: dist folder not found anywhere!`);
 }
 
 // Serve static assets using express.static
