@@ -28,10 +28,6 @@ const admin = require('firebase-admin');
 // Import authentication middleware
 const { verifyToken } = require('./middleware/auth');
 
-// Import CSRF protection middleware
-const cookieParser = require('cookie-parser');
-const { csrfMiddleware, getCsrfToken, csrfErrorHandler } = require('./middleware/csrf');
-
 // Import rate limiter
 const rateLimiter = require('./utils/rate-limiter');
 
@@ -129,17 +125,6 @@ app.use((req, res, next) => {
 });
 
 app.use(express.json());
-
-// ============ SECURITY: CSRF Protection ============
-// Cookie parser MUST be before CSRF middleware
-app.use(cookieParser());
-app.use(csrfMiddleware);
-
-// ============ SECURITY: CSRF Error Handler ============
-// Add after all routes
-const setupErrorHandlers = () => {
-  app.use(csrfErrorHandler);
-};
 
 const cache = new NodeCache({ stdTTL: 3600 });
 const translationCache = new NodeCache({ stdTTL: 86400 });
@@ -1320,19 +1305,6 @@ app.post('/api/auth/register', async (req, res) => {
   }
 });
 
-// ============ SECURITY: Get CSRF Token ============
-// Clients should call this endpoint once and include the token in POST/PUT/DELETE requests
-app.get('/api/csrf-token', (req, res) => {
-  try {
-    res.json({
-      csrfToken: req.csrfToken(),
-      expiresIn: 3600, // 1 hour in seconds
-    });
-  } catch (error) {
-    res.status(500).json({ error: 'Failed to generate CSRF token' });
-  }
-});
-
 // ============ MONITORING: Enhanced Health Check Endpoint ============
 // Provides system status, dependency health, and performance metrics
 app.get('/api/health', async (req, res) => {
@@ -1407,9 +1379,6 @@ app.get('/api/health', async (req, res) => {
 if (process.env.SENTRY_DSN) {
   app.use(Sentry.Handlers.errorHandler());
 }
-
-// Setup error handlers
-setupErrorHandlers();
 
 app.listen(PORT, () => {
   console.log(` Backend running on port ${PORT}`);
