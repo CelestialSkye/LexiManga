@@ -131,9 +131,16 @@ app.use(express.json());
 // ============ SERVE FRONTEND STATIC FILES ============
 // Serve static files from the frontend dist directory
 const frontendDistPath = path.join(__dirname, '../dist');
-if (fs.existsSync(frontendDistPath)) {
-  app.use(express.static(frontendDistPath));
-}
+console.log(`[Startup] Frontend path: ${frontendDistPath}`);
+console.log(`[Startup] Frontend dist exists: ${fs.existsSync(frontendDistPath)}`);
+
+// Always try to serve static files, even if dist doesn't exist yet
+app.use(
+  express.static(frontendDistPath, {
+    dotfiles: 'deny',
+    index: ['index.html'],
+  })
+);
 
 const cache = new NodeCache({ stdTTL: 3600 });
 const translationCache = new NodeCache({ stdTTL: 86400 });
@@ -1451,21 +1458,39 @@ if (process.env.SENTRY_DSN) {
 
 // ============ SPA FALLBACK: Route all non-API requests to index.html ============
 // This enables client-side routing for React Router
-app.get('*', (req, res) => {
+// This MUST be the last route handler before error handlers
+app.get('*', (req, res, next) => {
+  // Skip if this is an API request (shouldn't reach here, but just in case)
+  if (req.path.startsWith('/api')) {
+    return next();
+  }
+
   const indexPath = path.join(__dirname, '../dist/index.html');
-  console.log(`[SPA Fallback] Attempting to serve: ${indexPath}`);
+
+  console.log(`[SPA Fallback] Handling request for: ${req.path}`);
+  console.log(`[SPA Fallback] Attempting to serve index.html from: ${indexPath}`);
   console.log(`[SPA Fallback] File exists: ${fs.existsSync(indexPath)}`);
 
-  if (fs.existsSync(indexPath)) {
-    res.sendFile(indexPath);
-  } else {
-    // Log directory contents for debugging
-    const distPath = path.join(__dirname, '../dist');
-    console.log(`[SPA Fallback] dist exists: ${fs.existsSync(distPath)}`);
-    if (fs.existsSync(distPath)) {
-      console.log(`[SPA Fallback] dist contents:`, fs.readdirSync(distPath));
+  try {
+    if (fs.existsSync(indexPath)) {
+      // Set proper cache headers for HTML
+      res.set('Cache-Control', 'public, max-age=0, s-maxage=300');
+      res.sendFile(indexPath);
+    } else {
+      console.error(`[SPA Fallback] index.html NOT FOUND at: ${indexPath}`);
+      // List dist directory contents for debugging
+      const distPath = path.join(__dirname, '../dist');
+      if (fs.existsSync(distPath)) {
+        const files = fs.readdirSync(distPath);
+        console.log(`[SPA Fallback] dist directory contents:`, files);
+      } else {
+        console.error(`[SPA Fallback] dist directory does NOT exist: ${distPath}`);
+      }
+      res.status(404).send('Frontend not found - check server logs');
     }
-    res.status(404).json({ error: 'Frontend index.html not found', path: indexPath });
+  } catch (err) {
+    console.error(`[SPA Fallback] Error serving index.html:`, err);
+    res.status(500).send('Error loading application');
   }
 });
 
