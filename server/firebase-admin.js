@@ -17,8 +17,13 @@ if (!admin.apps.length) {
         });
         console.log('✅ Firebase Admin SDK initialized (dev - from file)');
       } else {
-        console.warn('⚠️ No FIREBASE_CREDENTIALS_PATH in development. Some features may not work.');
-        console.warn('Set FIREBASE_CREDENTIALS_PATH to your service account JSON file.');
+        console.warn(
+          '⚠️ No FIREBASE_CREDENTIALS_PATH in development. Rate limiting and activity logging will be disabled.'
+        );
+        console.warn(
+          'To enable full features, set FIREBASE_CREDENTIALS_PATH to your service account JSON file.'
+        );
+        // Don't throw - allow server to continue without Firebase Admin
       }
     } else {
       // For production (Render) - use environment variable as JSON string
@@ -47,7 +52,9 @@ if (!admin.apps.length) {
     console.error('❌ Firebase Admin initialization failed:', error.message);
     if (process.env.NODE_ENV === 'production') {
       console.error('Make sure FIREBASE_SERVICE_ACCOUNT_JSON is properly set in production.');
+      throw error; // Fail in production
     }
+    // In development, allow continued operation without Firebase Admin
   }
 } else {
   console.log('✅ Firebase Admin SDK already initialized');
