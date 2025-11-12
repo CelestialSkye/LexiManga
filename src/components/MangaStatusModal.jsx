@@ -70,12 +70,6 @@ const MangaStatusModal = ({ manga, opened, closeModal }) => {
     const isNew = !existingStatus;
 
     try {
-      console.log('🔐 MangaStatusModal.handleSave - starting save');
-      console.log('🔐 User UID:', user.uid);
-      console.log('🔐 Manga ID:', manga.id.toString());
-      console.log('🔐 Is New:', isNew);
-      console.log('🔐 Status data:', { status, progress, notes, score });
-
       await saveMutation.mutateAsync({
         uid: user.uid,
         mangaId: manga.id.toString(),
@@ -91,9 +85,8 @@ const MangaStatusModal = ({ manga, opened, closeModal }) => {
         },
         isNew,
       });
-      console.log('✅ MangaStatusModal.handleSave - save completed');
     } catch (error) {
-      console.error('❌ Error saving manga status:', error);
+      console.error('Error saving manga status:', error);
     } finally {
       closeModal();
     }

@@ -17,22 +17,12 @@ export const useMangaStatuses = (uid) => {
 
 const fetchMangaStatuses = async (uid) => {
   try {
-    console.log('🔍 fetchMangaStatuses - START - uid:', uid);
     if (!uid) {
-      console.warn('⚠️ fetchMangaStatuses - NO UID PROVIDED!');
       return [];
     }
 
     const statusesRef = collection(db, 'users', uid, 'mangaStatus');
-    console.log('🔍 fetchMangaStatuses - collection ref created, calling getDocs...');
     const statusesSnapshot = await getDocs(statusesRef);
-
-    console.log('✅ fetchMangaStatuses - uid:', uid);
-    console.log('✅ fetchMangaStatuses - docs count:', statusesSnapshot.docs.length);
-    console.log(
-      '✅ fetchMangaStatuses - docs:',
-      statusesSnapshot.docs.map((d) => ({ id: d.id, data: d.data() }))
-    );
 
     const mangaStatusesWithDetails = await Promise.allSettled(
       statusesSnapshot.docs.map(async (doc) => {
@@ -40,8 +30,6 @@ const fetchMangaStatuses = async (uid) => {
           id: doc.id,
           ...doc.data(),
         };
-
-        console.log('📦 Processing manga status:', mangaStatus);
 
         try {
           if (mangaStatus.mangaId) {
@@ -80,10 +68,9 @@ const fetchMangaStatuses = async (uid) => {
       .filter((result) => result.status === 'fulfilled')
       .map((result) => result.value);
 
-    console.log('✅ fetchMangaStatuses - final result:', result);
     return Array.isArray(result) ? result : [];
   } catch (error) {
-    console.error('❌ Error fetching manga statuses:', error);
+    console.error('Error fetching manga statuses:', error);
     return [];
   }
 };
