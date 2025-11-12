@@ -98,6 +98,8 @@ app.use(
           'https://*.firebasedatabase.app',
           'https://firestore.googleapis.com',
           'https://identitytoolkit.googleapis.com',
+          'https://vocabularymanga-backend.onrender.com',
+          'https://vocabularymanga.onrender.com',
         ],
         frameSrc: ['https://www.google.com/recaptcha', 'https://recaptcha.google.com'],
         fontSrc: ["'self'", 'data:', 'https://www.gstatic.com'],

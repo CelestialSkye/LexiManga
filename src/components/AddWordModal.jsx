@@ -94,6 +94,7 @@ const AddWordModal = ({ manga, opened, closeModal, showMangaSelector = false }) 
       const wordData = {
         mangaId: currentManga.id.toString(),
         mangaTitle: mangaTitleString,
+        coverImage: currentManga.coverImage || currentManga.image || '',
         word,
         translation,
         context,
