@@ -24,9 +24,10 @@ services:
     plan: free
     buildCommand: npm install && npm run build
     staticPublishPath: ./dist
-    routes:
-      - path: /*
+    redirects:
+      - source: /*
         destination: /index.html
+        type: rewrite
     envVars:
       - key: VITE_BACKEND_URL
         value: https://vocabularymanga-backend.onrender.com
