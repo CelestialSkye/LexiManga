@@ -4,7 +4,7 @@
   "description": "Backend server for Vocabulary Manga app with AniList API integration",
   "main": "index.js",
   "scripts": {
-    "start": "node --max-old-space-size=384 index.js",
+    "start": "node index.js",
     "dev": "nodemon index.js",
     "test": "node test-simple.js",
     "build": "echo 'No build step needed'"
