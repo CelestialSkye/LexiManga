@@ -88,28 +88,26 @@ jobs:
           path: dist/
           retention-days: 5
 
-  # ============ BUILD BACKEND ============
-  build-backend:
-    name: Verify Backend
-    runs-on: ubuntu-latest
-    needs: test
-    steps:
-      - uses: actions/checkout@v4
+   # ============ BUILD BACKEND ============
+   build-backend:
+     name: Verify Backend
+     runs-on: ubuntu-latest
+     needs: test
+     steps:
+       - uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: 'npm'
+       - name: Setup Node.js
+         uses: actions/setup-node@v4
+         with:
+           node-version: ${{ env.NODE_VERSION }}
+           cache: npm
+           cache-dependency-path: server/package-lock.json
 
-      - name: Install root dependencies
-        run: npm ci
+       - name: Install server dependencies
+         run: cd server && npm ci
 
-      - name: Install server dependencies
-        run: npm ci --cwd server
-
-      - name: Verify server can start
-        run: cd server && npm list
+       - name: Verify server configuration
+         run: cd server && npm list
 
   # ============ SECURITY CHECKS ============
   security:
@@ -132,12 +130,12 @@ jobs:
         run: npm audit --audit-level=moderate
         continue-on-error: true
 
-      - name: Check for secrets
-        uses: trufflesecurity/trufflehog@main
-        with:
-          path: ./
-          base: ${{ github.event.repository.default_branch }}
-          head: HEAD
+       - name: Check for secrets
+         uses: trufflesecurity/trufflehog@main
+         with:
+           path: ./
+           base: ${{ github.event.repository.default_branch }}
+           head: ${{ github.head_ref || github.ref }}
 
   # ============ DEPLOY TO STAGING (on develop branch) ============
   deploy-staging:
