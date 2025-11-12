@@ -84,17 +84,6 @@ const Auth = () => {
     }
 
     try {
-      // Check if reCAPTCHA is available
-      console.log('🔍 Checking reCAPTCHA availability...');
-      console.log('🔍 executeRecaptcha available:', typeof executeRecaptcha);
-      console.log('🔍 window.grecaptcha available:', typeof window.grecaptcha);
-
-      if (window.grecaptcha) {
-        console.log('🔍 grecaptcha.ready available:', typeof window.grecaptcha.ready);
-        console.log('🔍 grecaptcha.execute available:', typeof window.grecaptcha.execute);
-        console.log('🔍 grecaptcha.getResponse available:', typeof window.grecaptcha.getResponse);
-      }
-
       if (!executeRecaptcha) {
         throw new Error('reCAPTCHA not loaded');
       }
@@ -102,66 +91,36 @@ const Auth = () => {
       // Execute reCAPTCHA
       let token;
       try {
-        console.log('🔄 Executing reCAPTCHA...');
         token = await executeRecaptcha('register');
-        console.log(
-          '✅ reCAPTCHA token generated:',
-          token ? `Token length: ${token.length}` : 'null'
-        );
-
-        if (token) {
-          console.log('🔍 Token first 50 chars:', token.substring(0, 50));
-          console.log('🔍 Token last 50 chars:', token.substring(token.length - 50));
-          console.log('🔍 Full token:', token);
-
-          // Check if token is a valid JWT (should have 2 dots)
-          const dotCount = (token.match(/\./g) || []).length;
-          console.log('🔍 Token dot count:', dotCount, '(should be 2 for JWT)');
-
-          // Check if token looks like base64
-          const base64Regex = /^[A-Za-z0-9_-]+$/;
-          const looksLikeBase64 = base64Regex.test(token);
-          console.log('🔍 Token looks like base64:', looksLikeBase64);
-        }
-
         if (!token) {
           throw new Error('reCAPTCHA verification failed - token not generated');
         }
       } catch (error) {
-        console.error('❌ reCAPTCHA execution error:', error);
         throw new Error(
           'reCAPTCHA verification failed. Please disable your ad blocker and try again.'
         );
       }
 
       // Verify token on backend and register
-      console.log('📤 Sending registration request to backend:', import.meta.env.VITE_BACKEND_URL);
-      const requestBody = {
-        email,
-        password,
-        nickname,
-        nativeLang,
-        targetLang,
-        recaptchaToken: token,
-      };
-      console.log('📋 Request body keys:', Object.keys(requestBody));
-      console.log('📋 reCAPTCHA token in request:', token.substring(0, 100) + '...');
-
       const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/auth/register`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(requestBody),
+        body: JSON.stringify({
+          email,
+          password,
+          nickname,
+          nativeLang,
+          targetLang,
+          recaptchaToken: token,
+        }),
       });
 
-      console.log('📥 Backend response status:', response.status);
       if (!response.ok) {
         const data = await response.json();
-        console.error('❌ Backend error:', data);
         throw new Error(data.message || 'Registration failed');
       }
-      console.log('✅ Backend verification passed');
 
       // If backend verification passed, register with Firebase
       await register(email, password, nickname, nativeLang, targetLang);

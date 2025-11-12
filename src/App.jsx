@@ -59,15 +59,6 @@ const AppContent = () => {
 const App = () => {
   const recaptchaKey = import.meta.env.VITE_RECAPTCHA_SITE_KEY;
 
-  // Debug: Log if reCAPTCHA key is loaded
-  if (!recaptchaKey) {
-    console.error('❌ VITE_RECAPTCHA_SITE_KEY is not set');
-  } else {
-    console.log('✅ reCAPTCHA key loaded');
-    console.log('🔑 Site key:', recaptchaKey);
-    console.log('🔑 Site key length:', recaptchaKey.length);
-  }
-
   const theme = {
     fontFamily: 'Inter Variable, sans-serif',
     components: {
