@@ -1,8 +1,8 @@
 import { MantineProvider } from '@mantine/core';
 import { ModalsProvider } from '@mantine/modals';
-import { useEffect } from 'react';
 import { GoogleReCaptchaProvider } from 'react-google-recaptcha-v3';
 import { BrowserRouter, Route, Routes, useLocation } from 'react-router-dom';
+import { useEffect } from 'react';
 
 import Footer from './components/Footer';
 import { AuthProvider } from './context/AuthContext';
@@ -15,39 +15,40 @@ import MangaPage from './pages/MangaPage';
 import ProfilePage from './pages/ProfilePage';
 import SettingsPage from './pages/SettingsPage';
 
+// Optional: simple 404 page (you can style it later)
+const NotFoundPage = () => (
+  <div className="flex min-h-screen items-center justify-center text-center text-2xl font-semibold text-gray-600">
+    404 — Page Not Found
+  </div>
+);
+
+// Scroll to top on route change
+const ScrollToTop = () => {
+  const { pathname } = useLocation();
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
+  return null;
+};
+
 const AppContent = () => {
   const location = useLocation();
-  const recaptchaKey = import.meta.env.VITE_RECAPTCHA_SITE_KEY;
   const hideFooter = location.pathname === '/auth';
 
-  const theme = {
-    fontFamily: 'Inter Variable, sans-serif',
-    components: {
-      PasswordInput: {
-        styles: (theme) => ({
-          input: {
-            '&:focus': {
-              borderColor: `${theme.colors.violet[6]} !important`,
-              boxShadow: `0 0 0 2px ${theme.colors.violet[6]} !important`,
-            },
-          },
-        }),
-      },
-    },
-  };
-
   return (
-    <div className='flex min-h-screen flex-col'>
-      <main className='flex-1'>
+    <div className="flex min-h-screen flex-col">
+      <ScrollToTop />
+      <main className="flex-1">
         <Routes>
-          <Route path='/' element={<LandingPage />} />
-          <Route path='/auth' element={<Auth />} />
-          <Route path='/home' element={<Home />} />
-          <Route path='/dashboard' element={<Dashboard />} />
-          <Route path='/manga/:id' element={<MangaPage />} />
-          <Route path='/profile' element={<ProfilePage />} />
-          <Route path='/settings' element={<SettingsPage />} />
-          <Route path='/browse' element={<Browse />} />
+          <Route path="/" element={<LandingPage />} />
+          <Route path="/auth" element={<Auth />} />
+          <Route path="/home" element={<Home />} />
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/manga/:id" element={<MangaPage />} />
+          <Route path="/profile" element={<ProfilePage />} />
+          <Route path="/settings" element={<SettingsPage />} />
+          <Route path="/browse" element={<Browse />} />
+          <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </main>
       {!hideFooter && <Footer />}
@@ -76,7 +77,7 @@ const App = () => {
 
   return (
     <GoogleReCaptchaProvider reCaptchaKey={recaptchaKey}>
-      <MantineProvider theme={theme} defaultColorScheme='light' primaryColor='violet'>
+      <MantineProvider theme={theme} defaultColorScheme="light" primaryColor="violet">
         <ModalsProvider>
           <AuthProvider>
             <BrowserRouter>
