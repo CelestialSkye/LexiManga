@@ -1376,7 +1376,11 @@ if (process.env.SENTRY_DSN) {
 }
 
 app.listen(PORT, () => {
-  console.log(` Backend running on port ${PORT}`);
+  console.log(`🚀 Backend running on port ${PORT}`);
+  console.log('✅ CORS enabled for all origins');
+  console.log(
+    '✅ All API routes loaded: /api/search, /api/manga, /api/trending, /api/monthly, /api/suggested, /api/browse, /api/health'
+  );
 
   // Start cache scheduler after server is listening (non-blocking)
   setImmediate(() => {
