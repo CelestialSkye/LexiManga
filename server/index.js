@@ -132,12 +132,20 @@ const translationCache = new NodeCache({ stdTTL: 86400 });
 // Function to verify reCAPTCHA token
 const verifyRecaptcha = async (token) => {
   try {
+    console.log(
+      '🔄 [verifyRecaptcha] Starting verification for token:',
+      token ? `length: ${token.length}` : 'null'
+    );
+
     // Check if secret key is configured
     if (!process.env.VITE_RECAPTCHA_SECRET_KEY) {
-      console.error('❌ VITE_RECAPTCHA_SECRET_KEY is not set in environment variables');
+      console.error(
+        '❌ [verifyRecaptcha] VITE_RECAPTCHA_SECRET_KEY is not set in environment variables'
+      );
       return false;
     }
 
+    console.log('✅ [verifyRecaptcha] Secret key found, sending to Google API...');
     const response = await axios.post('https://www.google.com/recaptcha/api/siteverify', null, {
       params: {
         secret: process.env.VITE_RECAPTCHA_SECRET_KEY,
@@ -145,28 +153,40 @@ const verifyRecaptcha = async (token) => {
       },
     });
 
-    const { success, score, error_codes } = response.data;
+    const { success, score, error_codes, action, challenge_ts } = response.data;
 
-    console.log('reCAPTCHA verification result:', { success, score, error_codes });
+    console.log('📊 [verifyRecaptcha] Google response:', {
+      success,
+      score,
+      error_codes,
+      action,
+      challenge_ts,
+      token_length: token ? token.length : 'null',
+    });
 
     // reCAPTCHA v3 returns a score between 0 and 1
     // 1.0 is very likely a legitimate interaction, 0.0 is very likely a bot
     if (!success) {
-      console.error('reCAPTCHA verification failed:', error_codes);
+      console.error(
+        '❌ [verifyRecaptcha] Google verification failed with error codes:',
+        error_codes
+      );
       return false;
     }
 
     if (score <= 0.3) {
-      console.warn(`reCAPTCHA score too low: ${score}`);
+      console.warn(`⚠️ [verifyRecaptcha] reCAPTCHA score too low: ${score} (threshold: 0.3)`);
       return false;
     }
 
+    console.log(`✅ [verifyRecaptcha] reCAPTCHA verification PASSED (score: ${score})`);
     return true;
   } catch (error) {
-    console.error('reCAPTCHA verification error:', error.message);
+    console.error('❌ [verifyRecaptcha] Verification error:', error.message);
     if (error.response) {
-      console.error('reCAPTCHA API response:', error.response.data);
+      console.error('❌ [verifyRecaptcha] Google API error response:', error.response.data);
     }
+    console.error('❌ [verifyRecaptcha] Full error:', error);
     return false;
   }
 };
@@ -1291,8 +1311,16 @@ app.post('/api/auth/register', async (req, res) => {
     // Get client IP
     const clientIp = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
 
+    console.log('📨 [/api/auth/register] New registration request from IP:', clientIp);
+    console.log('📨 [/api/auth/register] Email:', email);
+    console.log(
+      '📨 [/api/auth/register] Token received:',
+      recaptchaToken ? `length: ${recaptchaToken.length}` : 'null'
+    );
+
     // Check IP-based rate limit (max 5 registrations per hour per IP)
     if (!checkIPRateLimit(clientIp)) {
+      console.warn('⚠️ [/api/auth/register] Rate limit exceeded for IP:', clientIp);
       return res.status(429).json({
         message: 'Too many registration attempts from this IP. Please try again later.',
       });
@@ -1300,14 +1328,19 @@ app.post('/api/auth/register', async (req, res) => {
 
     // Verify reCAPTCHA token
     if (!recaptchaToken) {
-      console.error('❌ Registration attempt without reCAPTCHA token from IP:', clientIp);
+      console.error(
+        '❌ [/api/auth/register] Registration attempt without reCAPTCHA token from IP:',
+        clientIp
+      );
       return res.status(400).json({
         message: 'reCAPTCHA token is required. Please disable your ad blocker and try again.',
       });
     }
 
+    console.log('🔄 [/api/auth/register] Verifying reCAPTCHA...');
     const isValidCaptcha = await verifyRecaptcha(recaptchaToken);
     if (!isValidCaptcha) {
+      console.error('❌ [/api/auth/register] reCAPTCHA verification failed');
       return res.status(400).json({
         message: 'reCAPTCHA verification failed. Please try again.',
       });
@@ -1315,12 +1348,13 @@ app.post('/api/auth/register', async (req, res) => {
 
     // If all checks pass, return success
     // The actual Firebase registration happens on the client side
+    console.log('✅ [/api/auth/register] Registration verification successful for:', email);
     res.json({
       success: true,
       message: 'reCAPTCHA verification passed. You can proceed with registration.',
     });
   } catch (error) {
-    console.error('Registration error:', error);
+    console.error('❌ [/api/auth/register] Registration error:', error);
     res.status(500).json({
       message: 'Registration verification failed. Please try again.',
     });

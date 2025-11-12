@@ -91,18 +91,24 @@ const Auth = () => {
       // Execute reCAPTCHA
       let token;
       try {
+        console.log('🔄 Executing reCAPTCHA...');
         token = await executeRecaptcha('register');
+        console.log(
+          '✅ reCAPTCHA token generated:',
+          token ? `Token length: ${token.length}` : 'null'
+        );
         if (!token) {
           throw new Error('reCAPTCHA verification failed - token not generated');
         }
       } catch (error) {
-        console.error('reCAPTCHA execution error:', error);
+        console.error('❌ reCAPTCHA execution error:', error);
         throw new Error(
           'reCAPTCHA verification failed. Please disable your ad blocker and try again.'
         );
       }
 
       // Verify token on backend and register
+      console.log('📤 Sending registration request to backend:', import.meta.env.VITE_BACKEND_URL);
       const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/auth/register`, {
         method: 'POST',
         headers: {
@@ -118,10 +124,13 @@ const Auth = () => {
         }),
       });
 
+      console.log('📥 Backend response status:', response.status);
       if (!response.ok) {
         const data = await response.json();
+        console.error('❌ Backend error:', data);
         throw new Error(data.message || 'Registration failed');
       }
+      console.log('✅ Backend verification passed');
 
       // If backend verification passed, register with Firebase
       await register(email, password, nickname, nativeLang, targetLang);
