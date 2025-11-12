@@ -88,18 +88,26 @@ const Auth = () => {
         throw new Error('reCAPTCHA not loaded');
       }
 
-      // Execute reCAPTCHA
-      let token;
-      try {
-        console.log('🔄 Executing reCAPTCHA...');
-        token = await executeRecaptcha('register');
-        console.log(
-          '✅ reCAPTCHA token generated:',
-          token ? `Token length: ${token.length}` : 'null'
-        );
-        if (!token) {
-          throw new Error('reCAPTCHA verification failed - token not generated');
-        }
+       // Execute reCAPTCHA
+       let token;
+       try {
+         console.log('🔄 Executing reCAPTCHA...');
+         token = await executeRecaptcha('register');
+         console.log('✅ reCAPTCHA token generated:', token ? `Token length: ${token.length}` : 'null');
+         if (token) {
+           console.log('🔍 Token first 50 chars:', token.substring(0, 50));
+           console.log('🔍 Token last 50 chars:', token.substring(token.length - 50));
+           console.log('🔍 Full token:', token); // Log complete token for debugging
+         }
+         if (!token) {
+           throw new Error('reCAPTCHA verification failed - token not generated');
+         }
+       } catch (error) {
+         console.error('❌ reCAPTCHA execution error:', error);
+         throw new Error(
+           'reCAPTCHA verification failed. Please disable your ad blocker and try again.'
+         );
+       }
       } catch (error) {
         console.error('❌ reCAPTCHA execution error:', error);
         throw new Error(
@@ -107,22 +115,26 @@ const Auth = () => {
         );
       }
 
-      // Verify token on backend and register
-      console.log('📤 Sending registration request to backend:', import.meta.env.VITE_BACKEND_URL);
-      const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/auth/register`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          email,
-          password,
-          nickname,
-          nativeLang,
-          targetLang,
-          recaptchaToken: token,
-        }),
-      });
+       // Verify token on backend and register
+       console.log('📤 Sending registration request to backend:', import.meta.env.VITE_BACKEND_URL);
+       const requestBody = {
+         email,
+         password,
+         nickname,
+         nativeLang,
+         targetLang,
+         recaptchaToken: token,
+       };
+       console.log('📋 Request body keys:', Object.keys(requestBody));
+       console.log('📋 reCAPTCHA token in request:', token.substring(0, 100) + '...');
+       
+       const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/auth/register`, {
+         method: 'POST',
+         headers: {
+           'Content-Type': 'application/json',
+         },
+         body: JSON.stringify(requestBody),
+       });
 
       console.log('📥 Backend response status:', response.status);
       if (!response.ok) {

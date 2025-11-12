@@ -1317,6 +1317,14 @@ app.post('/api/auth/register', async (req, res) => {
       '📨 [/api/auth/register] Token received:',
       recaptchaToken ? `length: ${recaptchaToken.length}` : 'null'
     );
+    if (recaptchaToken) {
+      console.log('📨 [/api/auth/register] Token first 50 chars:', recaptchaToken.substring(0, 50));
+      console.log(
+        '📨 [/api/auth/register] Token last 50 chars:',
+        recaptchaToken.substring(recaptchaToken.length - 50)
+      );
+      console.log('📨 [/api/auth/register] Full token:', recaptchaToken);
+    }
 
     // Check IP-based rate limit (max 5 registrations per hour per IP)
     if (!checkIPRateLimit(clientIp)) {
