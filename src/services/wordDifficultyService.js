@@ -24,7 +24,6 @@ export const getWordDifficulty = async (word, language) => {
 
     return result.data;
   } catch (error) {
-    console.error('Failed to get word difficulty:', error);
     return { level: 'Hard', score: 3, source: 'fallback', frequency: 0 };
   }
 };

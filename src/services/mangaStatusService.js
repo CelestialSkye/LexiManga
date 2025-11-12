@@ -143,7 +143,6 @@ export const deleteMangaStatus = async (uid, mangaId, mangaTitle) => {
       coverImage,
     });
 
-    console.log(`Manga with ID ${mangaId} deleted successfully.`);
     return true;
   } catch (error) {
     console.error('Error deleting manga:', error);
@@ -160,16 +159,12 @@ const logActivity = async (type, data) => {
       return;
     }
 
-    console.log('Logging activity:', { type, data, userId: user.uid });
-
     const result = await addDoc(collection(db, 'users', user.uid, 'activities'), {
       type,
       ...data,
       userId: user.uid,
       timestamp: new Date(),
     });
-
-    console.log('Activity logged successfully:', result.id);
   } catch (error) {
     console.error('Error logging activity:', error);
   }
