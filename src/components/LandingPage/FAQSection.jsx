@@ -74,17 +74,17 @@ const FAQSection = () => {
           withBorder
           shadow='sm'
           radius='md'
-          p='md'
-          mb='sm'
+          p='lg'
+          mb='md'
           style={{ cursor: 'pointer' }}
           onClick={() => toggle(index)}
         >
-          <Text fw={600} size='lg' mb='xs'>
+          <Text fw={700} size='lg' c='gray.900'>
             {faq.question}
           </Text>
 
           <Collapse in={openedIndex === index}>
-            <Text size='sm' c='dimmed'>
+            <Text size='md' c='gray.700' lh='lg' mt='md'>
               {faq.answer}
             </Text>
           </Collapse>
