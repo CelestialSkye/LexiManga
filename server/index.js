@@ -47,32 +47,9 @@ const app = express();
 const PORT = process.env.PORT || 3001;
 
 // ============ SECURITY: CORS Configuration ============
-const allowedOrigins = [
-  // Development
-  'http://localhost:3000',
-  'http://localhost:5173',
-  'http://127.0.0.1:3000',
-  'http://127.0.0.1:5173',
-  // Production - Render domains
-  'https://vocabularymanga.onrender.com',
-  'https://leximanga-frontend.onrender.com',
-  'https://leximanga-backend.onrender.com',
-  // Production - Custom domain (add when you have one)
-  // 'https://www.leximanga.com',
-  // 'https://leximanga.com',
-];
-
 const corsOptions = {
-  origin: function (origin, callback) {
-    // Allow requests with no origin (like mobile apps or curl requests)
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      console.warn(`CORS blocked request from origin: ${origin}`);
-      callback(new Error('Not allowed by CORS'));
-    }
-  },
-  credentials: true,
+  origin: '*', // Allow all origins for now (will restrict later)
+  credentials: false,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
   maxAge: 86400, // 24 hours
