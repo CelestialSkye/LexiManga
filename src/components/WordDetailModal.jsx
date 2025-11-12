@@ -186,6 +186,7 @@ const WordDetailModal = ({ opened, onClose, word, onEdit, onDelete }) => {
         <div>
           <div className='relative rounded-[12px] bg-violet-500 p-12'>
             {isEditing ? (
+              {/* TODO: Re-enable translation button once Firebase Admin is configured */}
               <ActionIcon
                 size='lg'
                 variant='filled'
@@ -196,6 +197,7 @@ const WordDetailModal = ({ opened, onClose, word, onEdit, onDelete }) => {
                   right: '16px',
                   backgroundColor: 'white !important',
                   color: 'black !important',
+                  display: 'none',
                 }}
                 className='violet-focus hover:!bg-white hover:!text-black'
                 onClick={handleTranslate}
