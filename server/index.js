@@ -571,68 +571,63 @@ app.post('/api/translate', verifyToken, async (req, res) => {
   }
 });
 
-const loadFrequencyLists = () => {
-  const frequencyLists = {
-    english: {},
-    japanese: {},
-    spanish: {},
-    french: {},
-    german: {},
-    hindi: {},
-    arabic: {},
-    portuguese: {},
-    bengali: {},
-    russian: {},
-    hebrew: {},
-    korean: {},
-    turkish: {},
-    italian: {},
-  };
-
-  const languageMap = {
-    english: 'en',
-    japanese: 'ja',
-    spanish: 'es',
-    french: 'fr',
-    german: 'de',
-    hindi: 'hi',
-    arabic: 'ar',
-    portuguese: 'pt',
-    bengali: 'bn',
-    russian: 'ru',
-    hebrew: 'he',
-    korean: 'ko',
-    turkish: 'tr',
-    italian: 'it',
-  };
-
-  Object.entries(languageMap).forEach(([lang, code]) => {
-    const filePath = path.join(__dirname, `frequency-lists/${code}_full.txt`);
-    try {
-      const data = fs.readFileSync(filePath, 'utf8');
-      data.split('\n').forEach((line) => {
-        const parts = line.trim().split(/\s+/);
-        const word = parts[0];
-        const frequency = parseInt(parts[1], 10);
-        if (word && !isNaN(frequency)) {
-          frequencyLists[lang][word.toLowerCase()] = frequency;
-        }
-      });
-    } catch (error) {
-      console.error(`Failed to load frequency list for ${lang}:`, error.message);
-    }
-  });
-
-  return frequencyLists;
+// Language code mapping
+const languageMap = {
+  english: 'en',
+  japanese: 'ja',
+  spanish: 'es',
+  french: 'fr',
+  german: 'de',
+  hindi: 'hi',
+  arabic: 'ar',
+  portuguese: 'pt',
+  bengali: 'bn',
+  russian: 'ru',
+  hebrew: 'he',
+  korean: 'ko',
+  turkish: 'tr',
+  italian: 'it',
 };
 
-// Lazy load frequency lists on first use to avoid blocking server startup
-let FREQUENCY_LISTS = null;
-const getFrequencyLists = () => {
-  if (!FREQUENCY_LISTS) {
-    FREQUENCY_LISTS = loadFrequencyLists();
+// Cache for loaded frequency lists (only load what's needed)
+const FREQUENCY_LISTS_CACHE = {};
+
+// Load a single language frequency list on demand
+const loadFrequencyList = (language) => {
+  // Return from cache if already loaded
+  if (FREQUENCY_LISTS_CACHE[language]) {
+    return FREQUENCY_LISTS_CACHE[language];
   }
-  return FREQUENCY_LISTS;
+
+  const code = languageMap[language];
+  if (!code) {
+    console.warn(`Unknown language: ${language}`);
+    return {};
+  }
+
+  const filePath = path.join(__dirname, `frequency-lists/${code}_full.txt`);
+  const frequencyList = {};
+
+  try {
+    console.log(`Loading frequency list for ${language} (${code})...`);
+    const data = fs.readFileSync(filePath, 'utf8');
+    data.split('\n').forEach((line) => {
+      const parts = line.trim().split(/\s+/);
+      const word = parts[0];
+      const frequency = parseInt(parts[1], 10);
+      if (word && !isNaN(frequency)) {
+        frequencyList[word.toLowerCase()] = frequency;
+      }
+    });
+    console.log(`✅ Loaded ${Object.keys(frequencyList).length} words for ${language}`);
+
+    // Cache it
+    FREQUENCY_LISTS_CACHE[language] = frequencyList;
+  } catch (error) {
+    console.error(`Failed to load frequency list for ${language}:`, error.message);
+  }
+
+  return frequencyList;
 };
 
 // Initialize cache scheduler with queries
@@ -789,10 +784,10 @@ app.get('/api/word-difficulty', async (req, res) => {
       return res.json({ data: cached, cached: true });
     }
 
-    const allFrequencyLists = getFrequencyLists();
-    const frequencyLists = allFrequencyLists[language] || {};
+    // Load only the requested language's frequency list
+    const frequencyList = loadFrequencyList(language);
     const wordLower = word.toLowerCase();
-    const frequency = frequencyLists[wordLower];
+    const frequency = frequencyList[wordLower];
 
     let difficulty;
 
