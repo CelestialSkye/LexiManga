@@ -129,8 +129,30 @@ app.use((req, res, next) => {
 app.use(express.json());
 
 // ============ SERVE FRONTEND STATIC FILES ============
-// Note: Static files are now served via the SPA fallback route to ensure proper routing
-// The express.static middleware was causing issues with 404 handling
+// Find and serve the dist folder
+let distPath = null;
+const possibleDistPaths = [
+  path.join(__dirname, '../dist'),
+  path.join(__dirname, '../../dist'),
+  '/opt/render/project/dist',
+  path.join(process.cwd(), 'dist'),
+];
+
+for (const p of possibleDistPaths) {
+  if (fs.existsSync(p)) {
+    distPath = p;
+    console.log(`✅ [Startup] Serving frontend from: ${distPath}`);
+    break;
+  }
+}
+
+if (distPath) {
+  // Serve static files from dist
+  app.use(express.static(distPath, { index: false }));
+} else {
+  console.warn(`⚠️  [Startup] dist folder not found at:`);
+  possibleDistPaths.forEach((p) => console.warn(`   - ${p}`));
+}
 
 const cache = new NodeCache({ stdTTL: 3600 });
 const translationCache = new NodeCache({ stdTTL: 86400 });
@@ -1446,88 +1468,21 @@ if (process.env.SENTRY_DSN) {
   app.use(Sentry.Handlers.errorHandler());
 }
 
-// ============ SERVE STATIC ASSETS ============
-// Serve any files that exist in the dist folder (CSS, JS, images, etc.)
-let distPathFound = null;
-const possibleDistPaths = [
-  path.join(__dirname, '../dist'), // ../dist (if running from server/)
-  path.join(__dirname, '../../dist'), // ../../dist (if src/server/)
-  path.join(__dirname, '../../../dist'), // ../../../dist (deeper nesting)
-  '/opt/render/project/dist', // Render absolute path
-  '/opt/render/project/src/dist', // Render in src/
-  path.join(process.cwd(), 'dist'), // Current working directory
-];
-
-// Find dist on startup
-for (const distPath of possibleDistPaths) {
-  if (fs.existsSync(distPath)) {
-    distPathFound = distPath;
-    console.log(`✅ [StaticAssets] Found dist folder at: ${distPath}`);
-    break;
-  }
-}
-
-if (!distPathFound) {
-  console.warn(`⚠️  [StaticAssets] Could not find dist folder. Checked:`);
-  possibleDistPaths.forEach((p) => console.warn(`   - ${p}`));
-}
-
-app.get(/^\/(?!api\/).*/, (req, res, next) => {
-  if (!distPathFound) return next();
-
-  const filePath = path.join(distPathFound, req.path);
-  if (fs.existsSync(filePath) && fs.statSync(filePath).isFile()) {
-    console.log(`[StaticAssets] Serving file: ${req.path} from ${filePath}`);
-    return res.sendFile(filePath);
-  }
-
-  // If file not found, continue to SPA fallback
-  next();
-});
-
 // ============ SPA FALLBACK: Route all non-API requests to index.html ============
-// This enables client-side routing for React Router
-// This MUST be the last route handler before error handlers
+// This MUST be the last route before error handlers
 app.get('*', (req, res) => {
-  // Skip if this is an API request (shouldn't reach here, but just in case)
+  // Skip API requests
   if (req.path.startsWith('/api')) {
-    return res.status(404).json({ error: 'API endpoint not found' });
+    return res.status(404).json({ error: 'API not found' });
   }
 
-  console.log(`[SPA Fallback] Handling request for: ${req.path}`);
-
-  // Try multiple possible dist paths
-  const possibleIndexPaths = [
-    path.join(__dirname, '../dist/index.html'),
-    path.join(__dirname, '../../dist/index.html'),
-    path.join(__dirname, '../../../dist/index.html'),
-    '/opt/render/project/dist/index.html',
-    '/opt/render/project/src/dist/index.html',
-    path.join(process.cwd(), 'dist/index.html'),
-  ];
-
-  let indexPath = null;
-  for (const p of possibleIndexPaths) {
-    if (fs.existsSync(p)) {
-      indexPath = p;
-      console.log(`✅ [SPA Fallback] Found index.html at: ${indexPath}`);
-      break;
-    }
+  if (!distPath) {
+    return res.status(500).send('Frontend not available');
   }
 
-  if (!indexPath) {
-    console.error(`❌ [SPA Fallback] index.html NOT found`);
-    return res.status(404).send('Frontend not found');
-  }
-
-  console.log(`[SPA Fallback] Serving index.html for SPA routing`);
+  const indexFilePath = path.join(distPath, 'index.html');
   res.set('Cache-Control', 'public, max-age=0, s-maxage=300');
-  res.sendFile(indexPath, (err) => {
-    if (err && !res.headersSent) {
-      console.error(`❌ [SPA Fallback] Error:`, err.message);
-      res.status(500).send('Error loading application');
-    }
-  });
+  res.sendFile(indexFilePath);
 });
 
 app.listen(PORT, () => {
