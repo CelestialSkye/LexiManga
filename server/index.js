@@ -2,24 +2,9 @@ const path = require('path');
 const fs = require('fs');
 require('dotenv').config({ path: path.resolve(__dirname, '../.env') });
 
-// Initialize Sentry BEFORE any other code
-const Sentry = require('@sentry/node');
-if (process.env.SENTRY_DSN) {
-  Sentry.init({
-    dsn: process.env.SENTRY_DSN,
-    tracesSampleRate: 1.0,
-    integrations: [new Sentry.Integrations.Http({ tracing: true })],
-    environment: process.env.NODE_ENV,
-  });
-}
-
 const express = require('express');
-const cors = require('cors');
-const helmet = require('helmet');
 const NodeCache = require('node-cache');
 const axios = require('axios');
-const cacheManager = require('./cache-manager');
-const cacheScheduler = require('./cache-scheduler');
 
 // Initialize Firebase Admin
 require('./firebase-admin');
@@ -27,9 +12,6 @@ const admin = require('firebase-admin');
 
 // Import authentication middleware
 const { verifyToken } = require('./middleware/auth');
-
-// Import rate limiter
-const rateLimiter = require('./utils/rate-limiter');
 
 // Import validation schemas
 const {
@@ -44,29 +26,16 @@ const {
 } = require('./validation/schemas');
 
 const app = express();
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 10000;
 
-// ============ SECURITY: CORS Configuration ============
-const corsOptions = {
-  origin: function (origin, callback) {
-    // Allow requests from any origin (temporary - for debugging)
-    callback(null, true);
-  },
-  credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
-  exposedHeaders: ['Content-Type'],
-  maxAge: 86400, // 24 hours
-};
+// ============ MIDDLEWARE ============
+app.use(express.json());
 
-app.use(cors(corsOptions));
-
-// Add explicit CORS headers as fallback
+// Enable CORS
 app.use((req, res, next) => {
   res.header('Access-Control-Allow-Origin', '*');
   res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS, PATCH');
-  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With');
-  res.header('Access-Control-Expose-Headers', 'Content-Type');
+  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
 
   if (req.method === 'OPTIONS') {
     return res.sendStatus(200);
@@ -74,84 +43,14 @@ app.use((req, res, next) => {
   next();
 });
 
-// ============ MONITORING: Sentry Request Handler ============
-// Capture transactions for performance monitoring
-if (process.env.SENTRY_DSN) {
-  app.use(Sentry.Handlers.requestHandler());
-}
-
-// ============ SECURITY: Security Headers with Helmet ============
-app.use(
-  helmet({
-    contentSecurityPolicy: {
-      directives: {
-        defaultSrc: ["'self'"],
-        scriptSrc: ["'self'", 'https://www.google.com/recaptcha', 'https://www.gstatic.com'],
-        styleSrc: ["'self'", "'unsafe-inline'", 'https://www.gstatic.com'],
-        imgSrc: ["'self'", 'data:', 'https:', 'https://s4.anilist.co'],
-        connectSrc: [
-          "'self'",
-          'https://graphql.anilist.co',
-          'https://www.google.com/recaptcha',
-          'https://www.gstatic.com',
-          'https://recaptcha.net',
-          'https://*.firebasedatabase.app',
-          'https://firestore.googleapis.com',
-          'https://identitytoolkit.googleapis.com',
-          'https://vocabularymanga-backend.onrender.com',
-          'https://vocabularymanga.onrender.com',
-        ],
-        frameSrc: ['https://www.google.com/recaptcha', 'https://recaptcha.google.com'],
-        fontSrc: ["'self'", 'data:', 'https://www.gstatic.com'],
-        objectSrc: ["'none'"],
-        upgradeInsecureRequests: [],
-      },
-    },
-    hsts: {
-      maxAge: 31536000, // 1 year
-      includeSubDomains: true,
-      preload: true,
-    },
-    referrerPolicy: { policy: 'strict-origin-when-cross-origin' },
-    noSniff: true,
-    xssFilter: true,
-  })
-);
-
-// ============ SECURITY: HTTPS Redirect (for production) ============
-app.use((req, res, next) => {
-  if (process.env.NODE_ENV === 'production' && req.header('x-forwarded-proto') !== 'https') {
-    res.redirect(`https://${req.header('host')}${req.url}`);
-  }
-  next();
-});
-
-app.use(express.json());
-
-// ============ SERVE FRONTEND STATIC FILES ============
-// Find and serve the dist folder
-let distPath = null;
-const possibleDistPaths = [
-  path.join(__dirname, '../dist'),
-  path.join(__dirname, '../../dist'),
-  '/opt/render/project/dist',
-  path.join(process.cwd(), 'dist'),
-];
-
-for (const p of possibleDistPaths) {
-  if (fs.existsSync(p)) {
-    distPath = p;
-    console.log(`✅ [Startup] Serving frontend from: ${distPath}`);
-    break;
-  }
-}
-
-if (distPath) {
-  // Serve static files from dist
-  app.use(express.static(distPath, { index: false }));
+// ============ SERVE FRONTEND ============
+// Serve static files from dist
+const distPath = path.join(__dirname, '../dist');
+if (fs.existsSync(distPath)) {
+  console.log(`✅ Serving frontend from: ${distPath}`);
+  app.use(express.static(distPath));
 } else {
-  console.warn(`⚠️  [Startup] dist folder not found at:`);
-  possibleDistPaths.forEach((p) => console.warn(`   - ${p}`));
+  console.warn(`⚠️  dist folder not found at: ${distPath}`);
 }
 
 const cache = new NodeCache({ stdTTL: 3600 });
@@ -1436,20 +1335,10 @@ app.get('/api/health', async (req, res) => {
       }
     } catch (error) {
       health.checks.anilist = 'error';
-      health.status = 'degraded';
       console.error('AniList API health check failed:', error.message);
     }
 
-    // Check environment variables (without exposing secrets)
-    health.checks.env = {
-      recaptcha_secret: !!process.env.VITE_RECAPTCHA_SECRET_KEY,
-      gemini_api: !!process.env.GEMINI_API_KEY,
-      firebase_service_account: !!process.env.FIREBASE_SERVICE_ACCOUNT_JSON,
-      firebase_project_id: !!process.env.VITE_FIREBASE_PROJECT_ID,
-      node_env: process.env.NODE_ENV,
-    };
-
-    // Return appropriate status code
+    // Return health status
     const statusCode = health.status === 'healthy' ? 200 : 503;
     res.status(statusCode).json(health);
   } catch (error) {
@@ -1462,54 +1351,24 @@ app.get('/api/health', async (req, res) => {
   }
 });
 
-// ============ MONITORING: Sentry Error Handler ============
-// Capture exceptions and send to Sentry (must be after all routes and before other error handlers)
-if (process.env.SENTRY_DSN) {
-  app.use(Sentry.Handlers.errorHandler());
-}
-
-// ============ SPA FALLBACK: Route all non-API requests to index.html ============
-// This MUST be the last route before error handlers
-// ====== All API routes above ======
-
-// ====== Health check ======
-// your health check route is fine here
-
-// ====== SPA fallback ======
-// Move this ABOVE Sentry’s error handler
+// ============ SPA FALLBACK ============
+// Serve index.html for all non-API routes (client-side routing)
 app.get('*', (req, res) => {
   if (req.path.startsWith('/api')) {
-    // Just end it cleanly without headers being set twice
-    res.status(404);
-    return res.json({ error: 'API not found' });
+    return res.status(404).json({ error: 'API endpoint not found' });
   }
 
-  if (!distPath) {
-    res.status(500);
-    return res.send('Frontend not available');
+  const indexPath = path.join(distPath, 'index.html');
+  if (fs.existsSync(indexPath)) {
+    res.set('Cache-Control', 'public, max-age=0, s-maxage=300');
+    res.sendFile(indexPath);
+  } else {
+    res.status(500).send('Frontend not available');
   }
-
-  const indexFilePath = path.join(distPath, 'index.html');
-  res.set('Cache-Control', 'public, max-age=0, s-maxage=300');
-  return res.sendFile(indexFilePath);
 });
 
-// ====== Sentry Error Handler (last) ======
-if (process.env.SENTRY_DSN) {
-  app.use(Sentry.Handlers.errorHandler());
-}
-
-
+// ============ START SERVER ============
 app.listen(PORT, () => {
   console.log(`🚀 Backend running on port ${PORT}`);
-  console.log('✅ CORS enabled for all origins');
-  console.log(
-    '✅ All API routes loaded: /api/search, /api/manga, /api/trending, /api/monthly, /api/suggested, /api/browse, /api/health'
-  );
-
-  // Start cache scheduler after server is listening (non-blocking)
-  // DISABLED: Cache scheduler was causing memory leaks on free tier
-  // setImmediate(() => {
-  //   cacheScheduler.startScheduler();
-  // });
+  console.log('✅ All API routes loaded: /api/search, /api/manga, /api/trending, /api/monthly, /api/suggested, /api/browse, /api/health');
 });
