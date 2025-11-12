@@ -246,7 +246,7 @@ const Auth = () => {
 
         {/* Right Section - Form */}
         <div
-          className='flex flex-col justify-center overflow-y-auto px-4 py-3 md:px-12 md:py-0'
+          className='flex flex-col items-center justify-center overflow-y-auto px-4 py-6 sm:px-6 md:px-12 md:py-0'
           style={{ maxHeight: '100vh' }}
         >
           <div className='w-full max-w-md py-3'>
@@ -384,15 +384,15 @@ const Auth = () => {
                         </Popover.Target>
                         <Popover.Dropdown>
                           <Text size='sm' lh='lg'>
-                            Registration requires an email, but no confirmation is sent. Feel free
-                            to use a non-primary email, but note that password recovery will not be
+                            Registration requires an email, but no confirmation is sent. You can use
+                            any fictitious email, but note that password recovery will not be
                             available.
                           </Text>
                         </Popover.Dropdown>
                       </Popover>
                     ) : (
                       <Tooltip
-                        label='Registration requires an email, but no confirmation is sent. Feel free to use a non-primary email, but note that password recovery will not be available.'
+                        label='Registration requires an email, but no confirmation is sent. You can use any fictitious email, but note that password recovery will not be available.'
                         position='top'
                         withArrow
                         multiline
