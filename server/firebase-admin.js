@@ -29,30 +29,31 @@ if (!admin.apps.length) {
       // For production (Render) - use environment variable as JSON string
       const serviceAccountJson = process.env.FIREBASE_SERVICE_ACCOUNT_JSON;
       if (!serviceAccountJson) {
-        throw new Error(
-          'FIREBASE_SERVICE_ACCOUNT_JSON environment variable not set. ' +
-            'Set it in your Render dashboard or environment.'
+        console.warn(
+          '⚠️ FIREBASE_SERVICE_ACCOUNT_JSON not set in production. Some features will be disabled.'
         );
-      }
-
-      try {
-        const serviceAccount = JSON.parse(serviceAccountJson);
-        admin.initializeApp({
-          credential: admin.credential.cert(serviceAccount),
-          projectId: process.env.VITE_FIREBASE_PROJECT_ID,
-        });
-        console.log('✅ Firebase Admin SDK initialized (production)');
-      } catch (parseError) {
-        console.error('JSON Parse Error Details:', parseError.message);
-        console.error('First 100 chars of JSON:', serviceAccountJson.substring(0, 100));
-        throw parseError;
+        console.warn('Set it in your Render dashboard Environment tab for full functionality.');
+        // Don't throw - allow server to continue
+      } else {
+        try {
+          const serviceAccount = JSON.parse(serviceAccountJson);
+          admin.initializeApp({
+            credential: admin.credential.cert(serviceAccount),
+            projectId: process.env.VITE_FIREBASE_PROJECT_ID,
+          });
+          console.log('✅ Firebase Admin SDK initialized (production)');
+        } catch (parseError) {
+          console.error('JSON Parse Error Details:', parseError.message);
+          console.error('First 100 chars of JSON:', serviceAccountJson.substring(0, 100));
+          throw parseError;
+        }
       }
     }
   } catch (error) {
     console.error('❌ Firebase Admin initialization failed:', error.message);
     if (process.env.NODE_ENV === 'production') {
       console.error('Make sure FIREBASE_SERVICE_ACCOUNT_JSON is properly set in production.');
-      throw error; // Fail in production
+      // Don't throw - allow server to continue without Firebase Admin
     }
     // In development, allow continued operation without Firebase Admin
   }
