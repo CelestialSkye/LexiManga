@@ -1,5 +1,15 @@
-import { Alert, Button, PasswordInput, Text, TextInput, Tooltip, Group } from '@mantine/core';
+import {
+  Alert,
+  Button,
+  PasswordInput,
+  Text,
+  TextInput,
+  Tooltip,
+  Group,
+  Popover,
+} from '@mantine/core';
 import { IconInfoCircle } from '@tabler/icons-react';
+import { useState as useStateComponent } from 'react';
 import { useMediaQuery } from '@mantine/hooks';
 import { modals } from '@mantine/modals';
 import { getAuth, sendPasswordResetEmail } from 'firebase/auth';
@@ -38,6 +48,7 @@ const Auth = () => {
     errors: [],
     strength: 'weak',
   });
+  const [emailTooltipOpen, setEmailTooltipOpen] = useStateComponent(false);
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -354,15 +365,36 @@ const Auth = () => {
                 <div>
                   <Group justify='space-between' align='center' mb={8}>
                     <label className='text-xs font-medium text-gray-700'>Email</label>
-                    <Tooltip
-                      label='Placeholder: This will explain email requirements'
-                      position='top'
-                      withArrow
-                      multiline
-                      w={200}
-                    >
-                      <IconInfoCircle size={16} style={{ cursor: 'pointer', color: '#9c36b5' }} />
-                    </Tooltip>
+                    {isMobile ? (
+                      <Popover
+                        position='bottom'
+                        withArrow
+                        shadow='md'
+                        opened={emailTooltipOpen}
+                        onChange={setEmailTooltipOpen}
+                      >
+                        <Popover.Target>
+                          <IconInfoCircle
+                            size={16}
+                            style={{ cursor: 'pointer', color: '#9c36b5' }}
+                            onClick={() => setEmailTooltipOpen(!emailTooltipOpen)}
+                          />
+                        </Popover.Target>
+                        <Popover.Dropdown>
+                          <Text size='sm'>Placeholder: This will explain email requirements</Text>
+                        </Popover.Dropdown>
+                      </Popover>
+                    ) : (
+                      <Tooltip
+                        label='Placeholder: This will explain email requirements'
+                        position='top'
+                        withArrow
+                        multiline
+                        w={200}
+                      >
+                        <IconInfoCircle size={16} style={{ cursor: 'pointer', color: '#9c36b5' }} />
+                      </Tooltip>
+                    )}
                   </Group>
                   <TextInput
                     placeholder='your@email.com'
