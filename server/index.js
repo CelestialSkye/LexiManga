@@ -45,20 +45,18 @@ app.use((req, res, next) => {
 });
 
 // ============ SERVE FRONTEND ============
-// Serve static files from dist
-// Check multiple paths since Render's directory structure varies
+// Find dist folder
 let distPath = null;
 const possiblePaths = [
-  path.join(__dirname, '../dist'), // ../dist from server/
-  path.join(__dirname, '../../dist'), // ../../dist (if in src/server/)
-  path.join(process.cwd(), 'dist'), // Current working directory
+  path.join(__dirname, '../dist'),
+  path.join(__dirname, '../../dist'),
+  path.join(process.cwd(), 'dist'),
 ];
 
 for (const p of possiblePaths) {
   if (fs.existsSync(p)) {
     distPath = p;
     console.log(`✅ Serving frontend from: ${distPath}`);
-    app.use(express.static(distPath));
     break;
   }
 }
@@ -66,6 +64,26 @@ for (const p of possiblePaths) {
 if (!distPath) {
   console.warn(`⚠️  dist folder not found. Checked:`);
   possiblePaths.forEach((p) => console.warn(`   - ${p}`));
+}
+
+// Serve static assets (CSS, JS, images, etc.)
+// Only serve actual files, don't serve 404 for missing files
+if (distPath) {
+  app.use((req, res, next) => {
+    // Skip API routes
+    if (req.path.startsWith('/api')) {
+      return next();
+    }
+
+    // Try to serve the file
+    const filePath = path.join(distPath, req.path);
+    if (fs.existsSync(filePath) && fs.statSync(filePath).isFile()) {
+      return res.sendFile(filePath);
+    }
+
+    // File doesn't exist, continue to next handler
+    next();
+  });
 }
 
 const cache = new NodeCache({ stdTTL: 3600 });
