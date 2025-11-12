@@ -11,7 +11,6 @@ export const useMangaStatuses = (uid) => {
     queryFn: () => fetchMangaStatuses(uid),
     enabled: !!uid,
     staleTime: 0,
-    initialData: [],
   });
 };
 
