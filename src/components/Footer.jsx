@@ -22,7 +22,7 @@ const Footer = () => {
 
   const links = [
     { label: 'Feedback', href: '#', action: handleFeedbackClick },
-    { label: 'GitHub', href: 'https://github.com', icon: IconBrandGithub },
+    { label: 'GitHub', href: 'https://github.com/CelestialSkye/LexiManga', icon: IconBrandGithub },
   ];
 
   return (
