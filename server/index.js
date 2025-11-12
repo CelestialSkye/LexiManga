@@ -179,17 +179,6 @@ const verifyRecaptcha = async (token) => {
       token_length: token ? token.length : 'null',
     });
 
-    const { success, score, error_codes, action, challenge_ts } = response.data;
-
-    console.log('📊 [verifyRecaptcha] Google response:', {
-      success,
-      score,
-      error_codes,
-      action,
-      challenge_ts,
-      token_length: token ? token.length : 'null',
-    });
-
     // reCAPTCHA v3 returns a score between 0 and 1
     // 1.0 is very likely a legitimate interaction, 0.0 is very likely a bot
     if (!success) {
