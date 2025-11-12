@@ -26,9 +26,13 @@ export const useSaveMangaStatus = () => {
 
   return useMutation({
     mutationFn: async ({ uid, mangaId, statusData, isNew }) => {
+      console.log('🔄 useSaveMangaStatus.mutationFn - START');
       const previousData = await getMangaStatus(uid, mangaId);
+      console.log('🔄 useSaveMangaStatus - previous data:', previousData);
 
+      console.log('🔄 useSaveMangaStatus - calling saveMangaStatus...');
       await saveMangaStatus(uid, mangaId, statusData);
+      console.log('🔄 useSaveMangaStatus - saveMangaStatus completed');
 
       return { previousData, newData: statusData, isNew, mangaId, uid };
     },
