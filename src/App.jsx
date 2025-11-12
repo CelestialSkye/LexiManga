@@ -17,7 +17,7 @@ import SettingsPage from './pages/SettingsPage';
 
 // Optional: simple 404 page (you can style it later)
 const NotFoundPage = () => (
-  <div className="flex min-h-screen items-center justify-center text-center text-2xl font-semibold text-gray-600">
+  <div className='flex min-h-screen items-center justify-center text-center text-2xl font-semibold text-gray-600'>
     404 — Page Not Found
   </div>
 );
@@ -36,19 +36,19 @@ const AppContent = () => {
   const hideFooter = location.pathname === '/auth';
 
   return (
-    <div className="flex min-h-screen flex-col">
+    <div className='flex min-h-screen flex-col'>
       <ScrollToTop />
-      <main className="flex-1">
+      <main className='flex-1'>
         <Routes>
-          <Route path="/" element={<LandingPage />} />
-          <Route path="/auth" element={<Auth />} />
-          <Route path="/home" element={<Home />} />
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/manga/:id" element={<MangaPage />} />
-          <Route path="/profile" element={<ProfilePage />} />
-          <Route path="/settings" element={<SettingsPage />} />
-          <Route path="/browse" element={<Browse />} />
-          <Route path="*" element={<NotFoundPage />} />
+          <Route path='/' element={<LandingPage />} />
+          <Route path='/auth' element={<Auth />} />
+          <Route path='/home' element={<Home />} />
+          <Route path='/dashboard' element={<Dashboard />} />
+          <Route path='/manga/:id' element={<MangaPage />} />
+          <Route path='/profile' element={<ProfilePage />} />
+          <Route path='/settings' element={<SettingsPage />} />
+          <Route path='/browse' element={<Browse />} />
+          <Route path='*' element={<NotFoundPage />} />
         </Routes>
       </main>
       {!hideFooter && <Footer />}
@@ -58,6 +58,13 @@ const AppContent = () => {
 
 const App = () => {
   const recaptchaKey = import.meta.env.VITE_RECAPTCHA_SITE_KEY;
+
+  // Debug: Log if reCAPTCHA key is loaded
+  if (!recaptchaKey) {
+    console.error('❌ VITE_RECAPTCHA_SITE_KEY is not set');
+  } else {
+    console.log('✅ reCAPTCHA key loaded');
+  }
 
   const theme = {
     fontFamily: 'Inter Variable, sans-serif',
@@ -75,9 +82,23 @@ const App = () => {
     },
   };
 
+  // If no reCAPTCHA key, show error message
+  if (!recaptchaKey) {
+    return (
+      <div className='flex min-h-screen items-center justify-center p-8'>
+        <div className='max-w-md rounded-lg border border-red-300 bg-red-50 p-6 text-center'>
+          <h2 className='mb-2 text-xl font-bold text-red-700'>Configuration Error</h2>
+          <p className='text-red-600'>
+            reCAPTCHA key is not configured. Please contact the administrator.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <GoogleReCaptchaProvider reCaptchaKey={recaptchaKey}>
-      <MantineProvider theme={theme} defaultColorScheme="light" primaryColor="violet">
+      <MantineProvider theme={theme} defaultColorScheme='light' primaryColor='violet'>
         <ModalsProvider>
           <AuthProvider>
             <BrowserRouter>
