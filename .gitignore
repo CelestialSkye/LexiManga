@@ -29,7 +29,7 @@ dist-ssr
 # Personal notes and todo files
 src/todo.txt
 
-# Phase 1 Documentation (reference only, not needed in repo)
+# Documentation files (reference only, not needed in repo)
 FIRESTORE_RULES_FIX.md
 KEYS_CONFIGURATION.md
 MASTER_CHECKLIST.md
@@ -40,6 +40,18 @@ QUICK_START_PHASE1.md
 RULES_UPDATED.md
 SETUP_INSTRUCTIONS.md
 TEST_LOCAL.md
+PHASE2_ISSUES.md
+PHASE2_SUMMARY.md
+PHASE3_AUDIT.md
+PHASE3_IMPLEMENTATION_EXAMPLES.md
+PHASE3_README.md
+PHASE3_SUMMARY.md
+PHASE3A_STATUS.md
+FALLBACK_STRATEGY.md
+ENVIRONMENT_SECURITY_CHECKLIST.md
+DEPLOYMENT.md
+CLAUDE.md
+AUDIT_FINDINGS.txt
 
 # Firebase/Setup documentation (temporary, reference only)
 CORS_SETUP_INSTRUCTIONS.md
