@@ -130,11 +130,31 @@ app.use(express.json());
 
 // ============ SERVE FRONTEND STATIC FILES ============
 // Serve static files from the frontend dist directory
-const frontendDistPath = path.join(__dirname, '../dist');
-console.log(`[Startup] Frontend path: ${frontendDistPath}`);
-console.log(`[Startup] Frontend dist exists: ${fs.existsSync(frontendDistPath)}`);
+// Try multiple possible locations for the dist folder
+const possibleDistPaths = [
+  path.join(__dirname, '../dist'), // ../dist (if running from server/)
+  path.join(__dirname, '../../../dist'), // ../../../dist (if running from somewhere else)
+  '/app/dist', // Absolute path on Render
+  '/app/repo/dist', // Alternative on Render
+];
 
-// Always try to serve static files, even if dist doesn't exist yet
+let frontendDistPath = null;
+for (const distPath of possibleDistPaths) {
+  if (fs.existsSync(distPath)) {
+    frontendDistPath = distPath;
+    console.log(`✅ [Startup] Found dist at: ${distPath}`);
+    break;
+  }
+}
+
+if (!frontendDistPath) {
+  console.warn(`⚠️  [Startup] dist folder NOT found. Tried:`);
+  possibleDistPaths.forEach((p) => console.warn(`   - ${p}`));
+  // Default to the expected location anyway
+  frontendDistPath = path.join(__dirname, '../dist');
+}
+
+// Always try to serve static files
 app.use(
   express.static(frontendDistPath, {
     dotfiles: 'deny',
