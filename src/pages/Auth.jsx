@@ -98,15 +98,30 @@ const Auth = () => {
       try {
         console.log('🔄 Executing reCAPTCHA...');
         token = await executeRecaptcha('register');
-        console.log(
-          '✅ reCAPTCHA token generated:',
-          token ? `Token length: ${token.length}` : 'null'
-        );
+        console.log('✅ reCAPTCHA token generated:', token ? `Token length: ${token.length}` : 'null');
+        
         if (token) {
           console.log('🔍 Token first 50 chars:', token.substring(0, 50));
           console.log('🔍 Token last 50 chars:', token.substring(token.length - 50));
           console.log('🔍 Full token:', token);
+          
+          // Check if token is a valid JWT (should have 2 dots)
+          const dotCount = (token.match(/\./g) || []).length;
+          console.log('🔍 Token dot count:', dotCount, '(should be 2 for JWT)');
+          
+          // Check if token looks like base64
+          const base64Regex = /^[A-Za-z0-9_-]+$/;
+          const looksLikeBase64 = base64Regex.test(token);
+          console.log('🔍 Token looks like base64:', looksLikeBase64);
         }
+        
+        if (!token) {
+          throw new Error('reCAPTCHA verification failed - token not generated');
+        }
+      } catch (error) {
+        console.error('❌ reCAPTCHA execution error:', error);
+        throw new Error('reCAPTCHA verification failed. Please disable your ad blocker and try again.');
+      }
         if (!token) {
           throw new Error('reCAPTCHA verification failed - token not generated');
         }
