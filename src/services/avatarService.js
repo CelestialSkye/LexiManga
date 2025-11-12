@@ -14,10 +14,7 @@ const MAGIC_BYTES = {
   'image/png': [0x89, 0x50, 0x4e, 0x47],
 };
 
-/**
- * Validates file magic bytes to ensure file type matches declared MIME type
- * Prevents malicious files disguised with wrong extensions
- */
+
 const validateMagicBytes = async (file) => {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
