@@ -770,43 +770,13 @@ cacheScheduler.initializeScheduler(
 );
 
 app.get('/api/word-difficulty', async (req, res) => {
-  try {
-    const { word, language } = req.query;
-
-    if (!word || !language) {
-      return res.status(400).json({ error: 'Word and language required' });
-    }
-
-    const cacheKey = `difficulty:${word}:${language}`;
-    const cached = cache.get(cacheKey);
-
-    if (cached) {
-      return res.json({ data: cached, cached: true });
-    }
-
-    // Load only the requested language's frequency list
-    const frequencyList = loadFrequencyList(language);
-    const wordLower = word.toLowerCase();
-    const frequency = frequencyList[wordLower];
-
-    let difficulty;
-
-    if (frequency === undefined) {
-      difficulty = { level: 'Hard', score: 3, source: 'frequency_list', frequency: 0 };
-    } else if (frequency >= 10000) {
-      difficulty = { level: 'Easy', score: 1, source: 'frequency_list', frequency };
-    } else if (frequency >= 1000) {
-      difficulty = { level: 'Medium', score: 2, source: 'frequency_list', frequency };
-    } else {
-      difficulty = { level: 'Hard', score: 3, source: 'frequency_list', frequency };
-    }
-
-    cache.set(cacheKey, difficulty, 1800);
-    res.json({ data: difficulty, cached: false });
-  } catch (error) {
-    console.error('Word difficulty error:', error);
-    res.status(500).json({ error: 'Failed to get word difficulty' });
-  }
+  // DISABLED: Word difficulty feature causes memory issues with frequency lists
+  // Archived in branch: archive/word-difficulty-feature
+  // Return neutral difficulty for all words
+  res.json({
+    data: { level: 'Medium', score: 2, source: 'disabled', frequency: 0 },
+    cached: false,
+  });
 });
 
 app.get('/api/user-words', async (req, res) => {

@@ -35,11 +35,11 @@ const AddWordModal = ({ manga, opened, closeModal, showMangaSelector = false }) 
       }))
     : [];
 
-  //calling the word difficulty hook
-  const { data: difficulty, isLoading: difficultyLoading } = useWordDifficulty(
-    word,
-    profile?.targetLang
-  );
+  // Word difficulty feature disabled due to memory constraints
+  // const { data: difficulty, isLoading: difficultyLoading } = useWordDifficulty(
+  //   word,
+  //   profile?.targetLang
+  // );
 
   const handleTranslate = async () => {
     if (!word.trim() || !profile?.targetLang || !profile?.nativeLang) return;
@@ -182,30 +182,7 @@ const AddWordModal = ({ manga, opened, closeModal, showMangaSelector = false }) 
             className='violet-focus'
             error={!word.trim() ? 'Word is required' : ''}
           />
-          {word.trim() && difficulty && (
-            <Text size='xs' mt='xs'>
-              Difficulty:
-              <Text
-                span
-                fw={600}
-                ml='xs'
-                c={
-                  difficulty.level === 'Easy'
-                    ? 'green'
-                    : difficulty.level === 'Medium'
-                      ? 'yellow'
-                      : 'red'
-                }
-              >
-                {difficulty.level} (Score: {difficulty.score})
-              </Text>
-            </Text>
-          )}
-          {word.trim() && difficultyLoading && (
-            <Text size='xs' c='dimmed' mt='xs'>
-              Loading difficulty...
-            </Text>
-          )}
+          {/* Word difficulty feature disabled due to memory constraints */}
         </div>
 
         <div className='pb-3'>
