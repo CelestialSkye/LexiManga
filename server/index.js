@@ -452,11 +452,50 @@ app.post('/api/translate', verifyToken, async (req, res) => {
     );
 
     const result = await Promise.race([model.generateContent(prompt), timeoutPromise]);
-    const response = await result.response;
-    const translation = response.text().trim();
+
+    if (!result) {
+      throw new Error('Translation API returned empty result');
+    }
+
+    // DEBUG: Log the structure of the result
+    console.log('Gemini API raw result type:', typeof result);
+    console.log('Gemini API result keys:', Object.keys(result || {}));
+    console.log('Gemini API result structure:', JSON.stringify(result, null, 2).substring(0, 500));
+
+    // Handle response - Gemini SDK might return response directly or as property
+    let responseText = '';
+
+    try {
+      // Try new SDK format first
+      if (result.response && typeof result.response.text === 'function') {
+        console.log('Using result.response.text() format');
+        responseText = result.response.text().trim();
+      }
+      // Try text() directly on result
+      else if (typeof result.text === 'function') {
+        console.log('Using result.text() format');
+        responseText = result.text().trim();
+      }
+      // Try content property
+      else if (result.candidates && Array.isArray(result.candidates) && result.candidates[0]) {
+        console.log('Using result.candidates format');
+        responseText = result.candidates[0].content.parts[0].text.trim();
+      }
+      // Fallback - try to stringify and extract
+      else {
+        console.log('Using fallback String format');
+        responseText = String(result).trim();
+      }
+    } catch (parseError) {
+      console.error('Error extracting text from Gemini response:', parseError);
+      console.error('parseError stack:', parseError.stack);
+      throw new Error('Translation service returned invalid format');
+    }
+
+    const translation = responseText;
 
     if (!translation) {
-      throw new Error('Translation failed - invalid response');
+      throw new Error('Translation failed - empty response from service');
     }
 
     translationCache.set(cacheKey, translation, 86400);
