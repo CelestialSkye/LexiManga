@@ -338,31 +338,6 @@ LexiManga/
 - **Firebase Authentication**: User management
 - **Sentry**: Error tracking & monitoring
 
----
-
-## 🌐 Deployment
-
-### Deploy to Render
-
-1. **Connect Repository**: Link your GitHub repo to Render
-2. **Create Web Services**:
-   - Frontend: Static site (points to `dist/` folder)
-   - Backend: Web service (Node.js)
-3. **Set Environment Variables** in Render dashboard:
-   - All Firebase keys
-   - Google API keys
-   - reCAPTCHA secrets
-4. **Deploy**: Render automatically builds and deploys on push
-
-### Firebase Deployment
-
-Deploy Firestore rules and storage rules:
-
-```bash
-firebase deploy --only firestore,storage
-```
-
----
 
 ##  Contributing
 
@@ -376,12 +351,7 @@ This is a **portfolio project**
 4. **Push to the branch** (`git push origin feature/amazing-feature`)
 5. **Open a Pull Request**
 
-### Code Style
 
-- Follow ESLint configuration (run `npm run lint`)
-- Use Prettier for code formatting
-- Write meaningful commit messages
-- Test your changes locally before submitting PR
 
 ### Known Limitations
 
@@ -391,18 +361,6 @@ This is a **portfolio project**
 
 ---
 
-## 📄 License
-
-This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) file for details.
-
-The MIT License allows you to:
-
-- ✅ Use this code for personal and commercial projects
-- ✅ Modify and distribute the code
-- ✅ Use the code privately
-- ⚠️ You must include a copy of the license and copyright notice
-
----
 
 ##  Acknowledgments & Credits
 
