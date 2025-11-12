@@ -1470,20 +1470,35 @@ if (process.env.SENTRY_DSN) {
 
 // ============ SPA FALLBACK: Route all non-API requests to index.html ============
 // This MUST be the last route before error handlers
+// ====== All API routes above ======
+
+// ====== Health check ======
+// your health check route is fine here
+
+// ====== SPA fallback ======
+// Move this ABOVE Sentry’s error handler
 app.get('*', (req, res) => {
-  // Skip API requests
   if (req.path.startsWith('/api')) {
-    return res.status(404).json({ error: 'API not found' });
+    // Just end it cleanly without headers being set twice
+    res.status(404);
+    return res.json({ error: 'API not found' });
   }
 
   if (!distPath) {
-    return res.status(500).send('Frontend not available');
+    res.status(500);
+    return res.send('Frontend not available');
   }
 
   const indexFilePath = path.join(distPath, 'index.html');
   res.set('Cache-Control', 'public, max-age=0, s-maxage=300');
-  res.sendFile(indexFilePath);
+  return res.sendFile(indexFilePath);
 });
+
+// ====== Sentry Error Handler (last) ======
+if (process.env.SENTRY_DSN) {
+  app.use(Sentry.Handlers.errorHandler());
+}
+
 
 app.listen(PORT, () => {
   console.log(`🚀 Backend running on port ${PORT}`);
