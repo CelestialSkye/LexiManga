@@ -411,15 +411,21 @@ app.post('/api/translate', verifyToken, async (req, res) => {
     const { word: text, sourceLang, targetLang, context } = validationResult.data;
     const userId = req.userId; // From verified token, not from request body
 
-    // Check rate limit using persistent Firestore-backed limiter
-    const rateLimit = await rateLimiter.checkTranslationLimit(userId);
-    if (!rateLimit.allowed) {
-      return res.status(429).json({
-        error: 'Rate limit exceeded',
-        remaining: rateLimit.remaining,
-        resetTime: rateLimit.resetTime,
-        retryAfter: rateLimit.retryAfter,
-      });
+    // Check rate limit using persistent Firestore-backed limiter (if available)
+    let rateLimit = { allowed: true, remaining: null, resetTime: null };
+    try {
+      rateLimit = await rateLimiter.checkTranslationLimit(userId);
+      if (!rateLimit.allowed) {
+        return res.status(429).json({
+          error: 'Rate limit exceeded',
+          remaining: rateLimit.remaining,
+          resetTime: rateLimit.resetTime,
+          retryAfter: rateLimit.retryAfter,
+        });
+      }
+    } catch (rateLimitError) {
+      console.warn('⚠️ Rate limiter unavailable:', rateLimitError.message);
+      // Continue without rate limiting if Firebase Admin is not available
     }
 
     const cacheKey = `translate:${text}:${sourceLang}:${targetLang}`;
