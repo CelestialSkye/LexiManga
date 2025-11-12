@@ -11,10 +11,10 @@ services:
         value: production
       - key: PORT
         value: 10000
-      # IMPORTANT: Set these via Render Dashboard, NOT in this file:
-      # - GEMINI_API_KEY (Your new key: AIzaSyCtGIIIFwHFXxoGpfaK_oNSwx0JMdY7XTM)
-      # - VITE_RECAPTCHA_SECRET_KEY (Your new key: 6LddjAksAAAAANhQjxGIeD-rsZ94vWLYndpy11YE)
-      # - FIREBASE_SERVICE_ACCOUNT_JSON (Your Firebase service account JSON as string)
+      # IMPORTANT: Set these via Render Dashboard Environment tab:
+      # - GEMINI_API_KEY (from your .env file)
+      # - VITE_RECAPTCHA_SECRET_KEY (from your .env file)
+      # - FIREBASE_SERVICE_ACCOUNT_JSON (Download from Firebase Console > Service Accounts)
       # - VITE_FIREBASE_PROJECT_ID (vocabularymanga)
 
   # Frontend Static Site
