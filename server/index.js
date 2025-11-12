@@ -153,14 +153,21 @@ const verifyRecaptcha = async (token) => {
     );
     console.log('   - Token length:', token.length);
 
-    const response = await axios.post('https://www.google.com/recaptcha/api/siteverify', null, {
-      params: {
-        secret: process.env.VITE_RECAPTCHA_SECRET_KEY,
-        response: token,
+    // Try with form data instead of params
+    const formData = new URLSearchParams();
+    formData.append('secret', process.env.VITE_RECAPTCHA_SECRET_KEY);
+    formData.append('response', token);
+
+    const response = await axios.post('https://www.google.com/recaptcha/api/siteverify', formData, {
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
       },
     });
 
-    console.log('📥 [verifyRecaptcha] Full Google response:', response.data);
+    console.log(
+      '📥 [verifyRecaptcha] Full Google response:',
+      JSON.stringify(response.data, null, 2)
+    );
     const { success, score, error_codes, action, challenge_ts } = response.data;
 
     console.log('📊 [verifyRecaptcha] Parsed response:', {
