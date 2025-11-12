@@ -133,8 +133,10 @@ app.use(express.json());
 // Try multiple possible locations for the dist folder
 const possibleDistPaths = [
   path.join(__dirname, '../dist'), // ../dist (if running from server/)
-  path.join(__dirname, '../../dist'), // ../../dist (Render structure)
-  '/opt/render/project/dist', // Render absolute path
+  path.join(__dirname, '../../dist'), // ../../dist (if src/server/)
+  path.join(__dirname, '../../../dist'), // ../../../dist (deeper nesting)
+  '/opt/render/project/dist', // Render absolute path (root)
+  '/opt/render/project/src/dist', // Render absolute path (in src/)
   path.join(process.cwd(), 'dist'), // Current working directory
 ];
 
@@ -1491,8 +1493,10 @@ app.get('*', (req, res) => {
   // Try multiple possible dist paths since Render structure is different
   const possibleIndexPaths = [
     path.join(__dirname, '../dist/index.html'), // From server/ directory
-    path.join(__dirname, '../../dist/index.html'), // From server/ if deeper
-    '/opt/render/project/dist/index.html', // Render absolute path
+    path.join(__dirname, '../../dist/index.html'), // From src/server/ directory
+    path.join(__dirname, '../../../dist/index.html'), // Even deeper nesting
+    '/opt/render/project/dist/index.html', // Render absolute path (root)
+    '/opt/render/project/src/dist/index.html', // Render absolute path (in src/)
     path.join(process.cwd(), 'dist/index.html'), // Current working directory
   ];
 
