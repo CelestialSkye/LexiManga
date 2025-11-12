@@ -128,6 +128,13 @@ app.use((req, res, next) => {
 
 app.use(express.json());
 
+// ============ SERVE FRONTEND STATIC FILES ============
+// Serve static files from the frontend dist directory
+const frontendDistPath = path.join(__dirname, '../dist');
+if (fs.existsSync(frontendDistPath)) {
+  app.use(express.static(frontendDistPath));
+}
+
 const cache = new NodeCache({ stdTTL: 3600 });
 const translationCache = new NodeCache({ stdTTL: 86400 });
 
@@ -1441,6 +1448,17 @@ app.get('/api/health', async (req, res) => {
 if (process.env.SENTRY_DSN) {
   app.use(Sentry.Handlers.errorHandler());
 }
+
+// ============ SPA FALLBACK: Route all non-API requests to index.html ============
+// This enables client-side routing for React Router
+app.get('*', (req, res) => {
+  const indexPath = path.join(__dirname, '../dist/index.html');
+  if (fs.existsSync(indexPath)) {
+    res.sendFile(indexPath);
+  } else {
+    res.status(404).json({ error: 'Frontend not found' });
+  }
+});
 
 app.listen(PORT, () => {
   console.log(`🚀 Backend running on port ${PORT}`);
