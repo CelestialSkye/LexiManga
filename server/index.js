@@ -1466,6 +1466,38 @@ app.get('/api/health', async (req, res) => {
   }
 });
 
+// ============ DEBUG: Test reCAPTCHA Token Verification Endpoint ============
+// For debugging purposes - accepts a token and tests it against Google
+app.post('/api/test/recaptcha', async (req, res) => {
+  try {
+    const { token } = req.body;
+
+    if (!token) {
+      return res.status(400).json({
+        error: 'No token provided',
+      });
+    }
+
+    console.log('🧪 [TEST] Testing reCAPTCHA token verification');
+    console.log('🧪 [TEST] Token length:', token.length);
+    console.log('🧪 [TEST] Token:', token);
+
+    const result = await verifyRecaptcha(token);
+
+    res.json({
+      success: result,
+      token_length: token.length,
+      has_dots: (token.match(/\./g) || []).length,
+      message: result ? 'Token is valid' : 'Token is invalid',
+    });
+  } catch (error) {
+    console.error('🧪 [TEST] Error:', error.message);
+    res.status(500).json({
+      error: error.message,
+    });
+  }
+});
+
 // ============ MONITORING: Sentry Error Handler ============
 // Capture exceptions and send to Sentry (must be after all routes and before other error handlers)
 if (process.env.SENTRY_DSN) {
