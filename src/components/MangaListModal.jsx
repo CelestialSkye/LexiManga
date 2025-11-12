@@ -11,13 +11,6 @@ const MangaListModal = () => {
   const [isStatusModalOpen, setIsStatusModalOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
 
-  // DEBUG: Log the actual manga status data
-  console.log('MangaListModal - mangaStatus data:', mangaStatus);
-  console.log(
-    'MangaListModal - mangaStatus count:',
-    Array.isArray(mangaStatus) ? mangaStatus.length : 'not an array'
-  );
-
   const filteredManga = mangaStatus.filter((manga) => {
     const title = manga.title || '';
     return title.toString().toLowerCase().includes(searchTerm.toLowerCase());

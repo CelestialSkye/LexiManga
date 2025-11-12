@@ -26,14 +26,8 @@ export const useSaveMangaStatus = () => {
 
   return useMutation({
     mutationFn: async ({ uid, mangaId, statusData, isNew }) => {
-      console.log('🔄 useSaveMangaStatus.mutationFn - START');
       const previousData = await getMangaStatus(uid, mangaId);
-      console.log('🔄 useSaveMangaStatus - previous data:', previousData);
-
-      console.log('🔄 useSaveMangaStatus - calling saveMangaStatus...');
       await saveMangaStatus(uid, mangaId, statusData);
-      console.log('🔄 useSaveMangaStatus - saveMangaStatus completed');
-
       return { previousData, newData: statusData, isNew, mangaId, uid };
     },
 
@@ -54,10 +48,6 @@ export const useSaveMangaStatus = () => {
     },
 
     onSuccess: async ({ previousData, newData, isNew, mangaId, uid }) => {
-      console.log('✅ useSaveMangaStatus.onSuccess - save was successful');
-      console.log('✅ newData:', newData);
-      console.log('✅ isNew:', isNew);
-
       let changes = {};
 
       if (!isNew && previousData) {
@@ -91,18 +81,15 @@ export const useSaveMangaStatus = () => {
         activityPayload.changes = changes;
       }
 
-      console.log('📝 Logging activity:', isNew ? 'manga_add' : 'manga_update', activityPayload);
       await logActivity(isNew ? 'manga_add' : 'manga_update', activityPayload);
 
       // Invalidate both the single manga query and the list query
-      console.log('🔄 Invalidating queries for uid:', uid);
       queryClient.invalidateQueries({
         queryKey: ['mangaStatus', uid, mangaId],
       });
       queryClient.invalidateQueries({
         queryKey: ['mangaStatuses', uid],
       });
-      console.log('✅ Queries invalidated');
     },
 
     onError: (error, variables, context) => {
@@ -129,10 +116,7 @@ const saveMangaStatus = async (uid, mangaId, statusData) => {
     createdAt: statusData.createdAt || now,
   };
 
-  console.log('💾 saveMangaStatus - saving to path:', `users/${uid}/mangaStatus/${mangaId}`);
-  console.log('💾 saveMangaStatus - data:', dataToSave);
   await setDoc(statusRef, dataToSave);
-  console.log('✅ saveMangaStatus - save successful');
   return dataToSave;
 };
 
