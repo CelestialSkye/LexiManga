@@ -2,6 +2,7 @@ import { Group, Text } from '@mantine/core';
 import { IconBrandGithub, IconBrandTwitter, IconMail } from '@tabler/icons-react';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { IconBrandGithub, IconBrandX } from '@tabler/icons-react';
 
 import logo from '../assets/logo.svg';
 import { useAuth } from '../context/AuthContext';
@@ -20,10 +21,12 @@ const Footer = () => {
     setFeedbackModalOpen(true);
   };
 
-  const links = [
-    { label: 'Feedback', href: '#', action: handleFeedbackClick },
-    { label: 'GitHub', href: 'https://github.com/CelestialSkye/LexiManga', icon: IconBrandGithub },
-  ];
+ const links = [
+  { label: 'Feedback', href: '#', action: handleFeedbackClick },
+  { label: 'GitHub', href: 'https://github.com/CelestialSkye/LexiManga', icon: IconBrandGithub },
+  { label: 'Twitter / X', href: 'https://x.com/SkyeMilize', icon: IconBrandX },
+];
+
 
   return (
     <>
