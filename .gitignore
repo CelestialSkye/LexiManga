@@ -41,6 +41,15 @@ RULES_UPDATED.md
 SETUP_INSTRUCTIONS.md
 TEST_LOCAL.md
 
+# Firebase/Setup documentation (temporary, reference only)
+CORS_SETUP_INSTRUCTIONS.md
+ENABLE_BILLING.md
+FIREBASE_BILLING_ISSUE.md
+FIREBASE_CORS_SETUP.md
+FIREBASE_STORAGE_SETUP_GUIDE.md
+cors.json
+test-cors.sh
+
 # Generated files that shouldn't be committed
 server/package-lock.json
 
