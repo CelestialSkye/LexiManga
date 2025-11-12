@@ -146,11 +146,30 @@ const verifyRecaptcha = async (token) => {
     }
 
     console.log('✅ [verifyRecaptcha] Secret key found, sending to Google API...');
+    console.log('📤 [verifyRecaptcha] Sending to Google with:');
+    console.log(
+      '   - Secret key (first 10 chars):',
+      process.env.VITE_RECAPTCHA_SECRET_KEY.substring(0, 10)
+    );
+    console.log('   - Token length:', token.length);
+
     const response = await axios.post('https://www.google.com/recaptcha/api/siteverify', null, {
       params: {
         secret: process.env.VITE_RECAPTCHA_SECRET_KEY,
         response: token,
       },
+    });
+
+    console.log('📥 [verifyRecaptcha] Full Google response:', response.data);
+    const { success, score, error_codes, action, challenge_ts } = response.data;
+
+    console.log('📊 [verifyRecaptcha] Parsed response:', {
+      success,
+      score,
+      error_codes,
+      action,
+      challenge_ts,
+      token_length: token ? token.length : 'null',
     });
 
     const { success, score, error_codes, action, challenge_ts } = response.data;
