@@ -20,12 +20,21 @@ const fetchMangaStatuses = async (uid) => {
     const statusesRef = collection(db, 'users', uid, 'mangaStatus');
     const statusesSnapshot = await getDocs(statusesRef);
 
+    console.log('🔍 fetchMangaStatuses - uid:', uid);
+    console.log('🔍 fetchMangaStatuses - docs count:', statusesSnapshot.docs.length);
+    console.log(
+      '🔍 fetchMangaStatuses - docs:',
+      statusesSnapshot.docs.map((d) => ({ id: d.id, data: d.data() }))
+    );
+
     const mangaStatusesWithDetails = await Promise.allSettled(
       statusesSnapshot.docs.map(async (doc) => {
         const mangaStatus = {
           id: doc.id,
           ...doc.data(),
         };
+
+        console.log('📦 Processing manga status:', mangaStatus);
 
         try {
           if (mangaStatus.mangaId) {
@@ -64,9 +73,10 @@ const fetchMangaStatuses = async (uid) => {
       .filter((result) => result.status === 'fulfilled')
       .map((result) => result.value);
 
+    console.log('✅ fetchMangaStatuses - final result:', result);
     return Array.isArray(result) ? result : [];
   } catch (error) {
-    console.error('Error fetching manga statuses:', error);
+    console.error('❌ Error fetching manga statuses:', error);
     return [];
   }
 };
