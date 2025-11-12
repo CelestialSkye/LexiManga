@@ -18,7 +18,7 @@ const fetchMangaStatuses = async (uid) => {
   const statusesRef = collection(db, 'users', uid, 'mangaStatus');
   const statusesSnapshot = await getDocs(statusesRef);
 
-  const mangaStatusesWithDetails = await Promise.all(
+  const mangaStatusesWithDetails = await Promise.allSettled(
     statusesSnapshot.docs.map(async (doc) => {
       const mangaStatus = {
         id: doc.id,
@@ -27,7 +27,13 @@ const fetchMangaStatuses = async (uid) => {
 
       try {
         if (mangaStatus.mangaId) {
-          const details = await getMangaDetails(mangaStatus.mangaId);
+          // Add timeout to prevent hanging
+          const detailsPromise = getMangaDetails(mangaStatus.mangaId);
+          const timeoutPromise = new Promise((_, reject) =>
+            setTimeout(() => reject(new Error('Details fetch timeout')), 10000)
+          );
+
+          const details = await Promise.race([detailsPromise, timeoutPromise]);
           const coverImage = details.data?.Media?.coverImage?.large;
           const anilistTitle =
             details.data?.Media?.title?.romaji || details.data?.Media?.title?.english;
@@ -39,15 +45,20 @@ const fetchMangaStatuses = async (uid) => {
           };
         }
       } catch (error) {
-        console.error(`Error fetching details for manga ${mangaStatus.id}:`, error);
+        // Silently fail and return basic data
+        // Don't log errors to reduce console noise
       }
 
       return {
         ...mangaStatus,
         title: mangaStatus.mangaTitle || 'Untitled',
+        coverImage: mangaStatus.coverImage || '',
       };
     })
   );
 
-  return mangaStatusesWithDetails;
+  // Filter out failed promises and extract values
+  return mangaStatusesWithDetails
+    .filter((result) => result.status === 'fulfilled')
+    .map((result) => result.value);
 };
