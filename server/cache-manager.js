@@ -1,4 +1,7 @@
-const { db } = require('./firebase-admin');
+const admin = require('./firebase-admin');
+
+// Get Firestore instance from Firebase Admin SDK
+const db = admin.firestore();
 
 /**
  * Generate a cache key based on query type and parameters
@@ -48,10 +51,9 @@ async function getCacheFromFirebase(cacheKey) {
       return null;
     }
 
-    const { doc, getDoc } = require('firebase/firestore');
-    const docSnap = await getDoc(doc(db, 'anilist_cache', cacheKey));
+    const docSnap = await db.collection('anilist_cache').doc(cacheKey).get();
 
-    if (!docSnap.exists()) {
+    if (!docSnap.exists) {
       return null;
     }
 
@@ -60,7 +62,7 @@ async function getCacheFromFirebase(cacheKey) {
     // Check if expired
     if (isExpired(cacheData.expiresAt)) {
       // Optionally delete expired cache (cleanup)
-      // await deleteDoc(doc(db, 'anilist_cache', cacheKey));
+      // await db.collection('anilist_cache').doc(cacheKey).delete();
       return null;
     }
 
@@ -89,11 +91,10 @@ async function setCacheInFirebase(cacheKey, data, ttlSeconds = 3600) {
       return false;
     }
 
-    const { doc, setDoc } = require('firebase/firestore');
     const now = Date.now();
     const expiresAt = now + ttlSeconds * 1000;
 
-    await setDoc(doc(db, 'anilist_cache', cacheKey), {
+    await db.collection('anilist_cache').doc(cacheKey).set({
       data,
       fetchedAt: now,
       expiresAt,
@@ -120,8 +121,7 @@ async function getCacheStats() {
       return null;
     }
 
-    const { collection, getDocs } = require('firebase/firestore');
-    const querySnapshot = await getDocs(collection(db, 'anilist_cache'));
+    const querySnapshot = await db.collection('anilist_cache').get();
     const stats = {
       totalEntries: querySnapshot.size,
       expiredEntries: 0,
@@ -129,8 +129,8 @@ async function getCacheStats() {
       cacheTypes: {},
     };
 
-    querySnapshot.forEach((doc) => {
-      const data = doc.data();
+    querySnapshot.forEach((docSnap) => {
+      const data = docSnap.data();
       const isExpiredEntry = isExpired(data.expiresAt);
 
       if (isExpiredEntry) {
@@ -161,14 +161,13 @@ async function clearExpiredCache() {
       return 0;
     }
 
-    const { collection, getDocs, deleteDoc, doc } = require('firebase/firestore');
-    const querySnapshot = await getDocs(collection(db, 'anilist_cache'));
+    const querySnapshot = await db.collection('anilist_cache').get();
     let deletedCount = 0;
 
     for (const docSnap of querySnapshot.docs) {
       const data = docSnap.data();
       if (isExpired(data.expiresAt)) {
-        await deleteDoc(doc(db, 'anilist_cache', docSnap.id));
+        await db.collection('anilist_cache').doc(docSnap.id).delete();
         deletedCount++;
       }
     }
