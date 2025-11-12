@@ -186,7 +186,7 @@ const WordDetailModal = ({ opened, onClose, word, onEdit, onDelete }) => {
         <div>
           <div className='relative rounded-[12px] bg-violet-500 p-12'>
             {isEditing ? (
-              {/* TODO: Re-enable translation button once Firebase Admin is configured */}
+              // TODO: Re-enable translation button once Firebase Admin is configured
               <ActionIcon
                 size='lg'
                 variant='filled'
