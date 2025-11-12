@@ -53,7 +53,8 @@ const allowedOrigins = [
   'http://localhost:5173',
   'http://127.0.0.1:3000',
   'http://127.0.0.1:5173',
-  // Production - Render domains (update with your actual domains)
+  // Production - Render domains
+  'https://vocabularymanga.onrender.com',
   'https://leximanga-frontend.onrender.com',
   'https://leximanga-backend.onrender.com',
   // Production - Custom domain (add when you have one)
