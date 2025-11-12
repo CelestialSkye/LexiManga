@@ -1453,10 +1453,19 @@ if (process.env.SENTRY_DSN) {
 // This enables client-side routing for React Router
 app.get('*', (req, res) => {
   const indexPath = path.join(__dirname, '../dist/index.html');
+  console.log(`[SPA Fallback] Attempting to serve: ${indexPath}`);
+  console.log(`[SPA Fallback] File exists: ${fs.existsSync(indexPath)}`);
+
   if (fs.existsSync(indexPath)) {
     res.sendFile(indexPath);
   } else {
-    res.status(404).json({ error: 'Frontend not found' });
+    // Log directory contents for debugging
+    const distPath = path.join(__dirname, '../dist');
+    console.log(`[SPA Fallback] dist exists: ${fs.existsSync(distPath)}`);
+    if (fs.existsSync(distPath)) {
+      console.log(`[SPA Fallback] dist contents:`, fs.readdirSync(distPath));
+    }
+    res.status(404).json({ error: 'Frontend index.html not found', path: indexPath });
   }
 });
 
