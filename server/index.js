@@ -48,14 +48,31 @@ const PORT = process.env.PORT || 3001;
 
 // ============ SECURITY: CORS Configuration ============
 const corsOptions = {
-  origin: '*', // Allow all origins for now (will restrict later)
-  credentials: false,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
+  origin: function (origin, callback) {
+    // Allow requests from any origin (temporary - for debugging)
+    callback(null, true);
+  },
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+  exposedHeaders: ['Content-Type'],
   maxAge: 86400, // 24 hours
 };
 
 app.use(cors(corsOptions));
+
+// Add explicit CORS headers as fallback
+app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS, PATCH');
+  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With');
+  res.header('Access-Control-Expose-Headers', 'Content-Type');
+
+  if (req.method === 'OPTIONS') {
+    return res.sendStatus(200);
+  }
+  next();
+});
 
 // ============ MONITORING: Sentry Request Handler ============
 // Capture transactions for performance monitoring
