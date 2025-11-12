@@ -45,12 +45,26 @@ app.use((req, res, next) => {
 
 // ============ SERVE FRONTEND ============
 // Serve static files from dist
-const distPath = path.join(__dirname, '../dist');
-if (fs.existsSync(distPath)) {
-  console.log(`✅ Serving frontend from: ${distPath}`);
-  app.use(express.static(distPath));
-} else {
-  console.warn(`⚠️  dist folder not found at: ${distPath}`);
+// Check multiple paths since Render's directory structure varies
+let distPath = null;
+const possiblePaths = [
+  path.join(__dirname, '../dist'), // ../dist from server/
+  path.join(__dirname, '../../dist'), // ../../dist (if in src/server/)
+  path.join(process.cwd(), 'dist'), // Current working directory
+];
+
+for (const p of possiblePaths) {
+  if (fs.existsSync(p)) {
+    distPath = p;
+    console.log(`✅ Serving frontend from: ${distPath}`);
+    app.use(express.static(distPath));
+    break;
+  }
+}
+
+if (!distPath) {
+  console.warn(`⚠️  dist folder not found. Checked:`);
+  possiblePaths.forEach((p) => console.warn(`   - ${p}`));
 }
 
 const cache = new NodeCache({ stdTTL: 3600 });
@@ -687,12 +701,7 @@ const SUGGESTED_QUERY_FOR_SCHEDULER = `
   }
 `;
 
-cacheScheduler.initializeScheduler(
-  ANILIST_API,
-  TRENDING_QUERY_FOR_SCHEDULER,
-  MONTHLY_MANGA_QUERY_FOR_SCHEDULER,
-  SUGGESTED_QUERY_FOR_SCHEDULER
-);
+// Cache scheduler disabled - caused memory issues on Render free tier
 
 app.get('/api/word-difficulty', async (req, res) => {
   // DISABLED: Word difficulty feature causes memory issues with frequency lists
@@ -1358,17 +1367,23 @@ app.get('*', (req, res) => {
     return res.status(404).json({ error: 'API endpoint not found' });
   }
 
+  if (!distPath) {
+    return res.status(500).send('Frontend not available - dist folder not found');
+  }
+
   const indexPath = path.join(distPath, 'index.html');
   if (fs.existsSync(indexPath)) {
     res.set('Cache-Control', 'public, max-age=0, s-maxage=300');
     res.sendFile(indexPath);
   } else {
-    res.status(500).send('Frontend not available');
+    res.status(500).send('Frontend not available - index.html not found');
   }
 });
 
 // ============ START SERVER ============
 app.listen(PORT, () => {
   console.log(`🚀 Backend running on port ${PORT}`);
-  console.log('✅ All API routes loaded: /api/search, /api/manga, /api/trending, /api/monthly, /api/suggested, /api/browse, /api/health');
+  console.log(
+    '✅ All API routes loaded: /api/search, /api/manga, /api/trending, /api/monthly, /api/suggested, /api/browse, /api/health'
+  );
 });
