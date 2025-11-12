@@ -372,6 +372,8 @@ const Auth = () => {
                         shadow='md'
                         opened={emailTooltipOpen}
                         onChange={setEmailTooltipOpen}
+                        width={280}
+                        styles={{ dropdown: { padding: '12px' } }}
                       >
                         <Popover.Target>
                           <IconInfoCircle
@@ -381,16 +383,20 @@ const Auth = () => {
                           />
                         </Popover.Target>
                         <Popover.Dropdown>
-                          <Text size='sm'>Placeholder: This will explain email requirements</Text>
+                          <Text size='sm' lh='lg'>
+                            Registration requires an email, but no confirmation is sent. Feel free
+                            to use a non-primary email, but note that password recovery will not be
+                            available.
+                          </Text>
                         </Popover.Dropdown>
                       </Popover>
                     ) : (
                       <Tooltip
-                        label='Placeholder: This will explain email requirements'
+                        label='Registration requires an email, but no confirmation is sent. Feel free to use a non-primary email, but note that password recovery will not be available.'
                         position='top'
                         withArrow
                         multiline
-                        w={200}
+                        w={280}
                       >
                         <IconInfoCircle size={16} style={{ cursor: 'pointer', color: '#9c36b5' }} />
                       </Tooltip>
