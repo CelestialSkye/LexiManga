@@ -1,7 +1,16 @@
 const admin = require('./firebase-admin');
 
-// Get Firestore instance from Firebase Admin SDK
-const db = admin.firestore();
+// Get Firestore instance from Firebase Admin SDK (if available)
+let db = null;
+try {
+  if (admin.apps && admin.apps.length > 0) {
+    db = admin.firestore();
+  } else {
+    console.warn('⚠️ Firebase Admin not initialized. Caching will use in-memory only.');
+  }
+} catch (error) {
+  console.warn('⚠️ Could not access Firestore:', error.message);
+}
 
 /**
  * Generate a cache key based on query type and parameters
