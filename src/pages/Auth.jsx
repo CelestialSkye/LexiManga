@@ -92,9 +92,14 @@ const Auth = () => {
       let token;
       try {
         token = await executeRecaptcha('register');
+        if (!token) {
+          throw new Error('reCAPTCHA verification failed - token not generated');
+        }
       } catch (error) {
         console.error('reCAPTCHA execution error:', error);
-        token = null;
+        throw new Error(
+          'reCAPTCHA verification failed. Please disable your ad blocker and try again.'
+        );
       }
 
       // Verify token on backend and register

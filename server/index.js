@@ -1300,8 +1300,9 @@ app.post('/api/auth/register', async (req, res) => {
 
     // Verify reCAPTCHA token
     if (!recaptchaToken) {
+      console.error('❌ Registration attempt without reCAPTCHA token from IP:', clientIp);
       return res.status(400).json({
-        message: 'reCAPTCHA token is required',
+        message: 'reCAPTCHA token is required. Please disable your ad blocker and try again.',
       });
     }
 
