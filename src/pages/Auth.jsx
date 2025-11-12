@@ -88,6 +88,12 @@ const Auth = () => {
       console.log('🔍 Checking reCAPTCHA availability...');
       console.log('🔍 executeRecaptcha available:', typeof executeRecaptcha);
       console.log('🔍 window.grecaptcha available:', typeof window.grecaptcha);
+      
+      if (window.grecaptcha) {
+        console.log('🔍 grecaptcha.ready available:', typeof window.grecaptcha.ready);
+        console.log('🔍 grecaptcha.execute available:', typeof window.grecaptcha.execute);
+        console.log('🔍 grecaptcha.getResponse available:', typeof window.grecaptcha.getResponse);
+      }
 
       if (!executeRecaptcha) {
         throw new Error('reCAPTCHA not loaded');

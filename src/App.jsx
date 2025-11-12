@@ -99,7 +99,14 @@ const App = () => {
   }
 
   return (
-    <GoogleReCaptchaProvider reCaptchaKey={recaptchaKey}>
+    <GoogleReCaptchaProvider
+      reCaptchaKey={recaptchaKey}
+      scriptProps={{
+        async: true,
+        defer: true,
+        appendTo: 'head',
+      }}
+    >
       <MantineProvider theme={theme} defaultColorScheme='light' primaryColor='violet'>
         <ModalsProvider>
           <AuthProvider>
