@@ -1368,19 +1368,27 @@ app.get('/api/health', async (req, res) => {
 // ============ SPA FALLBACK ============
 // Serve index.html for all non-API routes (client-side routing)
 app.get('*', (req, res) => {
+  console.log(`[SPA] Request for: ${req.path}`);
+
   if (req.path.startsWith('/api')) {
+    console.log(`[SPA] Blocking API route`);
     return res.status(404).json({ error: 'API endpoint not found' });
   }
 
   if (!distPath) {
+    console.log(`[SPA] ERROR: distPath is null`);
     return res.status(500).send('Frontend not available - dist folder not found');
   }
 
   const indexPath = path.join(distPath, 'index.html');
+  console.log(`[SPA] Trying to serve: ${indexPath}`);
+
   if (fs.existsSync(indexPath)) {
+    console.log(`[SPA] Found index.html, serving it`);
     res.set('Cache-Control', 'public, max-age=0, s-maxage=300');
     res.sendFile(indexPath);
   } else {
+    console.log(`[SPA] ERROR: index.html not found at ${indexPath}`);
     res.status(500).send('Frontend not available - index.html not found');
   }
 });
@@ -1388,6 +1396,12 @@ app.get('*', (req, res) => {
 // ============ START SERVER ============
 app.listen(PORT, () => {
   console.log(`🚀 Backend running on port ${PORT}`);
+  console.log(`📁 distPath: ${distPath || 'NOT FOUND'}`);
+  if (distPath && fs.existsSync(path.join(distPath, 'index.html'))) {
+    console.log(`✅ index.html found at: ${path.join(distPath, 'index.html')}`);
+  } else {
+    console.log(`❌ index.html NOT found`);
+  }
   console.log(
     '✅ All API routes loaded: /api/search, /api/manga, /api/trending, /api/monthly, /api/suggested, /api/browse, /api/health'
   );
