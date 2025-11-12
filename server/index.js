@@ -132,28 +132,12 @@ const translationCache = new NodeCache({ stdTTL: 86400 });
 // Function to verify reCAPTCHA token
 const verifyRecaptcha = async (token) => {
   try {
-    console.log(
-      '🔄 [verifyRecaptcha] Starting verification for token:',
-      token ? `length: ${token.length}` : 'null'
-    );
-
     // Check if secret key is configured
     if (!process.env.VITE_RECAPTCHA_SECRET_KEY) {
-      console.error(
-        '❌ [verifyRecaptcha] VITE_RECAPTCHA_SECRET_KEY is not set in environment variables'
-      );
       return false;
     }
 
-    console.log('✅ [verifyRecaptcha] Secret key found, sending to Google API...');
-    console.log('📤 [verifyRecaptcha] Sending to Google with:');
-    console.log(
-      '   - Secret key (first 10 chars):',
-      process.env.VITE_RECAPTCHA_SECRET_KEY.substring(0, 10)
-    );
-    console.log('   - Token length:', token.length);
-
-    // Try with form data instead of params
+    // Send form data to Google's siteverify endpoint
     const formData = new URLSearchParams();
     formData.append('secret', process.env.VITE_RECAPTCHA_SECRET_KEY);
     formData.append('response', token);
@@ -164,46 +148,22 @@ const verifyRecaptcha = async (token) => {
       },
     });
 
-    console.log(
-      '📥 [verifyRecaptcha] Full Google response:',
-      JSON.stringify(response.data, null, 2)
-    );
     // Note: Google returns "error-codes" (with hyphen), not "error_codes"
-    const { success, score, action, challenge_ts } = response.data;
+    const { success, score } = response.data;
     const error_codes = response.data['error-codes'] || response.data.error_codes;
-
-    console.log('📊 [verifyRecaptcha] Parsed response:', {
-      success,
-      score,
-      error_codes,
-      action,
-      challenge_ts,
-      token_length: token ? token.length : 'null',
-    });
 
     // reCAPTCHA v3 returns a score between 0 and 1
     // 1.0 is very likely a legitimate interaction, 0.0 is very likely a bot
     if (!success) {
-      console.error(
-        '❌ [verifyRecaptcha] Google verification failed with error codes:',
-        error_codes
-      );
       return false;
     }
 
     if (score <= 0.3) {
-      console.warn(`⚠️ [verifyRecaptcha] reCAPTCHA score too low: ${score} (threshold: 0.3)`);
       return false;
     }
 
-    console.log(`✅ [verifyRecaptcha] reCAPTCHA verification PASSED (score: ${score})`);
     return true;
   } catch (error) {
-    console.error('❌ [verifyRecaptcha] Verification error:', error.message);
-    if (error.response) {
-      console.error('❌ [verifyRecaptcha] Google API error response:', error.response.data);
-    }
-    console.error('❌ [verifyRecaptcha] Full error:', error);
     return false;
   }
 };
@@ -1328,24 +1288,8 @@ app.post('/api/auth/register', async (req, res) => {
     // Get client IP
     const clientIp = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
 
-    console.log('📨 [/api/auth/register] New registration request from IP:', clientIp);
-    console.log('📨 [/api/auth/register] Email:', email);
-    console.log(
-      '📨 [/api/auth/register] Token received:',
-      recaptchaToken ? `length: ${recaptchaToken.length}` : 'null'
-    );
-    if (recaptchaToken) {
-      console.log('📨 [/api/auth/register] Token first 50 chars:', recaptchaToken.substring(0, 50));
-      console.log(
-        '📨 [/api/auth/register] Token last 50 chars:',
-        recaptchaToken.substring(recaptchaToken.length - 50)
-      );
-      console.log('📨 [/api/auth/register] Full token:', recaptchaToken);
-    }
-
     // Check IP-based rate limit (max 5 registrations per hour per IP)
     if (!checkIPRateLimit(clientIp)) {
-      console.warn('⚠️ [/api/auth/register] Rate limit exceeded for IP:', clientIp);
       return res.status(429).json({
         message: 'Too many registration attempts from this IP. Please try again later.',
       });
@@ -1353,19 +1297,13 @@ app.post('/api/auth/register', async (req, res) => {
 
     // Verify reCAPTCHA token
     if (!recaptchaToken) {
-      console.error(
-        '❌ [/api/auth/register] Registration attempt without reCAPTCHA token from IP:',
-        clientIp
-      );
       return res.status(400).json({
         message: 'reCAPTCHA token is required. Please disable your ad blocker and try again.',
       });
     }
 
-    console.log('🔄 [/api/auth/register] Verifying reCAPTCHA...');
     const isValidCaptcha = await verifyRecaptcha(recaptchaToken);
     if (!isValidCaptcha) {
-      console.error('❌ [/api/auth/register] reCAPTCHA verification failed');
       return res.status(400).json({
         message: 'reCAPTCHA verification failed. Please try again.',
       });
@@ -1373,13 +1311,12 @@ app.post('/api/auth/register', async (req, res) => {
 
     // If all checks pass, return success
     // The actual Firebase registration happens on the client side
-    console.log('✅ [/api/auth/register] Registration verification successful for:', email);
     res.json({
       success: true,
       message: 'reCAPTCHA verification passed. You can proceed with registration.',
     });
   } catch (error) {
-    console.error('❌ [/api/auth/register] Registration error:', error);
+    console.error('Registration error:', error);
     res.status(500).json({
       message: 'Registration verification failed. Please try again.',
     });
@@ -1460,38 +1397,6 @@ app.get('/api/health', async (req, res) => {
       status: 'unhealthy',
       error: 'Health check failed',
       timestamp: new Date().toISOString(),
-    });
-  }
-});
-
-// ============ DEBUG: Test reCAPTCHA Token Verification Endpoint ============
-// For debugging purposes - accepts a token and tests it against Google
-app.post('/api/test/recaptcha', async (req, res) => {
-  try {
-    const { token } = req.body;
-
-    if (!token) {
-      return res.status(400).json({
-        error: 'No token provided',
-      });
-    }
-
-    console.log('🧪 [TEST] Testing reCAPTCHA token verification');
-    console.log('🧪 [TEST] Token length:', token.length);
-    console.log('🧪 [TEST] Token:', token);
-
-    const result = await verifyRecaptcha(token);
-
-    res.json({
-      success: result,
-      token_length: token.length,
-      has_dots: (token.match(/\./g) || []).length,
-      message: result ? 'Token is valid' : 'Token is invalid',
-    });
-  } catch (error) {
-    console.error('🧪 [TEST] Error:', error.message);
-    res.status(500).json({
-      error: error.message,
     });
   }
 });
