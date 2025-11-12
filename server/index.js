@@ -782,6 +782,15 @@ app.get('/api/word-difficulty', async (req, res) => {
       return res.status(400).json({ error: 'Word and language required' });
     }
 
+    // Disable word difficulty in production to save memory (206MB frequency lists)
+    if (process.env.NODE_ENV === 'production') {
+      // Return a neutral default difficulty
+      return res.json({
+        data: { level: 'Medium', score: 2, source: 'disabled', frequency: 0 },
+        cached: false,
+      });
+    }
+
     const cacheKey = `difficulty:${word}:${language}`;
     const cached = cache.get(cacheKey);
 
