@@ -1,7 +1,7 @@
 services:
   # Backend API Server
   - type: web
-    name: leximanga-backend
+    name: vocabularymanga-backend
     env: node
     plan: free
     buildCommand: cd server && npm install && npm run build
@@ -24,9 +24,12 @@ services:
     plan: free
     buildCommand: npm install && npm run build
     staticPublishPath: ./dist
+    routes:
+      - path: /*
+        destination: /index.html
     envVars:
       - key: VITE_BACKEND_URL
-        value: https://leximanga-backend.onrender.com
+        value: https://vocabularymanga-backend.onrender.com
       # Frontend only needs PUBLIC keys (already in .env):
       # - VITE_FIREBASE_API_KEY
       # - VITE_FIREBASE_AUTH_DOMAIN
