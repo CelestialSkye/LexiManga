@@ -80,13 +80,8 @@ for (const p of possiblePaths) {
 if (!distPath) {
   console.error(`\n❌ CRITICAL: dist folder with index.html not found!`);
   console.error(`   Checked paths:`);
-  possiblePaths.forEach(p => console.error(`   - ${p}`));
+  possiblePaths.forEach((p) => console.error(`   - ${p}`));
   console.error(`\n⚠️  Frontend will NOT be served!`);
-}
-}
-
-if (!distPath) {
-  console.error(`❌ ERROR: dist folder not found anywhere!`);
 }
 
 // Serve static assets using express.static
