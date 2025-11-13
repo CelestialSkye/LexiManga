@@ -30,19 +30,24 @@ const app = express();
 const PORT = process.env.PORT || 10000;
 
 // ============ MIDDLEWARE ============
-app.use(express.json());
-
-// Enable CORS
+// Enable CORS FIRST - before all other middleware
 app.use((req, res, next) => {
+  const origin = req.headers.origin;
+
+  // Allow all origins for API requests
   res.header('Access-Control-Allow-Origin', '*');
   res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS, PATCH');
-  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With');
+  res.header('Access-Control-Max-Age', '86400');
+  res.header('Access-Control-Allow-Credentials', 'true');
 
   if (req.method === 'OPTIONS') {
     return res.sendStatus(200);
   }
   next();
 });
+
+app.use(express.json());
 
 // ============ SERVE FRONTEND ============
 // Find dist folder
