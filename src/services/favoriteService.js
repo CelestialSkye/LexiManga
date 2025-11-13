@@ -18,7 +18,9 @@ export const useToggleFavorite = () => {
   return useMutation({
     mutationFn: ({ uid, mangaId, mangaData }) => toggleFavorite(uid, mangaId, mangaData),
     onSuccess: (data, variables) => {
+      // Invalidate both the specific favorite query and the list query
       queryClient.invalidateQueries({ queryKey: ['favorites', variables.uid, variables.mangaId] });
+      queryClient.invalidateQueries({ queryKey: ['favoritedManga', variables.uid] });
     },
   });
 };
