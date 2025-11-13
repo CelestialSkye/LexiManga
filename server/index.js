@@ -1403,7 +1403,9 @@ app.post('/api/avatar/upload', verifyToken, upload.single('avatar'), async (req,
 
     try {
       // Upload to Firebase Storage
-      const bucket = admin.storage().bucket();
+      const bucketName = process.env.VITE_FIREBASE_STORAGE_BUCKET;
+      console.log(`📦 Using storage bucket: ${bucketName}`);
+      const bucket = admin.storage().bucket(bucketName);
       const timestamp = Date.now();
       const filename = `${userId}_${timestamp}_${file.originalname.replace(/\s+/g, '_')}`;
       const filePath = `avatars/${userId}/${filename}`;

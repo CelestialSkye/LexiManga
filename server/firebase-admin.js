@@ -1,5 +1,6 @@
 const admin = require('firebase-admin');
 const path = require('path');
+const fs = require('fs');
 require('dotenv').config({ path: path.resolve(__dirname, '../.env') });
 
 // Only initialize if not already initialized
@@ -8,21 +9,25 @@ if (!admin.apps.length) {
     // For local development
     if (process.env.NODE_ENV !== 'production') {
       // Try to use credentials file if it exists
-      const credentialsPath = process.env.FIREBASE_CREDENTIALS_PATH;
-      if (credentialsPath) {
-        const serviceAccount = require(credentialsPath);
-        admin.initializeApp({
-          credential: admin.credential.cert(serviceAccount),
-          projectId: process.env.VITE_FIREBASE_PROJECT_ID,
-        });
-        console.log('✅ Firebase Admin SDK initialized (dev - from file)');
+      const credentialsFile = process.env.FIREBASE_CREDENTIALS_PATH
+        ? path.resolve(__dirname, '..', process.env.FIREBASE_CREDENTIALS_PATH)
+        : path.join(__dirname, 'config', 'firebase-key.json');
+
+      if (fs.existsSync(credentialsFile)) {
+        try {
+          const serviceAccount = JSON.parse(fs.readFileSync(credentialsFile, 'utf8'));
+          admin.initializeApp({
+            credential: admin.credential.cert(serviceAccount),
+            projectId: process.env.VITE_FIREBASE_PROJECT_ID,
+            storageBucket: process.env.VITE_FIREBASE_STORAGE_BUCKET,
+          });
+          console.log('✅ Firebase Admin SDK initialized (dev - from file)');
+        } catch (err) {
+          console.warn('⚠️ Error reading credentials file:', err.message);
+        }
       } else {
-        console.warn(
-          '⚠️ No FIREBASE_CREDENTIALS_PATH in development. Rate limiting and activity logging will be disabled.'
-        );
-        console.warn(
-          'To enable full features, set FIREBASE_CREDENTIALS_PATH to your service account JSON file.'
-        );
+        console.warn('⚠️ No Firebase credentials file found at:', credentialsFile);
+        console.warn('To enable full features, create server/config/firebase-key.json');
         // Don't throw - allow server to continue without Firebase Admin
       }
     } else {
@@ -40,6 +45,7 @@ if (!admin.apps.length) {
           admin.initializeApp({
             credential: admin.credential.cert(serviceAccount),
             projectId: process.env.VITE_FIREBASE_PROJECT_ID,
+            storageBucket: process.env.VITE_FIREBASE_STORAGE_BUCKET,
           });
           console.log('✅ Firebase Admin SDK initialized (production)');
         } catch (parseError) {
