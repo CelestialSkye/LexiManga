@@ -3,6 +3,10 @@ import { initializeApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
 import { getStorage } from 'firebase/storage';
+import { setLogLevel } from 'firebase/app';
+
+// Suppress Firebase SDK verbose logging
+setLogLevel('error');
 
 /**
  * Firebase configuration loaded from environment variables
@@ -48,15 +52,26 @@ export const storage = getStorage(app);
 
 // Initialize Analytics (only if supported and not blocked)
 let analytics = null;
-isSupported()
-  .then((yes) => (yes ? getAnalytics(app) : null))
-  .then((analyticsInstance) => {
-    analytics = analyticsInstance;
-  })
-  .catch(() => {
-    // Analytics failed to initialize (likely blocked by ad blocker)
-    console.log('Analytics disabled - likely blocked by ad blocker');
-  });
+
+// Initialize analytics with error suppression
+// Note: Analytics failures are non-critical and often caused by:
+// - Ad blockers
+// - Privacy browser settings
+// - Invalid or incomplete Firebase configuration
+if (typeof window !== 'undefined') {
+  isSupported()
+    .then((supported) => {
+      if (!supported) return null;
+      return getAnalytics(app);
+    })
+    .then((instance) => {
+      analytics = instance;
+    })
+    .catch((error) => {
+      // Silently fail - analytics initialization is non-critical
+      // The app will work fine without it
+    });
+}
 
 export { analytics };
 export default app;
