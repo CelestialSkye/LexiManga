@@ -1423,12 +1423,20 @@ app.get('/api/health', async (req, res) => {
 
 // ============ SPA FALLBACK ============
 // Serve index.html for all non-API routes (client-side routing)
+// IMPORTANT: Only serve index.html for HTML requests, not static assets
 app.get('*', (req, res) => {
   console.log(`[SPA] Request for: ${req.path}`);
 
+  // Block API routes
   if (req.path.startsWith('/api')) {
     console.log(`[SPA] Blocking API route`);
     return res.status(404).json({ error: 'API endpoint not found' });
+  }
+
+  // Block static asset requests (should be caught by express.static above)
+  if (req.path.match(/\.(js|css|json|svg|png|jpg|jpeg|gif|webp|woff|woff2|ttf|eot)$/i)) {
+    console.log(`[SPA] Static asset not found: ${req.path}`);
+    return res.status(404).send('Asset not found');
   }
 
   if (!distPath) {
