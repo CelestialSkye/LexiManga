@@ -1383,6 +1383,10 @@ app.post('/api/avatar/upload', verifyToken, upload.single('avatar'), async (req,
     const userId = req.userId; // From verified token
     const file = req.file;
 
+    console.log(
+      `📥 Avatar upload started for user ${userId}, file: ${file.originalname}, size: ${file.size}`
+    );
+
     // Validate file size (double-check on server)
     if (file.size > 5 * 1024 * 1024) {
       return res.status(400).json({ error: 'File size exceeds 5MB limit' });
@@ -1401,11 +1405,24 @@ app.post('/api/avatar/upload', verifyToken, upload.single('avatar'), async (req,
       return res.status(400).json({ error: 'Invalid file type - only JPEG and PNG allowed' });
     }
 
+    console.log(`✓ File validation passed`);
+
+    // Check if Firebase Admin is initialized
+    if (!admin.apps.length) {
+      console.error('❌ Firebase Admin not initialized - cannot upload to Storage');
+      return res.status(500).json({
+        error: 'Server configuration error',
+        details: 'Firebase Admin SDK not initialized. Please configure Firebase credentials.',
+      });
+    }
+
     // Upload to Firebase Storage
     const bucket = admin.storage().bucket();
     const timestamp = Date.now();
     const filename = `${userId}_${timestamp}_${file.originalname.replace(/\s+/g, '_')}`;
     const filePath = `avatars/${userId}/${filename}`;
+
+    console.log(`📤 Uploading to Firebase Storage: ${filePath}`);
 
     const fileRef = bucket.file(filePath);
 
@@ -1420,11 +1437,13 @@ app.post('/api/avatar/upload', verifyToken, upload.single('avatar'), async (req,
       },
     });
 
+    console.log(`✓ File saved to Firebase Storage`);
+
     // Make file public and get download URL
     await fileRef.makePublic();
     const downloadURL = fileRef.publicUrl();
 
-    console.log(`✅ Avatar uploaded for user ${userId}: ${filePath}`);
+    console.log(`✅ Avatar uploaded for user ${userId}: ${downloadURL}`);
 
     res.json({
       success: true,
@@ -1432,7 +1451,8 @@ app.post('/api/avatar/upload', verifyToken, upload.single('avatar'), async (req,
       message: 'Avatar uploaded successfully',
     });
   } catch (error) {
-    console.error('Avatar upload error:', error);
+    console.error('❌ Avatar upload error:', error.message);
+    console.error('Error stack:', error.stack);
     res.status(500).json({
       error: 'Avatar upload failed',
       details: error.message,
