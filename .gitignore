@@ -75,6 +75,10 @@ render.yaml
 # Generated files that shouldn't be committed
 server/package-lock.json
 
+# Test and utility scripts (development only)
+server/test-*.js
+server/upload-*.js
+
 # Local environment files
 .env
 .env.local
