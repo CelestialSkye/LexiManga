@@ -103,6 +103,7 @@
     "nodemon": "^3.1.10",
     "prettier": "^3.4.2",
     "prettier-plugin-tailwindcss": "^0.6.11",
+    "terser": "^5.44.1",
     "vite": "^6.1.0",
     "vite-plugin-singlefile": "^2.1.0",
     "vite-tsconfig-paths": "^5.1.4",

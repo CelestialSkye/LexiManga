@@ -14,6 +14,36 @@ export default defineConfig({
   build: {
     reportCompressedSize: false,
     commonjsOptions: { transformMixedEsModules: true },
+    // Optimize assets
+    assetsInlineLimit: 4096,
+    minify: 'terser',
+    terserOptions: {
+      compress: {
+        drop_console: true,
+      },
+    },
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          // Split vendors into separate chunks for better caching
+          if (id.includes('node_modules/react') && !id.includes('react-router')) {
+            return 'react-vendor';
+          }
+          if (id.includes('node_modules/@mantine/core')) {
+            return 'mantine-core';
+          }
+          if (id.includes('node_modules/@mantine/')) {
+            return 'mantine-extra';
+          }
+          if (id.includes('node_modules/@sentry')) {
+            return 'sentry';
+          }
+          if (id.includes('node_modules/@google')) {
+            return 'google-apis';
+          }
+        },
+      },
+    },
   },
   plugins: [
     tailwindcssPlugin(),

@@ -73,6 +73,7 @@ server/.env.local
 
 # Firebase service account key (contains sensitive credentials)
 serviceAccountKey.json
+server/config/firebase-key.json
 
 # Server middleware (optional - can exclude if keeping private)
 # server/middleware/
