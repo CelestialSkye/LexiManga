@@ -45,29 +45,44 @@ app.use((req, res, next) => {
 });
 
 // ============ SERVE FRONTEND ============
-// Find dist folder - checked on startup
+// Find dist folder
 let distPath = null;
 
-// Log directory info for debugging
-console.log(`📍 __dirname: ${__dirname}`);
-console.log(`📍 process.cwd(): ${process.cwd()}`);
+console.log(`\n📍 Debug Info:`);
+console.log(`   __dirname: ${__dirname}`);
+console.log(`   process.cwd(): ${process.cwd()}`);
 
+// Try to find dist - search multiple locations
 const possiblePaths = [
-  path.join(__dirname, '../dist'), // ../dist from server/
-  path.join(__dirname, '../../dist'), // ../../dist if deeper nesting
-  path.join(process.cwd(), 'dist'), // CWD/dist
-  '/opt/render/project/dist', // Render absolute path
+  path.join(__dirname, '../dist'),
+  path.join(__dirname, '../../dist'),
+  path.resolve(process.cwd(), '../dist'),
+  '/opt/render/project/dist',
 ];
 
-console.log(`🔍 Looking for dist folder...`);
+console.log(`\n🔍 Searching for dist folder...`);
 for (const p of possiblePaths) {
-  const exists = fs.existsSync(p);
-  console.log(`   ${exists ? '✅' : '❌'} ${p}`);
-  if (exists) {
-    distPath = p;
-    console.log(`✅ Using: ${distPath}`);
-    break;
+  try {
+    if (fs.existsSync(p)) {
+      // Check if index.html exists
+      const indexPath = path.join(p, 'index.html');
+      if (fs.existsSync(indexPath)) {
+        distPath = p;
+        console.log(`✅ Found dist: ${p}`);
+        break;
+      }
+    }
+  } catch (e) {
+    console.log(`❌ Error checking ${p}: ${e.message}`);
   }
+}
+
+if (!distPath) {
+  console.error(`\n❌ CRITICAL: dist folder with index.html not found!`);
+  console.error(`   Checked paths:`);
+  possiblePaths.forEach(p => console.error(`   - ${p}`));
+  console.error(`\n⚠️  Frontend will NOT be served!`);
+}
 }
 
 if (!distPath) {
