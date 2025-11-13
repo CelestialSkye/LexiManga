@@ -1,12 +1,9 @@
 import { Button } from '@mantine/core';
 import { IconTrash } from '@tabler/icons-react';
-import { useQuery } from '@tanstack/react-query';
-import { deleteDoc, doc } from 'firebase/firestore';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { db } from 'src/config/firebase';
 import { useAuth } from 'src/context/AuthContext';
-import { getFavoritedManga } from 'src/services/favoriteService';
+import { useFavoritedManga, useToggleFavorite } from 'src/services/favoriteService';
 
 const FavouritesModal = () => {
   const { user } = useAuth();
@@ -14,28 +11,22 @@ const FavouritesModal = () => {
   const navigate = useNavigate();
   const [deletingId, setDeletingId] = useState(null);
   const [deleteError, setDeleteError] = useState(null);
+  const toggleFavoriteMutation = useToggleFavorite();
 
-  const {
-    data: favorites,
-    isLoading,
-    error,
-    refetch,
-  } = useQuery({
-    queryKey: ['favorites', uid],
-    queryFn: () => getFavoritedManga(uid),
-    enabled: !!uid,
-  });
+  const { data: favorites, isLoading, error } = useFavoritedManga(uid);
 
-  const handleRemoveFavorite = async (e, mangaId) => {
+  const handleRemoveFavorite = async (e, mangaId, mangaData) => {
     e.stopPropagation(); // Prevent navigation to manga page
     setDeletingId(mangaId);
     setDeleteError(null);
 
     try {
-      const favoriteRef = doc(db, 'users', uid, 'favorites', String(mangaId));
-      await deleteDoc(favoriteRef);
-      // Refetch favorites list after deletion
-      refetch();
+      // Use the mutation to remove favorite - this will properly invalidate queries
+      await toggleFavoriteMutation.mutateAsync({
+        uid,
+        mangaId,
+        mangaData,
+      });
     } catch (err) {
       console.error('Error removing favorite:', err);
       setDeleteError('Failed to remove favorite. Please try again.');
@@ -74,8 +65,14 @@ const FavouritesModal = () => {
               variant='light'
               color='red'
               size='sm'
-              onClick={(e) => handleRemoveFavorite(e, fav.id)}
-              loading={deletingId === fav.id}
+              onClick={(e) =>
+                handleRemoveFavorite(e, fav.id, {
+                  title: fav.title,
+                  coverImage: { large: fav.coverImage },
+                })
+              }
+              loading={deletingId === fav.id || toggleFavoriteMutation.isPending}
+              disabled={toggleFavoriteMutation.isPending}
               leftSection={<IconTrash size={16} />}
               className='flex-shrink-0'
             >
