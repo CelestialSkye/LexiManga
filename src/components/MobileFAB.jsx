@@ -174,8 +174,6 @@ const MobileFAB = () => {
 
       <motion.button
         onClick={() => setIsExpanded(!isExpanded)}
-        animate={{ rotate: isExpanded ? 90 : 0 }}
-        transition={{ duration: 0.25, ease: 'easeInOut' }}
         className='flex h-16 w-16 items-center justify-center rounded-2xl border border-gray-200 bg-white shadow-lg transition-all duration-200 hover:shadow-xl'
       >
         <IconMenu2 size={32} stroke={2.5} className='text-violet-600' />
