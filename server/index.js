@@ -1058,8 +1058,15 @@ const MONTHLY_MANGA_QUERY = `
     }
 `;
 
-const BROWSE_QUERY = `
-   query ($page: Int, $perPage: Int, $search: String, $sort: [MediaSort]) {
+const BROWSE_QUERY_BASE = `
+   query (
+     $page: Int,
+     $perPage: Int,
+     $search: String,
+     $sort: [MediaSort],
+     $genres: [String],
+     $status: [MediaStatus]
+   ) {
      Page(page: $page, perPage: $perPage) {
        pageInfo {
          total
@@ -1070,7 +1077,9 @@ const BROWSE_QUERY = `
         media(
           type: MANGA,
           search: $search,
-          sort: $sort
+          sort: $sort,
+          genre_in: $genres,
+          status_in: $status
         ) {
            id
            title {
@@ -1205,9 +1214,118 @@ app.get('/api/browse', async (req, res) => {
     // Calculate page from offset
     const page = Math.floor(offset / limit) + 1;
 
-    // Whitelisted sort options
-    const VALID_SORTS = ['TRENDING_DESC', 'SCORE_DESC', 'POPULARITY_DESC', 'UPDATED_TIME_DESC'];
+    // Whitelisted sort options (valid AniList MediaSort values)
+    const VALID_SORTS = [
+      'TRENDING_DESC',
+      'SCORE_DESC',
+      'POPULARITY_DESC',
+      'UPDATED_TIME_DESC',
+      'START_DATE_DESC',
+    ];
     const validatedSort = VALID_SORTS.includes(sort) ? sort : 'TRENDING_DESC';
+
+    // Validate and prepare genres (only include if not empty)
+    const VALID_GENRES = [
+      'Action',
+      'Adventure',
+      'Comedy',
+      'Drama',
+      'Fantasy',
+      'Horror',
+      'Mahou Shoujo',
+      'Mecha',
+      'Music',
+      'Mystery',
+      'Psychological',
+      'Romance',
+      'Sci-Fi',
+      'Slice of Life',
+      'Sports',
+      'Supernatural',
+      'Thriller',
+    ];
+    const validatedGenres = genreArray
+      .filter((g) => VALID_GENRES.includes(g))
+      .filter((g) => g.length > 0); // Remove empty strings
+
+    // Validate status (only include if not empty)
+    const VALID_STATUS = ['RELEASING', 'FINISHED', 'NOT_YET_RELEASED', 'CANCELLED', 'HIATUS'];
+    const validatedStatus = status && VALID_STATUS.includes(status) ? [status] : [];
+
+    // Build media filter dynamically
+    let mediaFilters = `
+       type: MANGA,
+       search: $search,
+       sort: $sort
+     `;
+
+    if (validatedGenres.length > 0) {
+      mediaFilters += `, genre_in: $genres`;
+    }
+    if (validatedStatus.length > 0) {
+      mediaFilters += `, status_in: $status`;
+    }
+
+    // Build query dynamically based on filters
+    let queryVariablesDef = `
+       $page: Int,
+       $perPage: Int,
+       $search: String,
+       $sort: [MediaSort]
+     `;
+
+    if (validatedGenres.length > 0) {
+      queryVariablesDef += `, $genres: [String]`;
+    }
+    if (validatedStatus.length > 0) {
+      queryVariablesDef += `, $status: [MediaStatus]`;
+    }
+
+    const BROWSE_QUERY = `
+       query (${queryVariablesDef}) {
+         Page(page: $page, perPage: $perPage) {
+           pageInfo {
+             total
+             currentPage
+             lastPage
+             hasNextPage
+           }
+           media(${mediaFilters}) {
+             id
+             title {
+               romaji
+               english
+             }
+             coverImage {
+               large
+             }
+             bannerImage
+             averageScore
+             genres
+             status
+             chapters
+             volumes
+             description
+             popularity
+             format
+             source
+             startDate {
+               year
+             }
+             staff(sort: RELEVANCE, perPage: 5) {
+               edges {
+                 role
+                 node {
+                   name {
+                     full
+                   }
+                 }
+               }
+             }
+           }
+         }
+       }
+     `;
 
     const queryVariables = {
       page: Math.max(1, page),
@@ -1215,6 +1333,14 @@ app.get('/api/browse', async (req, res) => {
       search: search || null,
       sort: [validatedSort],
     };
+
+    // Only add genres and status if they have values
+    if (validatedGenres.length > 0) {
+      queryVariables.genres = validatedGenres;
+    }
+    if (validatedStatus.length > 0) {
+      queryVariables.status = validatedStatus;
+    }
 
     console.log('🔍 Browse Query Variables:', JSON.stringify(queryVariables, null, 2));
 

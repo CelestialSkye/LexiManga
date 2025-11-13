@@ -37,7 +37,7 @@ const browseSchema = z
       })
       .optional(),
     status: z
-      .enum(['ONGOING', 'COMPLETED', 'NOT_YET_RELEASED', 'CANCELLED', 'HIATUS'], {
+      .enum(['RELEASING', 'FINISHED', 'NOT_YET_RELEASED', 'CANCELLED', 'HIATUS'], {
         errorMap: () => ({ message: 'Invalid status' }),
       })
       .optional(),

@@ -51,11 +51,10 @@ const BrowseFilters = ({ filters, onFilterChange }) => {
   ];
 
   const sortOptions = [
+    { value: 'TRENDING_DESC', label: 'Trending' },
     { value: 'POPULARITY_DESC', label: 'Most Popular' },
     { value: 'SCORE_DESC', label: 'Highest Rated' },
-    { value: 'TRENDING_DESC', label: 'Trending' },
     { value: 'START_DATE_DESC', label: 'Newest' },
-    { value: 'TITLE_ROMAJI', label: 'A-Z' },
   ];
 
   const statusOptions = [

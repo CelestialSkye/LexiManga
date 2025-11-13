@@ -189,9 +189,9 @@ const TopBar = () => {
                               initial='closed'
                               animate='open'
                               exit='closed'
-                              className='notifications-container pointer-events-auto absolute top-14 right-0 z-50 flex min-w-[300px] flex-col gap-0 overflow-hidden rounded-[16px] shadow-lg'
+                              className='notifications-container pointer-events-auto absolute right-0 z-50 flex min-w-[300px] flex-col gap-0 overflow-hidden rounded-[16px] shadow-lg'
                               style={{
-                                marginTop: '7px',
+                                top: 'calc(100% + 8px)',
                                 backgroundColor: isDarkTopbar ? 'rgba(0, 0, 0, 0.4)' : '#ffffff',
                                 willChange: 'transform, opacity',
                               }}
@@ -364,7 +364,10 @@ const TopBar = () => {
                               initial='closed'
                               animate='open'
                               exit='closed'
-                              className={`dropdown-container absolute top-20 right-0 z-50 flex min-w-[200px] flex-col gap-1 rounded-[16px] ${dropdownBgClass} p-0 shadow-lg`}
+                              className={`dropdown-container absolute right-0 z-50 flex min-w-[200px] flex-col gap-1 rounded-[16px] ${dropdownBgClass} p-0 shadow-lg`}
+                              style={{
+                                top: 'calc(100% + 8px)',
+                              }}
                             >
                               <div
                                 size='sm'
