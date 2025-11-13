@@ -1,4 +1,5 @@
 import viteReactPlugin from '@vitejs/plugin-react';
+import tailwindcss from '@tailwindcss/vite';
 import { defineConfig } from 'vite';
 import { viteSingleFile } from 'vite-plugin-singlefile';
 import viteConfigPaths from 'vite-tsconfig-paths';
@@ -17,6 +18,7 @@ export default defineConfig({
     chunkSizeWarningLimit: 10000,
   },
   plugins: [
+    tailwindcss(),
     viteConfigPaths(),
     viteReactPlugin(),
     // eslint-disable-next-line no-undef
