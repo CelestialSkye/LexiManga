@@ -1446,5 +1446,3 @@ app.listen(PORT, () => {
     '✅ All API routes loaded: /api/search, /api/manga, /api/trending, /api/monthly, /api/suggested, /api/browse, /api/health'
   );
 });
-// Force rebuild
-# Force rebuild
