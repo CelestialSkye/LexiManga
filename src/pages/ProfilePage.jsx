@@ -92,14 +92,14 @@ const ProfilePage = () => {
       {/* page background */}
       <div className='flex-1 rounded-b-[16px] bg-white shadow-sm'>
         {/* banner section */}
-        <div className={`relative w-full bg-white ${isMobile ? 'h-52' : 'h-96'}`}>
+        <div className={`relative w-full bg-white ${isMobile ? 'h-52' : 'h-94'}`}>
           {/* TopBar  */}
           <div className={`${isDesktop ? 'absolute top-0 right-0 left-0 z-10' : ''}`}>
             <TopBar />
           </div>
 
           {/* banner */}
-          <div className='relative mb-6'>
+          <div className={`relative mb-6 ${isMobile ? 'h-52' : 'h-96'} w-full`}>
             <BannerUpload size='lg' />
             {/* black fading effect  */}
             <div className='pointer-events-none absolute top-0 left-0 h-1/3 w-full bg-gradient-to-b from-black/70 to-transparent'></div>
@@ -131,10 +131,16 @@ const ProfilePage = () => {
         </div>
 
         {/* Tab Navigation */}
-        <div className='mt-18 md:mt-18'>
+        <div className='mt-22 md:mt-22'>
           {isDesktop ? (
-            <div className='mr-[calc((100vw-min(80vw,1200px))/2)] ml-[calc((100vw-min(80vw,1200px))/2+192px)] pl-4'>
-              <ScrollButtons items={tabs} activeItem={activeTab} onItemClick={setActiveTab} />
+            <div className='flex items-center'>
+              {/* Buttons directly under cover image */}
+              <div className='ml-[calc((100vw-min(80vw,1200px))/2)]'></div>
+
+              {/* Navbar */}
+              <div className='mr-[calc((100vw-min(80vw,1200px))/2)] flex-1 pl-4'>
+                <ScrollButtons items={tabs} activeItem={activeTab} onItemClick={setActiveTab} />
+              </div>
             </div>
           ) : (
             <div className='w-full px-4'>
@@ -144,78 +150,81 @@ const ProfilePage = () => {
         </div>
       </div>
 
-      <div className='page-container pb-10'>
-        <div className={`relative mt-6 ${isDesktop ? 'flex gap-4' : ''}`}>
-          {isMobile && (
-            <ErrorBoundary FallbackComponent={ErrorFallback} onReset={() => {}}>
-              <ProfileSideScrollinfo />
-            </ErrorBoundary>
-          )}
-          {/* left section  */}
+      <div className='page-container flex flex-1 flex-col'>
+        <div className={`mt-6 flex flex-1 gap-4 ${isDesktop ? 'flex-row' : 'flex-col'}`}>
+          {/* left section */}
           {isDesktop && (
             <div className='w-48 flex-shrink-0'>
-              <div className='sticky top-6 mt-0 rounded-[16px] bg-white p-4 shadow-sm'>
-                <h3 className='mb-3 text-xs font-bold'>Quick Info</h3>
-                <div className='space-y-2'>
+              <div className='mt-0 rounded-[16px] bg-white p-4 shadow-sm'>
+                <h3 className='mb-4 text-sm font-bold text-gray-800'>Quick Info</h3>
+                <div className='space-y-3'>
                   <div>
-                    <span className='text-xs text-gray-600'>Manga Tracking:</span>
-                    <span className='ml-2 text-sm'>{mangaCount ?? 'N/A'}</span>
+                    <span className='text-xs font-medium text-gray-600'>Manga Tracking:</span>
+                    <div className='mt-1 text-xs font-bold'>{mangaCount ?? 'N/A'}</div>
                   </div>
                   <div>
-                    <span className='text-xs text-gray-600'>Words:</span>
-                    <span className='ml-2 text-sm'>{wordCount ?? 'N/A'}</span>
+                    <span className='text-xs font-medium text-gray-600'>Words:</span>
+                    <div className='mt-1 text-xs font-bold'>{wordCount ?? 'N/A'}</div>
                   </div>
                   <div>
-                    <span className='text-xs text-gray-600'>Learned:</span>
-                    <span className='ml-2 text-sm'>{learnedCount ?? 'N/A'}</span>
+                    <span className='text-xs font-medium text-gray-600'>Learned:</span>
+                    <div className='mt-1 text-xs font-bold'>{learnedCount ?? 'N/A'}</div>
                   </div>
                   <div>
-                    <span className='text-xs text-gray-600'>Unknown:</span>
-                    <span className='ml-2 text-sm'>{unknownCount ?? 'N/A'}</span>
+                    <span className='text-xs font-medium text-gray-600'>Unknown:</span>
+                    <div className='mt-1 text-xs font-bold'>{unknownCount ?? 'N/A'}</div>
                   </div>
                   <div>
-                    <span className='text-xs text-gray-600'>Learning:</span>
-                    <span className='ml-2 text-sm'>{learningCount ?? 'N/A'}</span>
+                    <span className='text-xs font-medium text-gray-600'>Learning:</span>
+                    <div className='mt-1 text-xs font-bold'>{learningCount ?? 'N/A'}</div>
                   </div>
                 </div>
               </div>
             </div>
           )}
 
+          {isMobile && (
+            <ErrorBoundary FallbackComponent={ErrorFallback} onReset={() => {}}>
+              <ProfileSideScrollinfo />
+            </ErrorBoundary>
+          )}
+
           {/* main container  */}
-          <div className={`flex-1 ${isDesktop ? 'pl-0' : ''}`}>
-            <div className='mb-4'>
-              {activeTab === 'overview' && <OverviewTab profile={profileData} />}
+          <div className='flex flex-1 flex-col'>
+            <div className='mb-4 flex-1'>
+              <div className='space-y-4'>
+                {activeTab === 'overview' && <OverviewTab profile={profileData} />}
 
-              {activeTab === 'activity' && (
-                <div className='rounded-[16px] bg-white p-4 shadow-md'>
-                  <ActivityTab profile={profileData} />
-                </div>
-              )}
+                {activeTab === 'activity' && (
+                  <div className='rounded-[16px] bg-white p-4 shadow-md'>
+                    <ActivityTab profile={profileData} />
+                  </div>
+                )}
 
-              {activeTab === 'scores' && (
-                <div className='rounded-[16px] bg-white p-4 shadow-md'>
-                  <ScoresTab profile={profileData} />
-                </div>
-              )}
+                {activeTab === 'scores' && (
+                  <div className='rounded-[16px] bg-white p-4 shadow-md'>
+                    <ScoresTab profile={profileData} />
+                  </div>
+                )}
 
-              {activeTab === 'study' && (
-                <div className='rounded-[16px] bg-white p-4 shadow-md'>
-                  <StudyTab profile={profileData} />
-                </div>
-              )}
+                {activeTab === 'study' && (
+                  <div className='rounded-[16px] bg-white p-4 shadow-md'>
+                    <StudyTab profile={profileData} />
+                  </div>
+                )}
 
-              {activeTab === 'vocabulary' && (
-                <div className='rounded-[16px] bg-white p-4 shadow-md'>
-                  <VocabularyTab profile={profileData} />
-                </div>
-              )}
+                {activeTab === 'vocabulary' && (
+                  <div className='rounded-[16px] bg-white p-4 shadow-md'>
+                    <VocabularyTab profile={profileData} />
+                  </div>
+                )}
 
-              {activeTab === 'favourites' && (
-                <div className='rounded-[16px] bg-white p-4 shadow-md'>
-                  <ProfileTab profile={profileData} />
-                </div>
-              )}
+                {activeTab === 'favourites' && (
+                  <div className='rounded-[16px] bg-white p-4 shadow-md'>
+                    <ProfileTab profile={profileData} />
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </div>
