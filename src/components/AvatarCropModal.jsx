@@ -1,6 +1,6 @@
 import { Button, Group, Modal, Stack, Text } from '@mantine/core';
-import Cropper from 'react-easy-crop';
 import { useCallback, useState } from 'react';
+import Cropper from 'react-easy-crop';
 
 const AvatarCropModal = ({ opened, onClose, imageSrc, onCropComplete }) => {
   const [crop, setCrop] = useState({ x: 0, y: 0 });
@@ -47,13 +47,17 @@ const AvatarCropModal = ({ opened, onClose, imageSrc, onCropComplete }) => {
           croppedAreaPixels.height
         );
 
-        canvas.toBlob((blob) => {
-          onCropComplete(blob);
-          onClose();
-          setIsProcessing(false);
-          setCrop({ x: 0, y: 0 });
-          setZoom(1);
-        }, 'image/jpeg', 0.95);
+        canvas.toBlob(
+          (blob) => {
+            onCropComplete(blob);
+            onClose();
+            setIsProcessing(false);
+            setCrop({ x: 0, y: 0 });
+            setZoom(1);
+          },
+          'image/jpeg',
+          0.95
+        );
       };
     } catch (error) {
       console.error('Error cropping image:', error);
@@ -62,19 +66,21 @@ const AvatarCropModal = ({ opened, onClose, imageSrc, onCropComplete }) => {
   };
 
   return (
-    <Modal opened={opened} onClose={onClose} title="Crop Avatar" centered size="lg">
-      <Stack gap="md">
-        <Text size="sm" c="dimmed">
+    <Modal opened={opened} onClose={onClose} title='Crop Avatar' centered size='lg'>
+      <Stack gap='md'>
+        <Text size='sm' c='dimmed'>
           Drag to move • Scroll to zoom • Select the area you want for your avatar
         </Text>
 
-        <div style={{ position: 'relative', width: '100%', height: 300, backgroundColor: '#f0f0f0' }}>
+        <div
+          style={{ position: 'relative', width: '100%', height: 300, backgroundColor: '#f0f0f0' }}
+        >
           <Cropper
             image={imageSrc}
             crop={crop}
             zoom={zoom}
             aspect={1} // Square aspect ratio for avatar
-            cropShape="rect"
+            cropShape='rect'
             showGrid={true}
             onCropChange={handleCropChange}
             onCropComplete={handleCropComplete}
@@ -84,11 +90,11 @@ const AvatarCropModal = ({ opened, onClose, imageSrc, onCropComplete }) => {
         </div>
 
         <div>
-          <Text size="xs" fw={500} mb="xs">
+          <Text size='xs' fw={500} mb='xs'>
             Zoom: {(zoom * 100).toFixed(0)}%
           </Text>
           <input
-            type="range"
+            type='range'
             min={1}
             max={3}
             step={0.1}
@@ -98,11 +104,11 @@ const AvatarCropModal = ({ opened, onClose, imageSrc, onCropComplete }) => {
           />
         </div>
 
-        <Group justify="flex-end">
-          <Button variant="outline" onClick={onClose} disabled={isProcessing}>
+        <Group justify='flex-end'>
+          <Button variant='outline' onClick={onClose} disabled={isProcessing}>
             Cancel
           </Button>
-          <Button onClick={handleSaveCrop} loading={isProcessing} color="violet">
+          <Button onClick={handleSaveCrop} loading={isProcessing} color='violet'>
             Crop & Save
           </Button>
         </Group>

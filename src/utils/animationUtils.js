@@ -1,5 +1,3 @@
-import { motion } from 'framer-motion';
-
 /**
  * Dropdown animation variants for Framer Motion
  * Provides smooth, reusable animations for dropdown menus

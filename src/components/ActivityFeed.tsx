@@ -4,7 +4,7 @@ import { db } from '../config/firebase';
 import { collection, query, orderBy, onSnapshot, limit } from 'firebase/firestore';
 import { getMangaDetails } from 'src/services/anilistApi';
 
-interface Activity {
+type Activity = {
   id: string;
   type: string;
   userId: string;
@@ -19,7 +19,7 @@ interface Activity {
   changes?: Record<string, { from: any; to: any }>;
   timestamp?: { seconds: number; nanoseconds: number } | null;
   [key: string]: any;
-}
+};
 
 const formatTimestamp = (timestamp: Activity['timestamp']): string => {
   if (!timestamp?.seconds) return 'Just now';

@@ -9,8 +9,6 @@ const ActionButton = ({
   size = 'xl',
   onClick,
   className = '',
-  iconSize = 18,
-  iconStroke = 2,
   iconContainerSize = 'w-5 h-5',
   buttonPadding = 'px-12 py-4',
   buttonShadow = 'shadow-lg',
@@ -21,7 +19,6 @@ const ActionButton = ({
   animationDuration = 0.15,
   disabled = false,
   loading = false,
-  buttonRounded = false,
   ...props
 }) => {
   return (

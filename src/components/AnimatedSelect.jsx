@@ -1,8 +1,7 @@
-import { Group, Text, TextInput } from '@mantine/core';
+import { Group, TextInput } from '@mantine/core';
 import { IconChevronDown, IconX } from '@tabler/icons-react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useEffect, useRef, useState } from 'react';
-import { dropdownCloseVariants } from 'src/utils/animationUtils';
 
 const dropdownVariants = {
   open: {

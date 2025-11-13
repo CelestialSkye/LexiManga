@@ -1,5 +1,5 @@
+import { Collapse, Divider, Paper, Text, Title } from '@mantine/core';
 import { useState } from 'react';
-import { Collapse, Paper, Text, Title, Divider } from '@mantine/core';
 
 const FAQSection = () => {
   const [openedIndex, setOpenedIndex] = useState(null);

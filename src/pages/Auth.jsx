@@ -1,18 +1,18 @@
 import {
   Alert,
   Button,
+  Group,
   PasswordInput,
+  Popover,
   Text,
   TextInput,
   Tooltip,
-  Group,
-  Popover,
 } from '@mantine/core';
-import { IconInfoCircle } from '@tabler/icons-react';
-import { useState as useStateComponent } from 'react';
 import { useMediaQuery } from '@mantine/hooks';
 import { modals } from '@mantine/modals';
+import { IconInfoCircle } from '@tabler/icons-react';
 import { getAuth, sendPasswordResetEmail } from 'firebase/auth';
+import { useState as useStateComponent } from 'react';
 import { useEffect, useState } from 'react';
 import { useGoogleReCaptcha } from 'react-google-recaptcha-v3';
 import { useNavigate } from 'react-router-dom';

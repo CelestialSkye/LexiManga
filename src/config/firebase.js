@@ -1,9 +1,9 @@
 import { getAnalytics, isSupported } from 'firebase/analytics';
 import { initializeApp } from 'firebase/app';
+import { setLogLevel } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
 import { getStorage } from 'firebase/storage';
-import { setLogLevel } from 'firebase/app';
 
 // Suppress Firebase SDK verbose logging
 setLogLevel('error');

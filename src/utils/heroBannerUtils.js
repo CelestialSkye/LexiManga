@@ -92,7 +92,7 @@ export const getDynamicPosition = (imageIndex, screenWidth) => {
 };
 
 // Function to calculate circular animation starting positions
-export const getAnimationStartPosition = (finalPosition, screenWidth) => {
+export const getAnimationStartPosition = (finalPosition) => {
   const { scaling } = HERO_BANNER_CONFIG;
 
   // Calculate the angle from center to the final position

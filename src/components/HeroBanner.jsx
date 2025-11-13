@@ -208,27 +208,26 @@ const HeroBanner = () => {
           {paragraph}
         </motion.p>
 
-       <motion.button
-  onClick={() => navigate('/home')}
-  className="mt-6 rounded-full bg-violet-600 px-6 py-2 text-sm font-semibold text-white shadow-md transition-all duration-300 hover:bg-violet-700 hover:shadow-lg active:scale-95"
-  initial={{ opacity: 0, y: 15 }}
-  animate={{ opacity: 1, y: 0 }}
-  transition={{
-    duration: 1.2,
-    ease: [0.22, 1, 0.36, 1],
-    delay:
-      (animationConfig.textDelay +
-        animationConfig.wordDelay * (title.line1.length + title.line2.length) +
-        animationConfig.paragraphDelay +
-        200) /
-      1000,
-  }}
-  whileHover={{ scale: 1.05 }}
-  whileTap={{ scale: 0.95 }}
->
-  Get Started
-  </motion.button>
-
+        <motion.button
+          onClick={() => navigate('/home')}
+          className='mt-6 rounded-full bg-violet-600 px-6 py-2 text-sm font-semibold text-white shadow-md transition-all duration-300 hover:bg-violet-700 hover:shadow-lg active:scale-95'
+          initial={{ opacity: 0, y: 15 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{
+            duration: 1.2,
+            ease: [0.22, 1, 0.36, 1],
+            delay:
+              (animationConfig.textDelay +
+                animationConfig.wordDelay * (title.line1.length + title.line2.length) +
+                animationConfig.paragraphDelay +
+                200) /
+              1000,
+          }}
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+        >
+          Get Started
+        </motion.button>
       </motion.div>
     </div>
   );

@@ -1,8 +1,8 @@
 import { MantineProvider } from '@mantine/core';
 import { ModalsProvider } from '@mantine/modals';
+import { useEffect } from 'react';
 import { GoogleReCaptchaProvider } from 'react-google-recaptcha-v3';
 import { BrowserRouter, Route, Routes, useLocation } from 'react-router-dom';
-import { useEffect } from 'react';
 
 import Footer from './components/Footer';
 import { AuthProvider } from './context/AuthContext';

@@ -1,8 +1,17 @@
-import { ActionIcon, Group, Modal, Radio, Select, Stack, Textarea } from '@mantine/core';
-import { Button, NumberInput, Text, TextInput } from '@mantine/core';
+import {
+  ActionIcon,
+  Button,
+  Group,
+  Modal,
+  NumberInput,
+  Radio,
+  Select,
+  Stack,
+  Textarea,
+  TextInput,
+} from '@mantine/core';
 import { IconLanguage } from '@tabler/icons-react';
 import { useState } from 'react';
-import { useWordDifficulty } from 'src/services/wordDifficultyService';
 
 import { useAuth } from '../context/AuthContext';
 import { translateWithGemini } from '../services/geminiApi';

@@ -11,7 +11,7 @@ const PASSWORD_REQUIREMENTS = {
   requireSpecialChar: true,
 };
 
-const SPECIAL_CHAR_REGEX = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/;
+const SPECIAL_CHAR_REGEX = /[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]/;
 
 /**
  * Validate password strength

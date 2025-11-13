@@ -25,7 +25,7 @@ describe('API Service', () => {
 
     it('should sanitize search input', () => {
       const sanitizeQuery = (query) => {
-        return query.trim().replace(/[<>\"\']/g, '');
+        return query.trim().replace(/[<>"']/g, '');
       };
 
       expect(sanitizeQuery('  anime  ')).toBe('anime');

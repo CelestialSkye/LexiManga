@@ -1,5 +1,6 @@
 import HeroBanner from '@components/HeroBanner';
 import Benefits from '@components/LandingPage/Benefits';
+import FAQSection from '@components/LandingPage/FAQSection';
 import HeroBannerMobile from '@components/LandingPage/HeroBanner';
 import HowItWorks from '@components/LandingPage/HowItWorks';
 import NavBar from '@components/LandingPage/NavBar';
@@ -12,7 +13,6 @@ import screenshot from '../assets/landing/screenshot1.png';
 import { ActionButton } from '../components';
 import { useAuth } from '../context/AuthContext';
 import { useResponsive } from '../hooks/useResponsive';
-import FAQSection from '@components/LandingPage/FAQSection';
 
 const LandingPage = () => {
   const navigate = useNavigate();
