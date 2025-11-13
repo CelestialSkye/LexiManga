@@ -12,6 +12,7 @@ import screenshot from '../assets/landing/screenshot1.png';
 import { ActionButton } from '../components';
 import { useAuth } from '../context/AuthContext';
 import { useResponsive } from '../hooks/useResponsive';
+import FAQSection from '@components/LandingPage/FAQSection';
 
 const LandingPage = () => {
   const navigate = useNavigate();
@@ -55,6 +56,7 @@ const LandingPage = () => {
         </div>
       </section>
       <HowItWorks />
+      <FAQSection />
       <section className='mx-auto mb-[150px] max-w-[95%] px-4 py-12 sm:px-6 md:max-w-[85%] md:px-8'>
         <div className='relative'>
           {/* Background Image */}
