@@ -15,7 +15,7 @@ function ProfileSideScrollinfo() {
               Manga Tracking
             </Text>
             <Text size='sm' fw={700} c='dark' className='font-bold whitespace-nowrap'>
-              {mangaCount ?? 'N/A'}
+              {mangaCount ?? 0}
             </Text>
           </div>
 
@@ -25,7 +25,7 @@ function ProfileSideScrollinfo() {
               Words
             </Text>
             <Text size='sm' fw={700} c='dark' className='font-bold whitespace-nowrap'>
-              {wordCount ?? 'N/A'}
+              {wordCount ?? 0}
             </Text>
           </div>
 
@@ -35,7 +35,7 @@ function ProfileSideScrollinfo() {
               Learned Words
             </Text>
             <Text size='sm' fw={700} c='dark' className='font-bold whitespace-nowrap'>
-              {learnedCount ?? 'N/A'}
+              {learnedCount ?? 0}
             </Text>
           </div>
 
@@ -45,7 +45,7 @@ function ProfileSideScrollinfo() {
               Unknown Words
             </Text>
             <Text size='sm' fw={700} c='dark' className='font-bold whitespace-nowrap'>
-              {unknownCount || 'N/A'}
+              {unknownCount || 0}
             </Text>
           </div>
 
@@ -55,7 +55,7 @@ function ProfileSideScrollinfo() {
               Learning
             </Text>
             <Text size='sm' fw={700} c='dark' className='font-bold whitespace-nowrap'>
-              {learningCount || 'N/A'}
+              {learningCount || 0}
             </Text>
           </div>
         </Box>
