@@ -5,7 +5,6 @@ require('dotenv').config({ path: path.resolve(__dirname, '../.env') });
 const express = require('express');
 const NodeCache = require('node-cache');
 const axios = require('axios');
-const multer = require('multer');
 const cacheManager = require('./cache-manager');
 
 // Initialize Firebase Admin
@@ -1355,107 +1354,6 @@ app.post('/api/auth/register', async (req, res) => {
     console.error('Registration error:', error);
     res.status(500).json({
       message: 'Registration verification failed. Please try again.',
-    });
-  }
-});
-
-// ============ AVATAR UPLOAD ENDPOINT ============
-// Upload avatar through backend to Firebase Storage (bypasses CORS issues)
-const upload = multer({
-  storage: multer.memoryStorage(),
-  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB limit
-  fileFilter: (req, file, cb) => {
-    const allowedMimes = ['image/jpeg', 'image/png'];
-    if (allowedMimes.includes(file.mimetype)) {
-      cb(null, true);
-    } else {
-      cb(new Error('Only JPEG and PNG files are allowed'), false);
-    }
-  },
-});
-
-app.post('/api/avatar/upload', verifyToken, upload.single('avatar'), async (req, res) => {
-  try {
-    if (!req.file) {
-      return res.status(400).json({ error: 'No file provided' });
-    }
-
-    const userId = req.userId; // From verified token
-    const file = req.file;
-
-    console.log(
-      `📥 Avatar upload started for user ${userId}, file: ${file.originalname}, size: ${file.size}`
-    );
-
-    // Validate file size (double-check on server)
-    if (file.size > 5 * 1024 * 1024) {
-      return res.status(400).json({ error: 'File size exceeds 5MB limit' });
-    }
-
-    // Validate file type by magic bytes (more secure)
-    const magicBytes = file.buffer.slice(0, 4);
-    const isJpeg = magicBytes[0] === 0xff && magicBytes[1] === 0xd8 && magicBytes[2] === 0xff;
-    const isPng =
-      magicBytes[0] === 0x89 &&
-      magicBytes[1] === 0x50 &&
-      magicBytes[2] === 0x4e &&
-      magicBytes[3] === 0x47;
-
-    if (!isJpeg && !isPng) {
-      return res.status(400).json({ error: 'Invalid file type - only JPEG and PNG allowed' });
-    }
-
-    console.log(`✓ File validation passed`);
-
-    // Check if Firebase Admin is initialized
-    if (!admin.apps.length) {
-      console.error('❌ Firebase Admin not initialized - cannot upload to Storage');
-      return res.status(500).json({
-        error: 'Server configuration error',
-        details: 'Firebase Admin SDK not initialized. Please configure Firebase credentials.',
-      });
-    }
-
-    // Upload to Firebase Storage
-    const bucket = admin.storage().bucket();
-    const timestamp = Date.now();
-    const filename = `${userId}_${timestamp}_${file.originalname.replace(/\s+/g, '_')}`;
-    const filePath = `avatars/${userId}/${filename}`;
-
-    console.log(`📤 Uploading to Firebase Storage: ${filePath}`);
-
-    const fileRef = bucket.file(filePath);
-
-    // Upload file with metadata
-    await fileRef.save(file.buffer, {
-      metadata: {
-        contentType: file.mimetype,
-        metadata: {
-          uploadedBy: userId,
-          uploadedAt: new Date().toISOString(),
-        },
-      },
-    });
-
-    console.log(`✓ File saved to Firebase Storage`);
-
-    // Make file public and get download URL
-    await fileRef.makePublic();
-    const downloadURL = fileRef.publicUrl();
-
-    console.log(`✅ Avatar uploaded for user ${userId}: ${downloadURL}`);
-
-    res.json({
-      success: true,
-      downloadURL,
-      message: 'Avatar uploaded successfully',
-    });
-  } catch (error) {
-    console.error('❌ Avatar upload error:', error.message);
-    console.error('Error stack:', error.stack);
-    res.status(500).json({
-      error: 'Avatar upload failed',
-      details: error.message,
     });
   }
 });
