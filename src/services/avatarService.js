@@ -1,19 +1,18 @@
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
-import { deleteObject, getDownloadURL, ref, uploadBytes } from 'firebase/storage';
+import { deleteObject, ref } from 'firebase/storage';
 
 import { storage } from '../config/firebase';
 import { db } from '../config/firebase';
 
-const AVATAR_FOLDER = 'avatars';
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:10000';
 const MAX_FILE_SIZE = 5 * 1024 * 1024;
 const ALLOWED_FILE_TYPES = ['image/jpeg', 'image/png'];
 
-// Magic bytes for file type validation
+// Magic bytes for file type validation (client-side, for UX feedback)
 const MAGIC_BYTES = {
   'image/jpeg': [0xff, 0xd8, 0xff],
   'image/png': [0x89, 0x50, 0x4e, 0x47],
 };
-
 
 const validateMagicBytes = async (file) => {
   return new Promise((resolve, reject) => {
@@ -44,8 +43,9 @@ const validateMagicBytes = async (file) => {
 
 export const avatarService = {
   /**
-   * Uploads avatar to Firebase Storage (not Firestore)
-   * Uses magic byte validation to prevent malicious files
+   * Uploads avatar through backend to Firebase Storage
+   * Backend handles the actual upload to avoid CORS issues
+   * Uses magic byte validation on both client and server
    */
   async uploadAvatar(uid, file) {
     if (!file) {
@@ -61,27 +61,43 @@ export const avatarService = {
     }
 
     try {
-      // Validate magic bytes to ensure file type is legitimate
+      // Validate magic bytes on client-side first (UX feedback)
       await validateMagicBytes(file);
 
-      // Upload to Firebase Storage with user isolation
-      const timestamp = Date.now();
-      const filename = `${uid}_${timestamp}_${file.name.replace(/\s+/g, '_')}`;
-      const storageRef = ref(storage, `${AVATAR_FOLDER}/${uid}/${filename}`);
+      // Upload through backend endpoint
+      const formData = new FormData();
+      formData.append('avatar', file);
 
-      const snapshot = await uploadBytes(storageRef, file, {
-        contentType: file.type,
-        customMetadata: {
-          uploadedBy: uid,
-          uploadedAt: new Date().toISOString(),
+      const response = await fetch(`${BACKEND_URL}/api/avatar/upload`, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${await this.getAuthToken()}`,
         },
+        body: formData,
       });
 
-      const downloadURL = await getDownloadURL(snapshot.ref);
-      return downloadURL;
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Avatar upload failed');
+      }
+
+      const data = await response.json();
+      return data.downloadURL;
     } catch (error) {
       throw new Error(`Avatar upload failed: ${error.message}`);
     }
+  },
+
+  /**
+   * Get current auth token from Firebase
+   */
+  async getAuthToken() {
+    const auth = (await import('../config/firebase')).auth;
+    const user = auth.currentUser;
+    if (!user) {
+      throw new Error('User not authenticated');
+    }
+    return user.getIdToken();
   },
 
   /**
