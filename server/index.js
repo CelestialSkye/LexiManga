@@ -109,7 +109,23 @@ if (!distPath) {
 // Serve static assets using express.static
 // This handles CSS, JS, images, etc. from the dist folder
 if (distPath) {
-  app.use(express.static(distPath, { index: false }));
+  console.log(`📦 Serving static files from: ${distPath}`);
+
+  // List what's in the dist folder
+  try {
+    const distContents = fs.readdirSync(distPath);
+    console.log(`📂 Contents of dist: ${distContents.join(', ')}`);
+  } catch (e) {
+    console.error(`❌ Can't read dist folder: ${e.message}`);
+  }
+
+  app.use(
+    express.static(distPath, {
+      index: false,
+      maxAge: '1d',
+      etag: false,
+    })
+  );
 }
 
 const cache = new NodeCache({ stdTTL: 3600 });
