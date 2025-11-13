@@ -54,10 +54,11 @@ const LanguageTab = () => {
             <LanguageSelect value={language} onChange={handleLanguageChange} required />
           </div>
 
-          <div className='rounded-lg border border-violet-200 bg-violet-50 p-4'>
-            <p className='text-sm text-blue-900'>
-              <span className='font-semibold'>Note:</span> Changing your target language will reset
-              all your current vocabulary words. This action cannot be undone.
+          <div className='rounded-lg border border-red-300 bg-red-50 p-4'>
+            <p className='text-sm text-red-900'>
+              <span className='font-semibold'>⚠️ Important:</span> Changing your target language
+              will reset all your current vocabulary words. This action cannot be undone. Don't
+              forget to archive your words collection from settings before changing languages!
             </p>
           </div>
 
