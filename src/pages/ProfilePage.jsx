@@ -144,7 +144,7 @@ const ProfilePage = () => {
         </div>
       </div>
 
-      <div className='page-container pb-6'>
+      <div className='page-container pb-10'>
         <div className={`relative mt-6 ${isDesktop ? 'flex gap-4' : ''}`}>
           {isMobile && (
             <ErrorBoundary FallbackComponent={ErrorFallback} onReset={() => {}}>
