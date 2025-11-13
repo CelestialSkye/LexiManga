@@ -6,6 +6,7 @@ const express = require('express');
 const NodeCache = require('node-cache');
 const axios = require('axios');
 const cors = require('cors');
+const multer = require('multer');
 const cacheManager = require('./cache-manager');
 
 // Initialize Firebase Admin
@@ -1349,6 +1350,96 @@ app.post('/api/auth/register', async (req, res) => {
     console.error('Registration error:', error);
     res.status(500).json({
       message: 'Registration verification failed. Please try again.',
+    });
+  }
+});
+
+// ============ AVATAR UPLOAD ENDPOINT ============
+// Configure multer for file uploads
+const upload = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB
+  fileFilter: (req, file, cb) => {
+    if (['image/jpeg', 'image/png'].includes(file.mimetype)) {
+      cb(null, true);
+    } else {
+      cb(new Error('Only JPEG and PNG allowed'), false);
+    }
+  },
+});
+
+app.post('/api/avatar/upload', verifyToken, upload.single('avatar'), async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ error: 'No file provided' });
+    }
+
+    const userId = req.userId;
+    const file = req.file;
+
+    // Validate file size
+    if (file.size > 5 * 1024 * 1024) {
+      return res.status(400).json({ error: 'File size exceeds 5MB' });
+    }
+
+    // Validate magic bytes
+    const buf = file.buffer.slice(0, 4);
+    const isJpeg = buf[0] === 0xff && buf[1] === 0xd8 && buf[2] === 0xff;
+    const isPng = buf[0] === 0x89 && buf[1] === 0x50 && buf[2] === 0x4e && buf[3] === 0x47;
+
+    if (!isJpeg && !isPng) {
+      return res.status(400).json({ error: 'Invalid file type' });
+    }
+
+    console.log(`📥 Avatar upload for user ${userId}`);
+
+    // Check if Firebase Admin is available
+    if (!admin.apps.length) {
+      return res.status(500).json({
+        error: 'Firebase not configured',
+        details: 'Avatar upload requires Firebase Admin SDK',
+      });
+    }
+
+    try {
+      // Upload to Firebase Storage
+      const bucket = admin.storage().bucket();
+      const timestamp = Date.now();
+      const filename = `${userId}_${timestamp}_${file.originalname.replace(/\s+/g, '_')}`;
+      const filePath = `avatars/${userId}/${filename}`;
+
+      const fileRef = bucket.file(filePath);
+
+      await fileRef.save(file.buffer, {
+        metadata: {
+          contentType: file.mimetype,
+          metadata: {
+            uploadedBy: userId,
+            uploadedAt: new Date().toISOString(),
+          },
+        },
+      });
+
+      // Make file public
+      await fileRef.makePublic();
+      const downloadURL = fileRef.publicUrl();
+
+      console.log(`✅ Avatar uploaded: ${downloadURL}`);
+
+      res.json({
+        success: true,
+        downloadURL,
+        message: 'Avatar uploaded successfully',
+      });
+    } catch (fbError) {
+      console.error('Firebase Storage error:', fbError.message);
+      throw fbError;
+    }
+  } catch (error) {
+    console.error('❌ Avatar upload error:', error.message);
+    res.status(500).json({
+      error: 'Avatar upload failed',
+      details: error.message,
     });
   }
 });
