@@ -100,35 +100,38 @@ const MobileFAB = () => {
     visible: {
       opacity: 1,
       transition: {
-        staggerChildren: 0.03,
-        delayChildren: 0.05,
+        duration: 0.2,
+        ease: 'easeInOut',
       },
     },
     exit: {
       opacity: 0,
       transition: {
-        staggerChildren: 0.02,
-        staggerDirection: -1,
+        duration: 0.15,
+        ease: 'easeInOut',
       },
     },
   };
 
   const itemVariants = {
-    hidden: { opacity: 0, scale: 0.8, y: 5 },
+    hidden: { opacity: 0, scale: 0.95, y: 8 },
     visible: {
       opacity: 1,
       scale: 1,
       y: 0,
       transition: {
-        type: 'spring',
-        stiffness: 200,
-        damping: 15,
+        duration: 0.25,
+        ease: 'easeOut',
       },
     },
     exit: {
       opacity: 0,
-      scale: 0.8,
-      y: 5,
+      scale: 0.95,
+      y: 8,
+      transition: {
+        duration: 0.15,
+        ease: 'easeIn',
+      },
     },
   };
 
@@ -172,6 +175,8 @@ const MobileFAB = () => {
 
       <motion.button
         onClick={() => setIsExpanded(!isExpanded)}
+        animate={{ rotate: isExpanded ? 90 : 0 }}
+        transition={{ duration: 0.25, ease: 'easeInOut' }}
         className='flex h-16 w-16 items-center justify-center rounded-2xl border border-gray-200 bg-white shadow-lg transition-all duration-200 hover:shadow-xl'
       >
         <IconMenu2 size={32} stroke={2.5} className='text-violet-600' />
