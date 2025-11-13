@@ -137,6 +137,27 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  //Update Language
+  const updateLanguage = async (newTargetLang) => {
+    try {
+      if (!user) throw new Error('User not found');
+
+      // Update local profile state immediately
+      setProfile((prev) => ({ ...prev, targetLang: newTargetLang }));
+
+      // Fetch fresh profile from database to ensure consistency
+      const docSnap = await getDoc(doc(db, 'users', user.uid));
+      if (docSnap.exists()) {
+        setProfile(docSnap.data());
+      }
+
+      return true;
+    } catch (error) {
+      console.warn('Language update failed');
+      throw error;
+    }
+  };
+
   //Keep track of user state
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
@@ -178,6 +199,7 @@ export const AuthProvider = ({ children }) => {
     deleteAvatar,
     updateBanner,
     deleteBanner,
+    updateLanguage,
   };
 
   return <AuthContext.Provider value={value}>{!loading && children}</AuthContext.Provider>;

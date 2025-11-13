@@ -4,7 +4,7 @@ import { useAuth } from 'src/context/AuthContext';
 import { authService } from 'src/services';
 
 const LanguageTab = () => {
-  const { user } = useAuth();
+  const { user, updateLanguage } = useAuth();
   const [language, setLanguage] = useState('');
   const [isSaving, setIsSaving] = useState(false);
   const [message, setMessage] = useState('');
@@ -25,6 +25,8 @@ const LanguageTab = () => {
 
     try {
       await authService.changeLanguageAndResetWords(user.uid, language);
+      // Update the language in the auth context immediately
+      await updateLanguage(language);
       setMessage(`Success: Language changed to ${language}. Your vocabulary has been reset.`);
       setLanguage('');
     } catch (error) {
