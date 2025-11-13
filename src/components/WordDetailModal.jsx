@@ -130,19 +130,32 @@ const WordDetailModal = ({ opened, onClose, word, onEdit, onDelete }) => {
       return; // Don't save if translation is empty
     }
 
+    // Check if anything actually changed
+    const hasChanges =
+      word.word !== editData.word ||
+      word.translation !== editData.translation ||
+      word.context !== editData.context ||
+      word.chapter !== editData.chapter ||
+      word.page !== editData.page ||
+      word.status !== editData.status;
+
+    // Don't save if nothing changed
+    if (!hasChanges) {
+      setIsEditing(false);
+      return;
+    }
+
     try {
       const updatedWordData = {
         ...word,
         ...editData,
       };
-      console.log('Updating word:', updatedWordData);
       await updateWordMutation.mutateAsync({
         uid: user.uid,
         mangaId: word.mangaId,
         wordId: word.id,
         wordData: updatedWordData,
       });
-      console.log('Word updated successfully');
       setIsEditing(false);
       onClose();
       onEdit?.(updatedWordData);

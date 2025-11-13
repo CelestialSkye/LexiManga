@@ -107,35 +107,38 @@ export const useUpdateVocabWord = () => {
           }
         });
 
-        let coverImage = null;
-        try {
-          const mangaDetails = await getMangaDetails(mangaId);
-          coverImage =
-            mangaDetails?.data?.Media?.coverImage?.large ??
-            mangaDetails?.data?.Media?.coverImage?.medium ??
-            null;
-        } catch (err) {
-          console.warn('Failed to fetch cover image:', err);
+        // Only log activity if there are actual changes
+        if (Object.keys(changes).length > 0) {
+          let coverImage = null;
+          try {
+            const mangaDetails = await getMangaDetails(mangaId);
+            coverImage =
+              mangaDetails?.data?.Media?.coverImage?.large ??
+              mangaDetails?.data?.Media?.coverImage?.medium ??
+              null;
+          } catch (err) {
+            console.warn('Failed to fetch cover image:', err);
+          }
+
+          // Extract manga title - handle both string and object formats
+          const mangaTitleForUpdateLog =
+            typeof newData.mangaTitle === 'string'
+              ? newData.mangaTitle
+              : newData.mangaTitle?.english ||
+                newData.mangaTitle?.romaji ||
+                newData.mangaTitle?.native ||
+                'Unknown';
+
+          await logActivity('word_update', {
+            word: newData.word,
+            mangaTitle: mangaTitleForUpdateLog,
+            mangaId,
+            wordId,
+            changes,
+            newStatus: newData.status,
+            coverImage,
+          });
         }
-
-        // Extract manga title - handle both string and object formats
-        const mangaTitleForUpdateLog =
-          typeof newData.mangaTitle === 'string'
-            ? newData.mangaTitle
-            : newData.mangaTitle?.english ||
-              newData.mangaTitle?.romaji ||
-              newData.mangaTitle?.native ||
-              'Unknown';
-
-        await logActivity('word_update', {
-          word: newData.word,
-          mangaTitle: mangaTitleForUpdateLog,
-          mangaId,
-          wordId,
-          changes,
-          newStatus: newData.status,
-          coverImage,
-        });
       }
 
       queryClient.invalidateQueries({ queryKey: ['vocabWord', uid, mangaId, wordId] });
