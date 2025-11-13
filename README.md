@@ -11,9 +11,8 @@
 
 LexiManga is a web-based vocabulary tracking and learning application designed for manga and anime enthusiasts who want to improve their language skills. Track your reading progress across 14 languages, capture vocabulary with context, and leverage AI-powered translations while building a personalized word bank.
 
--- This feature is disabled for now
+-- This project was created purely for fun, learning, and to showcase my portfolio work. It’s completely non-commercial — no ads, no monetization, and no profit intended.
 
----
 
 ## 📋 Table of Contents
 
