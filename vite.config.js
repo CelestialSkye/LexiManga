@@ -1,4 +1,3 @@
-import tailwindcssPlugin from '@tailwindcss/vite';
 import viteReactPlugin from '@vitejs/plugin-react';
 import { defineConfig } from 'vite';
 import { viteSingleFile } from 'vite-plugin-singlefile';
@@ -14,11 +13,10 @@ export default defineConfig({
   build: {
     reportCompressedSize: false,
     commonjsOptions: { transformMixedEsModules: true },
-    // Disable minification for faster builds
     minify: false,
+    chunkSizeWarningLimit: 10000,
   },
   plugins: [
-    tailwindcssPlugin(),
     viteConfigPaths(),
     viteReactPlugin(),
     // eslint-disable-next-line no-undef
