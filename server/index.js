@@ -5,6 +5,7 @@ require('dotenv').config({ path: path.resolve(__dirname, '../.env') });
 const express = require('express');
 const NodeCache = require('node-cache');
 const axios = require('axios');
+const cors = require('cors');
 const cacheManager = require('./cache-manager');
 
 // Initialize Firebase Admin
@@ -30,22 +31,16 @@ const app = express();
 const PORT = process.env.PORT || 10000;
 
 // ============ MIDDLEWARE ============
-// Enable CORS FIRST - before all other middleware
-app.use((req, res, next) => {
-  const origin = req.headers.origin;
-
-  // Allow all origins for API requests
-  res.header('Access-Control-Allow-Origin', '*');
-  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS, PATCH');
-  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With');
-  res.header('Access-Control-Max-Age', '86400');
-  res.header('Access-Control-Allow-Credentials', 'true');
-
-  if (req.method === 'OPTIONS') {
-    return res.sendStatus(200);
-  }
-  next();
-});
+// Enable CORS with proper configuration
+app.use(
+  cors({
+    origin: '*',
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+    credentials: false,
+    maxAge: 86400,
+  })
+);
 
 app.use(express.json());
 
