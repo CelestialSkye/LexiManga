@@ -2,30 +2,18 @@ import { MantineProvider } from '@mantine/core';
 import { ModalsProvider } from '@mantine/modals';
 import { GoogleReCaptchaProvider } from 'react-google-recaptcha-v3';
 import { BrowserRouter, Route, Routes, useLocation } from 'react-router-dom';
-import { useEffect, Suspense, lazy } from 'react';
+import { useEffect } from 'react';
 
 import Footer from './components/Footer';
 import { AuthProvider } from './context/AuthContext';
-
-// Lazy load pages for code splitting
-const LandingPage = lazy(() => import('./pages/LandingPage'));
-const Auth = lazy(() => import('./pages/Auth'));
-const Home = lazy(() => import('./pages/Home'));
-const Dashboard = lazy(() => import('./pages/Dashboard'));
-const MangaPage = lazy(() => import('./pages/MangaPage'));
-const ProfilePage = lazy(() => import('./pages/ProfilePage'));
-const SettingsPage = lazy(() => import('./pages/SettingsPage'));
-const Browse = lazy(() => import('./pages/Browse'));
-
-// Loading component
-const PageLoader = () => (
-  <div className='flex min-h-screen items-center justify-center'>
-    <div className='text-center'>
-      <div className='mb-4 h-8 w-8 animate-spin rounded-full border-4 border-violet-200 border-t-violet-600'></div>
-      <p className='text-gray-600'>Loading...</p>
-    </div>
-  </div>
-);
+import Auth from './pages/Auth';
+import Browse from './pages/Browse';
+import Dashboard from './pages/Dashboard';
+import Home from './pages/Home';
+import LandingPage from './pages/LandingPage';
+import MangaPage from './pages/MangaPage';
+import ProfilePage from './pages/ProfilePage';
+import SettingsPage from './pages/SettingsPage';
 
 // Optional: simple 404 page (you can style it later)
 const NotFoundPage = () => (
@@ -51,19 +39,17 @@ const AppContent = () => {
     <div className='flex min-h-screen flex-col'>
       <ScrollToTop />
       <main className='flex-1'>
-        <Suspense fallback={<PageLoader />}>
-          <Routes>
-            <Route path='/' element={<LandingPage />} />
-            <Route path='/auth' element={<Auth />} />
-            <Route path='/home' element={<Home />} />
-            <Route path='/dashboard' element={<Dashboard />} />
-            <Route path='/manga/:id' element={<MangaPage />} />
-            <Route path='/profile' element={<ProfilePage />} />
-            <Route path='/settings' element={<SettingsPage />} />
-            <Route path='/browse' element={<Browse />} />
-            <Route path='*' element={<NotFoundPage />} />
-          </Routes>
-        </Suspense>
+        <Routes>
+          <Route path='/' element={<LandingPage />} />
+          <Route path='/auth' element={<Auth />} />
+          <Route path='/home' element={<Home />} />
+          <Route path='/dashboard' element={<Dashboard />} />
+          <Route path='/manga/:id' element={<MangaPage />} />
+          <Route path='/profile' element={<ProfilePage />} />
+          <Route path='/settings' element={<SettingsPage />} />
+          <Route path='/browse' element={<Browse />} />
+          <Route path='*' element={<NotFoundPage />} />
+        </Routes>
       </main>
       {!hideFooter && <Footer />}
     </div>
