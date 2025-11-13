@@ -100,6 +100,24 @@ const MobileFAB = () => {
     visible: {
       opacity: 1,
       transition: {
+        duration: 0.15,
+        ease: 'easeInOut',
+      },
+    },
+    exit: {
+      opacity: 0,
+      transition: {
+        duration: 0.1,
+        ease: 'easeInOut',
+      },
+    },
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
         duration: 0.2,
         ease: 'easeInOut',
       },
@@ -107,30 +125,8 @@ const MobileFAB = () => {
     exit: {
       opacity: 0,
       transition: {
-        duration: 0.15,
+        duration: 0.1,
         ease: 'easeInOut',
-      },
-    },
-  };
-
-  const itemVariants = {
-    hidden: { opacity: 0, scale: 0.95, y: 8 },
-    visible: {
-      opacity: 1,
-      scale: 1,
-      y: 0,
-      transition: {
-        duration: 0.25,
-        ease: 'easeOut',
-      },
-    },
-    exit: {
-      opacity: 0,
-      scale: 0.95,
-      y: 8,
-      transition: {
-        duration: 0.15,
-        ease: 'easeIn',
       },
     },
   };
@@ -155,6 +151,9 @@ const MobileFAB = () => {
                     <motion.button
                       key={item.label}
                       variants={itemVariants}
+                      initial='hidden'
+                      animate='visible'
+                      exit='exit'
                       onClick={item.action}
                       className='group flex h-16 flex-col items-center justify-center gap-2 rounded-xl border border-gray-200 bg-white transition-all duration-200 hover:bg-gray-50'
                     >
