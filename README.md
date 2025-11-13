@@ -11,6 +11,8 @@
 
 LexiManga is a web-based vocabulary tracking and learning application designed for manga and anime enthusiasts who want to improve their language skills. Track your reading progress across 14 languages, capture vocabulary with context, and leverage AI-powered translations while building a personalized word bank.
 
+-- This feature is disabled for now
+
 ---
 
 ## 📋 Table of Contents
@@ -372,6 +374,8 @@ The project includes word frequency lists for 14 languages used for word difficu
 - English, Japanese, Spanish, French, German, Hindi, Arabic, Portuguese, Bengali, Russian, Hebrew, Korean, Turkish, Italian
 
 These lists are sourced from frequency analysis corpora and linguistic databases.
+
+-- This feature is disabled for storage reasons
 
 A production ready, scalable starter template for Vite + React
 https://github.com/RicardoValdovinos/vite-react-boilerplate
