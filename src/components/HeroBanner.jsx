@@ -55,7 +55,6 @@ const HeroBanner = () => {
       style={{
         height: '130vh',
         minHeight: '1100px',
-        maxHeight: '2000px',
         overflow: 'visible',
         overflowX: 'hidden',
       }}

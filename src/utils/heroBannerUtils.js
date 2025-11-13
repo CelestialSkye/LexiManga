@@ -5,31 +5,37 @@ export const getResponsiveImageSize = () => {
   const screenWidth = window.innerWidth;
   const { baseImageSize, breakpoints } = HERO_BANNER_CONFIG;
 
-  // Base size for large screens (1200px+)
-  if (screenWidth >= breakpoints.desktop) {
-    return {
-      width: baseImageSize.width,
-      height: baseImageSize.height,
-      scale: 1,
-    };
-  }
-  // Medium screens (768px - 1199px)
-  else if (screenWidth >= breakpoints.mobile) {
-    // Much more gradual scaling: images get smaller very slowly
-    const scale = Math.max(
+  // Calculate scale based on screen width
+  // At 768px: 0.8
+  // At 1200px: 1.0
+  // At 1920px: 1.4
+  // At 2560px: 1.8
+  let scale = 1;
+
+  if (screenWidth < breakpoints.mobile) {
+    // Small screens (below 768px) - hide hero banner
+    return { width: 0, height: 0, scale: 0 };
+  } else if (screenWidth < breakpoints.desktop) {
+    // Medium screens (768px - 1199px): scale from 0.8 to 1.0
+    scale = Math.max(
       0.8,
       Math.min(1.0, (screenWidth - breakpoints.mobile) / (breakpoints.desktop - breakpoints.mobile))
     );
-    return {
-      width: Math.round(baseImageSize.width * scale),
-      height: Math.round(baseImageSize.height * scale),
-      scale: scale,
-    };
+  } else {
+    // Large screens (1200px+): scale from 1.0 upward
+    // Scale factor increases by 0.0004 per pixel above 1200px
+    // This gives smooth scaling for ultra-wide monitors
+    const scaleFactor = (screenWidth - breakpoints.desktop) * 0.0004;
+    scale = 1.0 + scaleFactor;
+    // Cap the maximum scale at 2.0 to prevent images from becoming too large
+    scale = Math.min(2.0, scale);
   }
-  // Small screens (below 768px) - hide hero banner
-  else {
-    return { width: 0, height: 0, scale: 0 };
-  }
+
+  return {
+    width: Math.round(baseImageSize.width * scale),
+    height: Math.round(baseImageSize.height * scale),
+    scale: scale,
+  };
 };
 
 // Function to calculate responsive text size based on screen width
@@ -66,9 +72,25 @@ export const getResponsiveTextSize = () => {
 export const getDynamicPosition = (imageIndex, screenWidth) => {
   const { imagePositions, scaling, breakpoints } = HERO_BANNER_CONFIG;
 
-  // Smooth scaling factor based on screen width
-  // At 1200px = 1.0, at 768px = 0.6
-  const scale = Math.max(0.6, Math.min(1.0, screenWidth / breakpoints.desktop));
+  // Calculate smooth scaling factor based on screen width
+  // For medium screens (768px - 1199px): scale from 0.6 to 1.0
+  // For desktop and larger: scale up to handle ultra-wide monitors
+  let scale = 1.0;
+
+  if (screenWidth < breakpoints.mobile) {
+    scale = 0;
+  } else if (screenWidth < breakpoints.desktop) {
+    // Medium screens: 0.6 at 768px, 1.0 at 1200px
+    scale = Math.max(
+      0.6,
+      Math.min(1.0, (screenWidth - breakpoints.mobile) / (breakpoints.desktop - breakpoints.mobile))
+    );
+  } else {
+    // Large screens (1200px+): continue scaling up
+    // At 1200px = 1.0, at 1920px = 1.37, at 2560px = 1.74
+    scale = 1.0 + (screenWidth - breakpoints.desktop) * 0.00029;
+    scale = Math.min(2.0, scale); // Cap at 2.0
+  }
 
   // Unified scaling approach - all images scale consistently
   const scaleMultiplier = scaling.scaleMultiplier;
