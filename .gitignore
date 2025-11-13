@@ -52,6 +52,13 @@ ENVIRONMENT_SECURITY_CHECKLIST.md
 DEPLOYMENT.md
 CLAUDE.md
 AUDIT_FINDINGS.txt
+ADBLOCK_TROUBLESHOOTING.md
+BUILD_OPTIMIZATION.md
+RENDER_SETUP.md
+SETUP_ENVIRONMENT.md
+TESTING.md
+TESTING_ISSUES_FIXED.md
+.env.example
 
 # Firebase/Setup documentation (temporary, reference only)
 CORS_SETUP_INSTRUCTIONS.md
@@ -61,6 +68,9 @@ FIREBASE_CORS_SETUP.md
 FIREBASE_STORAGE_SETUP_GUIDE.md
 cors.json
 test-cors.sh
+
+# Deployment configuration (should not be in repo)
+render.yaml
 
 # Generated files that shouldn't be committed
 server/package-lock.json
