@@ -23,7 +23,9 @@ const AvatarUpload = () => {
     if (file) {
       setSelectedFile(file);
       setPreview(URL.createObjectURL(file));
-      setIsCropModalOpen(true);
+      // Close the upload modal and open the crop modal
+      setIsModalOpen(false);
+      setTimeout(() => setIsCropModalOpen(true), 100);
     }
   };
 
