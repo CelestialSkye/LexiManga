@@ -54,10 +54,13 @@ console.log(`   process.cwd(): ${process.cwd()}`);
 
 // Try to find dist - search multiple locations
 const possiblePaths = [
-  path.join(__dirname, '../dist'),
-  path.join(__dirname, '../../dist'),
-  path.resolve(process.cwd(), '../dist'),
-  '/opt/render/project/dist',
+  path.join(__dirname, '../dist'), // ../dist from server/
+  path.join(__dirname, '../../dist'), // ../../dist
+  path.resolve(process.cwd(), '../dist'), // ../dist from cwd
+  path.resolve(__dirname, '../../../dist'), // ../../../dist
+  '/opt/render/project/dist', // Render root
+  '/opt/render/project/src/dist', // Render src
+  path.resolve('/opt/render/project', 'dist'), // Try resolve
 ];
 
 console.log(`\n🔍 Searching for dist folder...`);
@@ -81,7 +84,26 @@ if (!distPath) {
   console.error(`\n❌ CRITICAL: dist folder with index.html not found!`);
   console.error(`   Checked paths:`);
   possiblePaths.forEach((p) => console.error(`   - ${p}`));
-  console.error(`\n⚠️  Frontend will NOT be served!`);
+  console.error(`\n⚠️  Frontend will NOT be served unless we create a fallback!`);
+
+  // Try one more thing - check if we can find ANY dist by walking the filesystem
+  console.error(`\n🔍 Last attempt: searching from /opt/render/project...`);
+  try {
+    const result = require('child_process').execSync(
+      'find /opt/render/project -name "index.html" -type f 2>/dev/null',
+      { encoding: 'utf8' }
+    );
+    if (result) {
+      console.log(`Found index.html files:\n${result}`);
+      const foundPath = result.split('\n')[0].replace('/index.html', '');
+      if (foundPath && fs.existsSync(foundPath)) {
+        distPath = foundPath;
+        console.log(`✅ Using found path: ${distPath}`);
+      }
+    }
+  } catch (e) {
+    console.error(`   find command failed: ${e.message}`);
+  }
 }
 
 // Serve static assets using express.static
