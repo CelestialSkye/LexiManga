@@ -356,49 +356,51 @@ const TopBar = () => {
                           user.email?.charAt(0).toUpperCase()}
                       </Avatar>
 
-                      <AnimatePresence mode='wait'>
-                        {isDropdownOpen && (
-                          <motion.div
-                            variants={dropdownCloseVariants}
-                            initial='closed'
-                            animate='open'
-                            exit='closed'
-                            className={`dropdown-container absolute top-20 right-28 z-50 flex min-w-[200px] flex-col gap-1 rounded-[16px] ${dropdownBgClass} p-0 shadow-lg`}
-                          >
-                            <div
-                              size='sm'
-                              className={`w-full rounded px-4 py-2 text-left text-sm transition-colors ${dropdownItemClass}`}
+                      <div className='dropdown-wrapper relative'>
+                        <AnimatePresence mode='wait'>
+                          {isDropdownOpen && (
+                            <motion.div
+                              variants={dropdownCloseVariants}
+                              initial='closed'
+                              animate='open'
+                              exit='closed'
+                              className={`dropdown-container absolute top-20 right-0 z-50 flex min-w-[200px] flex-col gap-1 rounded-[16px] ${dropdownBgClass} p-0 shadow-lg`}
                             >
-                              {capitalizeFirstLetter(profile?.nickname || user.email)}
-                            </div>
-                            <button
-                              className={`w-full rounded px-4 py-2 text-left text-sm transition-colors ${dropdownTextClass}`}
-                              onClick={() => navigate('/home')}
-                            >
-                              Home
-                            </button>
-                            <button
-                              className={`w-full rounded px-4 py-2 text-left text-sm transition-colors ${dropdownTextClass}`}
-                              onClick={() => navigate('/profile')}
-                            >
-                              Profile
-                            </button>
-                            <button
-                              className={`w-full rounded px-4 py-2 text-left text-sm transition-colors ${dropdownTextClass}`}
-                              onClick={() => navigate('/settings')}
-                            >
-                              Settings
-                            </button>
+                              <div
+                                size='sm'
+                                className={`w-full rounded px-4 py-2 text-left text-sm transition-colors ${dropdownItemClass}`}
+                              >
+                                {capitalizeFirstLetter(profile?.nickname || user.email)}
+                              </div>
+                              <button
+                                className={`w-full rounded px-4 py-2 text-left text-sm transition-colors ${dropdownTextClass}`}
+                                onClick={() => navigate('/home')}
+                              >
+                                Home
+                              </button>
+                              <button
+                                className={`w-full rounded px-4 py-2 text-left text-sm transition-colors ${dropdownTextClass}`}
+                                onClick={() => navigate('/profile')}
+                              >
+                                Profile
+                              </button>
+                              <button
+                                className={`w-full rounded px-4 py-2 text-left text-sm transition-colors ${dropdownTextClass}`}
+                                onClick={() => navigate('/settings')}
+                              >
+                                Settings
+                              </button>
 
-                            <button
-                              className={`w-full rounded px-4 py-2 text-left text-sm transition-colors ${isDarkTopbar ? 'text-red-400 hover:bg-red-900/30' : 'text-red-600 hover:bg-red-100'}`}
-                              onClick={logout}
-                            >
-                              Logout
-                            </button>
-                          </motion.div>
-                        )}
-                      </AnimatePresence>
+                              <button
+                                className={`w-full rounded px-4 py-2 text-left text-sm transition-colors ${isDarkTopbar ? 'text-red-400 hover:bg-red-900/30' : 'text-red-600 hover:bg-red-100'}`}
+                                onClick={logout}
+                              >
+                                Logout
+                              </button>
+                            </motion.div>
+                          )}
+                        </AnimatePresence>
+                      </div>
                     </Group>
                   ) : (
                     <Group gap='sm'>

@@ -1059,7 +1059,7 @@ const MONTHLY_MANGA_QUERY = `
 `;
 
 const BROWSE_QUERY = `
-   query ($page: Int, $perPage: Int, $search: String, $genres: [String], $sort: [MediaSort], $statusIn: [MediaStatus], $excludeGenres: [String]) {
+   query ($page: Int, $perPage: Int, $search: String, $sort: [MediaSort]) {
      Page(page: $page, perPage: $perPage) {
        pageInfo {
          total
@@ -1070,45 +1070,42 @@ const BROWSE_QUERY = `
         media(
           type: MANGA,
           search: $search,
-          genre_in: $genres,
-          genre_not_in: $excludeGenres,
-          sort: $sort,
-          status_in: $statusIn
+          sort: $sort
         ) {
-          id
-          title {
-            romaji
-            english
-          }
-          coverImage {
-            large
-          }
-          bannerImage
-          averageScore
-          genres
-          status
-          chapters
-          volumes
-          description
-          popularity
-          format
-          source
-          startDate {
-            year
-          }
-          staff(sort: RELEVANCE, perPage: 5) {
-            edges {
-              role
-              node {
-                name {
-                  full
-                }
-              }
-            }
-          }
-        }
-     }
-   }
+           id
+           title {
+             romaji
+             english
+           }
+           coverImage {
+             large
+           }
+           bannerImage
+           averageScore
+           genres
+           status
+           chapters
+           volumes
+           description
+           popularity
+           format
+           source
+           startDate {
+             year
+           }
+           staff(sort: RELEVANCE, perPage: 5) {
+             edges {
+               role
+               node {
+                 name {
+                   full
+                 }
+               }
+             }
+           }
+         }
+      }
+    }
 `;
 
 app.get('/api/monthly', async (req, res) => {
@@ -1179,6 +1176,11 @@ app.get('/api/monthly', async (req, res) => {
 // ============ PUBLIC: Browse endpoint ============
 app.get('/api/browse', async (req, res) => {
   try {
+    // Handle both 'page' parameter (from frontend) and 'offset'/'limit' (from API)
+    const pageParam = req.query.page ? parseInt(req.query.page) : 1;
+    const offsetParam = req.query.offset ? parseInt(req.query.offset) : (pageParam - 1) * 20;
+    const limitParam = req.query.limit ? parseInt(req.query.limit) : 20;
+
     // Validate query parameters using Zod schema
     const validationResult = validateInput(browseSchema, {
       search: req.query.search,
@@ -1186,8 +1188,9 @@ app.get('/api/browse', async (req, res) => {
       format: req.query.format,
       status: req.query.status,
       sort: req.query.sort,
-      limit: req.query.limit ? parseInt(req.query.limit) : undefined,
-      offset: req.query.offset ? parseInt(req.query.offset) : undefined,
+      year: req.query.year,
+      limit: limitParam,
+      offset: offsetParam,
     });
 
     if (!validationResult.success) {
@@ -1197,63 +1200,30 @@ app.get('/api/browse', async (req, res) => {
       });
     }
 
-    const { search, genres: genreArray, status, sort, limit, offset, year } = validationResult.data;
+    const { search, genres: genreArray, status, sort, year, limit, offset } = validationResult.data;
 
     // Calculate page from offset
     const page = Math.floor(offset / limit) + 1;
-
-    // Whitelist valid statuses to prevent parameter injection
-    const VALID_STATUSES = ['ONGOING', 'COMPLETED', 'NOT_YET_RELEASED', 'CANCELLED', 'HIATUS'];
-    const statusInValues =
-      status && VALID_STATUSES.includes(status)
-        ? [status]
-        : search
-          ? ['RELEASING', 'FINISHED']
-          : ['RELEASING', 'FINISHED'];
-
-    // Whitelisted genres to prevent injection (common manga genres)
-    const VALID_GENRES = [
-      'Action',
-      'Adventure',
-      'Comedy',
-      'Drama',
-      'Fantasy',
-      'Horror',
-      'Mecha',
-      'Music',
-      'Mystery',
-      'Psychological',
-      'Romance',
-      'Sci-Fi',
-      'Slice of Life',
-      'Sports',
-      'Supernatural',
-      'Thriller',
-    ];
-
-    // Filter genres to only whitelisted values
-    const validatedGenres = genreArray.filter((g) => VALID_GENRES.includes(g));
 
     // Whitelisted sort options
     const VALID_SORTS = ['TRENDING_DESC', 'SCORE_DESC', 'POPULARITY_DESC', 'UPDATED_TIME_DESC'];
     const validatedSort = VALID_SORTS.includes(sort) ? sort : 'TRENDING_DESC';
 
-    const excludeGenres = ['Hentai', 'Ecchi'];
+    const queryVariables = {
+      page: Math.max(1, page),
+      perPage: Math.min(limit, 20), // Cap at 20
+      search: search || null,
+      sort: [validatedSort],
+    };
+
+    console.log('🔍 Browse Query Variables:', JSON.stringify(queryVariables, null, 2));
 
     const response = await fetch(ANILIST_API, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         query: BROWSE_QUERY,
-        variables: {
-          page: Math.max(1, page),
-          perPage: Math.min(limit, 20), // Cap at 20
-          search: search || null,
-          genres: validatedGenres,
-          excludeGenres,
-          sort: [validatedSort],
-          statusIn: statusInValues,
-        },
+        variables: queryVariables,
       }),
     });
 
@@ -1269,6 +1239,7 @@ app.get('/api/browse', async (req, res) => {
     }
 
     let media = data.data?.Page?.media || [];
+    console.log('📊 Media count returned:', media.length);
 
     // Client-side filtering by year since AniList doesn't support startDate_greater
     if (year && year !== '' && !isNaN(parseInt(year))) {

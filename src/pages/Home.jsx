@@ -28,8 +28,8 @@ const Home = () => {
           <TopBarMobile />
         </header>
 
-        {/* Main Content */}
-        <main className='mx-auto max-w-[95%] flex-1 px-4 py-6 sm:px-6 md:max-w-[85%] md:px-8'>
+        {/* Main Content - Matches TopBar Width */}
+        <main className='mx-auto w-[85%] max-w-[1200px] flex-1 px-8 py-6'>
           <MonthlyManga />
           <Trending />
           <SuggestionManga />
