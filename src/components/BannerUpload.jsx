@@ -4,11 +4,13 @@ import { useRef, useState } from 'react';
 
 import { useAuth } from '../context/AuthContext';
 import ActionButton from './ActionButton';
+import BannerCropModal from './BannerCropModal';
 const defaultBanner = new URL('../assets/defaultBanner.jpg', import.meta.url).href;
 
 const BannerUpload = () => {
   const { profile, updateBanner } = useAuth();
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isCropModalOpen, setIsCropModalOpen] = useState(false);
   const [selectedFile, setSelectedFile] = useState(null);
   const [preview, setPreview] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -19,24 +21,37 @@ const BannerUpload = () => {
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
-    setSelectedFile(file);
-    setPreview(URL.createObjectURL(file));
+    if (file) {
+      setSelectedFile(file);
+      setPreview(URL.createObjectURL(file));
+      setIsCropModalOpen(true);
+    }
   };
 
-  const handleUpload = async () => {
-    if (!selectedFile) return;
+  const handleCropComplete = async (croppedBlob) => {
     setLoading(true);
     setError('');
     try {
-      await updateBanner(selectedFile);
+      // Create a File object from the blob
+      const croppedFile = new File([croppedBlob], 'banner-cropped.jpg', {
+        type: 'image/jpeg',
+      });
+      await updateBanner(croppedFile);
       setIsModalOpen(false);
       setSelectedFile(null);
       setPreview(null);
+      if (fileInputRef.current) fileInputRef.current.value = '';
     } catch (error) {
       setError(error.message);
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleUpload = async () => {
+    if (!selectedFile) return;
+    // Now we just need to open the crop modal
+    setIsCropModalOpen(true);
   };
 
   return (
@@ -132,10 +147,18 @@ const BannerUpload = () => {
             radius={12}
             className='w-full px-6 py-3 text-base'
           >
-            Upload Banner
+            Crop & Upload
           </ActionButton>
         </div>
       </Modal>
+
+      {/* Crop Modal */}
+      <BannerCropModal
+        opened={isCropModalOpen}
+        onClose={() => setIsCropModalOpen(false)}
+        imageSrc={preview}
+        onCropComplete={handleCropComplete}
+      />
     </>
   );
 };
