@@ -119,6 +119,7 @@ const TopBar = () => {
               <Group
                 justify='space-between'
                 className='mx-auto h-18 w-[85%] max-w-[1200px] px-8 py-2'
+                style={{ overflow: 'visible' }}
               >
                 {/* Logo/Brand */}
                 <div
@@ -189,9 +190,9 @@ const TopBar = () => {
                               initial='closed'
                               animate='open'
                               exit='closed'
-                              className='notifications-container pointer-events-auto absolute right-0 z-50 flex min-w-[300px] flex-col gap-0 overflow-hidden rounded-[16px] shadow-lg'
+                              className='notifications-container pointer-events-auto absolute right-0 z-50 flex min-w-[300px] flex-col gap-0 overflow-hidden rounded-[16px] shadow-lg mt-[10px]'
                               style={{
-                                top: 'calc(100% + 8px)',
+                                top: 'calc(100% + 12px)',
                                 backgroundColor: isDarkTopbar ? 'rgba(0, 0, 0, 0.4)' : '#ffffff',
                                 willChange: 'transform, opacity',
                               }}
@@ -364,9 +365,9 @@ const TopBar = () => {
                               initial='closed'
                               animate='open'
                               exit='closed'
-                              className={`dropdown-container absolute right-0 z-50 flex min-w-[200px] flex-col gap-1 rounded-[16px] ${dropdownBgClass} p-0 shadow-lg`}
+                              className={`dropdown-container absolute right-0 z-50 flex min-w-[200px] flex-col gap-1 rounded-[16px] ${dropdownBgClass} p-0 shadow-lg mt-10`}
                               style={{
-                                top: 'calc(100% + 8px)',
+                                top: 'calc(100% +12px)',
                               }}
                             >
                               <div
