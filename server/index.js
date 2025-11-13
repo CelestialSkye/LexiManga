@@ -1446,6 +1446,85 @@ app.post('/api/avatar/upload', verifyToken, upload.single('avatar'), async (req,
   }
 });
 
+// ============ BANNER UPLOAD ENDPOINT ============
+app.post('/api/banner/upload', verifyToken, upload.single('banner'), async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ error: 'No file provided' });
+    }
+
+    const userId = req.userId;
+    const file = req.file;
+
+    // Validate file size
+    if (file.size > 5 * 1024 * 1024) {
+      return res.status(400).json({ error: 'File size exceeds 5MB' });
+    }
+
+    // Validate magic bytes
+    const buf = file.buffer.slice(0, 4);
+    const isJpeg = buf[0] === 0xff && buf[1] === 0xd8 && buf[2] === 0xff;
+    const isPng = buf[0] === 0x89 && buf[1] === 0x50 && buf[2] === 0x4e && buf[3] === 0x47;
+
+    if (!isJpeg && !isPng) {
+      return res.status(400).json({ error: 'Invalid file type' });
+    }
+
+    console.log(`📥 Banner upload for user ${userId}`);
+
+    // Check if Firebase Admin is available
+    if (!admin.apps.length) {
+      return res.status(500).json({
+        error: 'Firebase not configured',
+        details: 'Banner upload requires Firebase Admin SDK',
+      });
+    }
+
+    try {
+      // Upload to Firebase Storage
+      const bucketName = process.env.VITE_FIREBASE_STORAGE_BUCKET;
+      console.log(`📦 Using storage bucket: ${bucketName}`);
+      const bucket = admin.storage().bucket(bucketName);
+      const timestamp = Date.now();
+      const filename = `${userId}_${timestamp}_${file.originalname.replace(/\s+/g, '_')}`;
+      const filePath = `banners/${userId}/${filename}`;
+
+      const fileRef = bucket.file(filePath);
+
+      await fileRef.save(file.buffer, {
+        metadata: {
+          contentType: file.mimetype,
+          metadata: {
+            uploadedBy: userId,
+            uploadedAt: new Date().toISOString(),
+          },
+        },
+      });
+
+      // Make file public
+      await fileRef.makePublic();
+      const downloadURL = fileRef.publicUrl();
+
+      console.log(`✅ Banner uploaded: ${downloadURL}`);
+
+      res.json({
+        success: true,
+        downloadURL,
+        message: 'Banner uploaded successfully',
+      });
+    } catch (fbError) {
+      console.error('Firebase Storage error:', fbError.message);
+      throw fbError;
+    }
+  } catch (error) {
+    console.error('❌ Banner upload error:', error.message);
+    res.status(500).json({
+      error: 'Banner upload failed',
+      details: error.message,
+    });
+  }
+});
+
 // ============ MONITORING: Enhanced Health Check Endpoint ============
 // Provides system status, dependency health, and performance metrics
 app.get('/api/health', async (req, res) => {
