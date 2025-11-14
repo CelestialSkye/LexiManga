@@ -7,6 +7,7 @@ import {
   Radio,
   Select,
   Stack,
+  Text,
   Textarea,
   TextInput,
 } from '@mantine/core';
