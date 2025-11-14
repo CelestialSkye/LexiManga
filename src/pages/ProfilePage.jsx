@@ -138,7 +138,7 @@ const ProfilePage = () => {
               <div className='ml-[calc((100vw-min(80vw,1200px))/2)]'></div>
 
               {/* Navbar */}
-              <div className='mr-[calc((100vw-min(80vw,1200px))/2)] flex-1 pl-4'>
+              <div className='mr-[calc((100vw-min(80vw,1200px))/2)] flex-1 pl-0'>
                 <ScrollButtons items={tabs} activeItem={activeTab} onItemClick={setActiveTab} />
               </div>
             </div>
