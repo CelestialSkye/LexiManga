@@ -29,7 +29,7 @@ const Home = () => {
         </header>
 
         {/* Main Content - Matches TopBar Width */}
-        <main className='mx-auto w-[85%] max-w-[1200px] flex-1 px-8 py-6'>
+        <main className='mx-auto w-[95%] max-w-[1200px] flex-1 px-8 py-6 md:w-[85%]'>
           <MonthlyManga />
           <Trending />
           <SuggestionManga />
