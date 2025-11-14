@@ -1,6 +1,6 @@
 import { Drawer, Skeleton } from '@mantine/core';
 import { useMediaQuery } from '@mantine/hooks';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import defaultAvatar from '../../assets/defaultAvatar.jpg';
@@ -17,6 +17,11 @@ const TopBarMobile = () => {
   const [dailyActivities, setDailyActivities] = useState(null);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+
+  // Gesture tracking
+  const touchStartX = useRef(0);
+  const touchStartY = useRef(0);
+  const isDraggingRef = useRef(false);
 
   useEffect(() => {
     setIsMounted(true);
@@ -36,6 +41,43 @@ const TopBarMobile = () => {
         });
     }
   }, [drawerOpen, user]);
+
+  // Handle touch start
+  const handleTouchStart = (e) => {
+    touchStartX.current = e.touches[0].clientX;
+    touchStartY.current = e.touches[0].clientY;
+    isDraggingRef.current = false;
+  };
+
+  // Handle touch move
+  const handleTouchMove = (e) => {
+    if (!drawerOpen) return;
+
+    const touchCurrentX = e.touches[0].clientX;
+    const touchCurrentY = e.touches[0].clientY;
+    const diffX = touchStartX.current - touchCurrentX;
+    const diffY = touchStartY.current - touchCurrentY;
+
+    // Check if it's a horizontal swipe (more horizontal than vertical)
+    if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 10) {
+      isDraggingRef.current = true;
+    }
+  };
+
+  // Handle touch end
+  const handleTouchEnd = (e) => {
+    if (!drawerOpen || !isDraggingRef.current) return;
+
+    const touchEndX = e.changedTouches[0].clientX;
+    const diffX = touchStartX.current - touchEndX;
+
+    // Swipe right (toward the edge of the drawer from left) should close the drawer
+    // Since drawer is on the right side, swiping right (positive diffX) means moving left on screen
+    if (diffX > 50) {
+      // User swiped right (closing the drawer)
+      setDrawerOpen(false);
+    }
+  };
 
   if (!isMounted || !isMobile) return null;
 
@@ -79,7 +121,12 @@ const TopBarMobile = () => {
         size='sm'
         withCloseButton={false}
       >
-        <div className='space-y-4'>
+        <div
+          className='space-y-4'
+          onTouchStart={handleTouchStart}
+          onTouchMove={handleTouchMove}
+          onTouchEnd={handleTouchEnd}
+        >
           <div className='flex items-center gap-3 border-b pb-4'>
             <img
               src={profile?.avatarUrl || defaultAvatar}
