@@ -71,13 +71,34 @@ const TopBarMobile = () => {
     const touchEndX = e.changedTouches[0].clientX;
     const diffX = touchStartX.current - touchEndX;
 
-    // Swipe right (toward the edge of the drawer from left) should close the drawer
-    // Since drawer is on the right side, swiping right (positive diffX) means moving left on screen
-    if (diffX > 50) {
+    // Drawer opens from right to left, so swiping right to left (positive diffX) closes it
+    // User swipes from left to right to close: touchStartX is greater than touchEndX
+    // This means diffX = touchStartX - touchEndX > 0 (positive value)
+    // We need to reverse this: if user moves finger to the right (closing), touchEndX > touchStartX
+    // So diffX should be negative (touchStartX - touchEndX < 0)
+    const swipeDistance = touchEndX - touchStartX;
+
+    // If user swiped to the right (positive swipeDistance > 50px), close the drawer
+    if (swipeDistance > 50) {
       // User swiped right (closing the drawer)
       setDrawerOpen(false);
     }
   };
+
+  // Attach touch handlers to document when drawer is open
+  useEffect(() => {
+    if (!drawerOpen) return;
+
+    document.addEventListener('touchstart', handleTouchStart, true);
+    document.addEventListener('touchmove', handleTouchMove, true);
+    document.addEventListener('touchend', handleTouchEnd, true);
+
+    return () => {
+      document.removeEventListener('touchstart', handleTouchStart, true);
+      document.removeEventListener('touchmove', handleTouchMove, true);
+      document.removeEventListener('touchend', handleTouchEnd, true);
+    };
+  }, [drawerOpen]);
 
   if (!isMounted || !isMobile) return null;
 
@@ -121,12 +142,7 @@ const TopBarMobile = () => {
         size='sm'
         withCloseButton={false}
       >
-        <div
-          className='space-y-4'
-          onTouchStart={handleTouchStart}
-          onTouchMove={handleTouchMove}
-          onTouchEnd={handleTouchEnd}
-        >
+        <div className='space-y-4'>
           <div className='flex items-center gap-3 border-b pb-4'>
             <img
               src={profile?.avatarUrl || defaultAvatar}
