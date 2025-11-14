@@ -1,6 +1,7 @@
 import TopBarMobile from '@components/HomePage/TopbarMobile';
 import TopBar from '@components/TopBar';
 import { Center } from '@mantine/core';
+import { useMediaQuery } from '@mantine/hooks';
 import React, { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useBrowseManga } from 'src/services/anilistApi';
@@ -11,6 +12,7 @@ import LoadingLogo from '../components/LoadingLogo';
 
 const Browse = () => {
   const [searchParams] = useSearchParams();
+  const isMobile = useMediaQuery('(max-width: 768px)');
   const [page, setPage] = useState(1);
   const [filters, setFilters] = useState({
     search: searchParams.get('search') || '',
@@ -74,7 +76,9 @@ const Browse = () => {
         </header>
 
         {/* Main Content - Matches TopBar Width */}
-        <main className='mx-auto w-[95%] max-w-[1200px] flex-1 px-8 py-6 md:w-[85%]'>
+        <main
+          className={`mx-auto ${isMobile ? 'w-[95%] px-4' : 'w-[85%] px-8'} max-w-[1200px] flex-1 py-6`}
+        >
           {isLoading ? (
             <div className='rounded-lg bg-white p-6'>
               <Center style={{ minHeight: '400px' }}>

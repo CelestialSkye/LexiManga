@@ -3,6 +3,7 @@ import MonthlyManga from '@components/HomePage/MonthlyManga';
 import SuggestionManga from '@components/HomePage/SuggestedManga';
 import TopBarMobile from '@components/HomePage/TopbarMobile';
 import LoadingLogo from '@components/LoadingLogo';
+import { useMediaQuery } from '@mantine/hooks';
 
 import Trending from '../components/HomePage/Trending';
 import TopBar from '../components/TopBar';
@@ -10,6 +11,7 @@ import useHomePageLoading from '../hooks/useHomePageLoading';
 
 const Home = () => {
   const isLoading = useHomePageLoading();
+  const isMobile = useMediaQuery('(max-width: 768px)');
 
   if (isLoading) {
     return (
@@ -29,7 +31,9 @@ const Home = () => {
         </header>
 
         {/* Main Content - Matches TopBar Width */}
-        <main className='mx-auto w-[95%] max-w-[1200px] flex-1 px-8 py-6 md:w-[85%]'>
+        <main
+          className={`mx-auto ${isMobile ? 'w-[95%] px-4' : 'w-[85%] px-8'} max-w-[1200px] flex-1 py-6`}
+        >
           <MonthlyManga />
           <Trending />
           <SuggestionManga />
